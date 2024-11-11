@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import BlogCard from "@/components/BlogCard";
+import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 
 const FEATURED_POST = {
@@ -66,26 +67,31 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      <div className="bg-primary text-white py-24">
-        <div className="container mx-auto px-4">
+      <div className="relative bg-primary overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-800 opacity-90"></div>
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519681393784-d120267933ba')] bg-cover bg-center mix-blend-overlay"></div>
+        <div className="relative container mx-auto px-4 py-32">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white leading-tight">
               Insights for Creative Minds
             </h1>
-            <p className="text-xl mb-8 text-white/90">
-              Join our community of designers, developers, and creative professionals. Get weekly insights on design, technology, and business.
+            <p className="text-xl md:text-2xl mb-12 text-white/90 leading-relaxed">
+              Join our community of designers, developers, and creative professionals. 
+              Get weekly insights on design, technology, and business.
             </p>
-            <NewsletterSignup />
+            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-8 max-w-2xl mx-auto">
+              <NewsletterSignup />
+            </div>
           </div>
         </div>
       </div>
 
-      <main className="container mx-auto px-4 py-16">
+      <main className="container mx-auto px-4 py-24">
         {/* Featured Post */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold mb-8 text-left">Featured Story</h2>
-          <div className="bg-white rounded-xl overflow-hidden shadow-lg">
-            <div className="grid md:grid-cols-2 gap-6">
+        <div className="mb-24">
+          <h2 className="text-3xl font-bold mb-12 text-left">Featured Story</h2>
+          <div className="bg-white rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300">
+            <div className="grid md:grid-cols-2 gap-0">
               <div className="aspect-w-16 aspect-h-9 md:aspect-h-full">
                 <img
                   src={FEATURED_POST.image}
@@ -93,25 +99,25 @@ const Index = () => {
                   className="object-cover w-full h-full"
                 />
               </div>
-              <div className="p-8 flex flex-col justify-center">
-                <div className="flex gap-2 mb-3">
+              <div className="p-12 flex flex-col justify-center">
+                <div className="flex gap-2 mb-4">
                   {FEATURED_POST.categories.map((category) => (
                     <span
                       key={category}
-                      className="text-xs font-medium px-2 py-1 bg-blue-50 text-primary rounded-full"
+                      className="text-xs font-medium px-3 py-1 bg-blue-50 text-primary rounded-full"
                     >
                       {category}
                     </span>
                   ))}
                 </div>
-                <h3 className="text-2xl font-bold mb-4">{FEATURED_POST.title}</h3>
-                <p className="text-gray-600 mb-6">{FEATURED_POST.excerpt}</p>
-                <div className="flex items-center text-sm text-gray-500 mb-6">
-                  <span>{FEATURED_POST.author}</span>
+                <h3 className="text-3xl font-bold mb-6">{FEATURED_POST.title}</h3>
+                <p className="text-gray-600 mb-8 text-lg leading-relaxed">{FEATURED_POST.excerpt}</p>
+                <div className="flex items-center text-sm text-gray-500 mb-8">
+                  <span className="font-medium">{FEATURED_POST.author}</span>
                   <span className="mx-2">•</span>
                   <span>{FEATURED_POST.date}</span>
                 </div>
-                <Button className="self-start">Read More</Button>
+                <Button size="lg" className="self-start">Read More</Button>
               </div>
             </div>
           </div>
@@ -119,9 +125,9 @@ const Index = () => {
 
         {/* Latest Posts */}
         <div>
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold">Latest Stories</h2>
-            <Button variant="outline">View All</Button>
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-3xl font-bold">Latest Stories</h2>
+            <Button variant="outline" size="lg">View All</Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {BLOG_POSTS.map((post) => (
@@ -132,17 +138,19 @@ const Index = () => {
       </main>
 
       {/* Newsletter Section */}
-      <section className="bg-gray-100 py-20">
+      <section className="bg-gray-100 py-32">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4">Stay in the Loop</h2>
-            <p className="text-gray-600 mb-8">
+            <h2 className="text-4xl font-bold mb-6">Stay in the Loop</h2>
+            <p className="text-xl text-gray-600 mb-12">
               Get the latest articles, resources, and insights about design and development delivered directly to your inbox.
             </p>
             <NewsletterSignup />
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };
