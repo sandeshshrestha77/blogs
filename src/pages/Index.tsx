@@ -1,5 +1,4 @@
 import Navbar from "@/components/Navbar";
-import NewsletterSignup from "@/components/NewsletterSignup";
 import BlogCard from "@/components/BlogCard";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -79,7 +78,6 @@ const Index = () => {
               Join our community of designers, developers, and creative professionals. 
               Get weekly insights on design, technology, and business.
             </p>
-            <NewsletterSignup />
           </div>
         </div>
       </div>
@@ -134,19 +132,6 @@ const Index = () => {
           </div>
         </div>
       </main>
-
-      {/* Newsletter Section */}
-      <section className="bg-gray-100 py-32">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-6">Stay in the Loop</h2>
-            <p className="text-xl text-gray-600 mb-12">
-              Get the latest articles, resources, and insights about design and development delivered directly to your inbox.
-            </p>
-            <NewsletterSignup />
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </div>
