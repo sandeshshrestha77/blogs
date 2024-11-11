@@ -13,7 +13,7 @@ interface BlogCardProps {
 const BlogCard = ({ title, excerpt, image, author, date, categories, slug }: BlogCardProps) => {
   return (
     <Link to={`/blog/${slug}`} className="group">
-      <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+      <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
         <div className="aspect-w-16 aspect-h-9 overflow-hidden">
           <img
             src={image}
@@ -26,16 +26,16 @@ const BlogCard = ({ title, excerpt, image, author, date, categories, slug }: Blo
             {categories.map((category) => (
               <span
                 key={category}
-                className="text-xs font-medium px-2 py-1 bg-gray-100 rounded-full"
+                className="text-xs font-medium px-2 py-1 bg-blue-50 text-primary rounded-full"
               >
                 {category}
               </span>
             ))}
           </div>
-          <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+          <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2">
             {title}
           </h3>
-          <p className="text-gray-600 mb-4 line-clamp-2">{excerpt}</p>
+          <p className="text-gray-600 mb-4 line-clamp-2 text-sm">{excerpt}</p>
           <div className="flex items-center text-sm text-gray-500">
             <span>{author}</span>
             <span className="mx-2">•</span>

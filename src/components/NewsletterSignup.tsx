@@ -8,12 +8,12 @@ const NewsletterSignup = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Thanks for subscribing!");
+    toast.success("Thanks for subscribing! Check your email to confirm.");
     setEmail("");
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 max-w-md w-full">
+    <form onSubmit={handleSubmit} className="flex gap-2 max-w-md w-full mx-auto">
       <Input
         type="email"
         placeholder="Enter your email"
@@ -22,7 +22,7 @@ const NewsletterSignup = () => {
         className="bg-white/90 border-0"
         required
       />
-      <Button type="submit" className="bg-white text-primary hover:bg-white/90">
+      <Button type="submit" variant="secondary" className="bg-white text-primary hover:bg-white/90 whitespace-nowrap">
         Subscribe
       </Button>
     </form>
