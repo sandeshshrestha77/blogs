@@ -79,7 +79,7 @@ const getBlogPost = (slug: string) => {
 
 // Author card component
 const AuthorCard = ({ author, date }: { author: string; date: string }) => (
-  <Card className="p-6 sticky top-8">
+  <Card className="p-6 lg:sticky lg:top-8">
     <div className="flex flex-col items-center text-center">
       <div className="w-20 h-20 rounded-full bg-gray-200 mb-4 overflow-hidden">
         <img
@@ -134,9 +134,10 @@ const BlogPost = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main content and author info container */}
+          <div className="flex flex-col lg:flex-row gap-8">
             {/* Main content */}
-            <div className="lg:col-span-2">
+            <div className="flex-1">
               <div className="flex gap-2 mb-4">
                 {post.categories.map((category) => (
                   <span
@@ -168,7 +169,7 @@ const BlogPost = () => {
             </div>
 
             {/* Author sidebar */}
-            <div className="lg:col-span-1">
+            <div className="lg:w-80">
               <AuthorCard author={post.author} date={post.date} />
             </div>
           </div>
