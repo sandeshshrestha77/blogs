@@ -79,9 +79,7 @@ const Index = () => {
               Join our community of designers, developers, and creative professionals. 
               Get weekly insights on design, technology, and business.
             </p>
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-8 max-w-2xl mx-auto">
-              <NewsletterSignup />
-            </div>
+            <NewsletterSignup />
           </div>
         </div>
       </div>
