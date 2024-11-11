@@ -2,8 +2,9 @@ import { useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { Card } from "@/components/ui/card";
 
-// This would typically come from an API or database
+// Separate the data fetching logic
 const getBlogPost = (slug: string) => {
   const allPosts = [
     {
@@ -76,6 +77,31 @@ const getBlogPost = (slug: string) => {
   return allPosts.find((post) => post.slug === slug);
 };
 
+// Author card component
+const AuthorCard = ({ author, date }: { author: string; date: string }) => (
+  <Card className="p-6 sticky top-8">
+    <div className="flex flex-col items-center text-center">
+      <div className="w-20 h-20 rounded-full bg-gray-200 mb-4 overflow-hidden">
+        <img
+          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${author}`}
+          alt={author}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <h3 className="font-semibold text-lg mb-2">{author}</h3>
+      <p className="text-sm text-gray-500 mb-4">Senior Content Writer</p>
+      <div className="w-full h-px bg-gray-200 my-4" />
+      <div className="text-sm text-gray-500">
+        <p>Published on</p>
+        <p className="font-medium text-gray-900">{date}</p>
+      </div>
+      <Button className="w-full mt-4" variant="outline">
+        Follow Author
+      </Button>
+    </div>
+  </Card>
+);
+
 const BlogPost = () => {
   const { slug } = useParams();
   const post = getBlogPost(slug || "");
@@ -101,46 +127,50 @@ const BlogPost = () => {
       <Navbar />
       
       <article className="container mx-auto px-4 py-16">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <Link to="/" className="text-primary hover:underline mb-8 inline-block">
               ← Back to all posts
             </Link>
           </div>
 
-          <div className="flex gap-2 mb-4">
-            {post.categories.map((category) => (
-              <span
-                key={category}
-                className="text-xs font-medium px-2 py-1 bg-blue-50 text-primary rounded-full"
-              >
-                {category}
-              </span>
-            ))}
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main content */}
+            <div className="lg:col-span-2">
+              <div className="flex gap-2 mb-4">
+                {post.categories.map((category) => (
+                  <span
+                    key={category}
+                    className="text-xs font-medium px-2 py-1 bg-blue-50 text-primary rounded-full"
+                  >
+                    {category}
+                  </span>
+                ))}
+              </div>
 
-          <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-          
-          <div className="flex items-center text-sm text-gray-500 mb-8">
-            <span>{post.author}</span>
-            <span className="mx-2">•</span>
-            <span>{post.date}</span>
-          </div>
+              <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
 
-          <div className="aspect-w-16 aspect-h-9 mb-8 rounded-xl overflow-hidden">
-            <img
-              src={post.image}
-              alt={post.title}
-              className="object-cover w-full h-full"
-            />
-          </div>
+              <div className="aspect-w-16 aspect-h-9 mb-8 rounded-xl overflow-hidden">
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="object-cover w-full h-full"
+                />
+              </div>
 
-          <div className="prose prose-lg max-w-none">
-            {post.content.split('\n\n').map((paragraph, index) => (
-              <p key={index} className="mb-6 text-gray-700 leading-relaxed">
-                {paragraph}
-              </p>
-            ))}
+              <div className="prose prose-lg lg:prose-xl max-w-none">
+                {post.content.split('\n\n').map((paragraph, index) => (
+                  <p key={index} className="text-gray-700 leading-relaxed mb-6">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            {/* Author sidebar */}
+            <div className="lg:col-span-1">
+              <AuthorCard author={post.author} date={post.date} />
+            </div>
           </div>
         </div>
       </article>
