@@ -30,14 +30,12 @@ const AuthorCard = ({
       </div>
       <h3 className="font-semibold text-lg mb-2">{author}</h3>
       <p className="text-sm text-muted-foreground mb-4">Graphic Designer</p>
-      <div className="w-full h-px bg-border my-4" />
+      
       <div className="text-sm text-muted-foreground">
-        <p>Published on</p>
-        <p className="font-medium text-foreground">{date}</p>
+        
+        
       </div>
-      <Button className="w-full mt-4" variant="outline">
-        Follow Author
-      </Button>
+      
     </div>
   </Card>;
 const BlogPost = () => {
@@ -92,7 +90,7 @@ const BlogPost = () => {
       
       <article className="container mx-auto px-4 py-16">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
+          <div className="mb-8 bg-inherit">
             <Link to="/" className="text-primary hover:underline mb-8 inline-block">
               ← Back to all posts
             </Link>
@@ -103,7 +101,7 @@ const BlogPost = () => {
             {/* Main content */}
             <div className="flex-1">
               <div className="flex gap-2 mb-4">
-                {post.category && <span className="text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded-full">
+                {post.category && <span className="text-xs font-medium px-2 py-1 bg-primary/10 rounded-full text-zinc-950">
                     {post.category}
                   </span>}
               </div>
