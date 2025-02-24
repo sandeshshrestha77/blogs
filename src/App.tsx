@@ -6,7 +6,7 @@ import AdminPostForm from "./pages/AdminPostForm";
 import Login from "./pages/Login";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
   return (
