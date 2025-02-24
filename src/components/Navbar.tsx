@@ -1,11 +1,10 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
+import { SearchDialog } from "./SearchDialog";
+import { ThemeToggle } from "./ThemeToggle";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-background border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -14,19 +13,9 @@ const Navbar = () => {
             </Link>
           </div>
           
-          <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium">
-              Home
-            </Link>
-            <Link to="/design" className="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium">
-              Design
-            </Link>
-            <Link to="/research" className="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium">
-              Research
-            </Link>
-            <Link to="/interviews" className="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium">
-              Interviews
-            </Link>
+          <div className="flex items-center space-x-4">
+            <SearchDialog />
+            <ThemeToggle />
           </div>
         </div>
       </div>
