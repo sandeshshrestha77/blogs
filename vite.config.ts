@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    allowedHosts: ["blog-p93i.onrender.com"], // Added this line
   },
   plugins: [
     react(),
