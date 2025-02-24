@@ -123,7 +123,13 @@ const Index = () => {
                     <span className="mx-2">•</span>
                     <span>{featuredPost.date}</span>
                   </div>
-                  <Button size="lg" className="self-start">Read More</Button>
+                  <Button 
+                    size="lg" 
+                    className="self-start"
+                    onClick={() => window.location.href = `/blog/${featuredPost.slug}`}
+                  >
+                    Read More
+                  </Button>
                 </div>
               </div>
             </div>
