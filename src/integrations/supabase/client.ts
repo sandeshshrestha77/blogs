@@ -6,7 +6,7 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 
 // Get the current site URL
 const siteUrl = import.meta.env.PROD 
-  ? (import.meta.env.VITE_SITE_URL || 'https://your-production-url.com')
+  ? (import.meta.env.VITE_SITE_URL || 'https://blog.sandeshshrestha.xyz/')
   : 'http://localhost:8080';
 
 export const supabase = createClient<Database>(
