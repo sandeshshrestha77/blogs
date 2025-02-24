@@ -39,7 +39,7 @@ const Login = () => {
       <div className="max-w-4xl w-full bg-white shadow-lg rounded-lg overflow-hidden grid md:grid-cols-2">
         {/* Left Side - Image */}
         <div className="hidden md:flex items-center justify-center bg-gray-200">
-          <img src="https://source.unsplash.com/500x500/?workspace" alt="Login" className="w-full h-full object-cover" />
+          <img src="https://wallpapercave.com/wp/wp5943234.jpg" alt="Login" className="w-full h-full object-cover" />
         </div>
 
         {/* Right Side - Form */}
