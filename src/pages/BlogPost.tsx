@@ -99,20 +99,11 @@ const BlogPost = () => {
 
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex-1">
-<<<<<<< HEAD
               {post.category && (
                 <span className="text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded-full">
                   {post.category}
                 </span>
               )}
-=======
-              <div className="flex gap-2 mb-4">
-                {post.category && <span className="text-xs font-medium px-2 py-1 bg-primary/10 rounded-full text-zinc-950">
-                    {post.category}
-                  </span>}
-              </div>
-
->>>>>>> 993c1ea82d6aa7d321fd24897a699158c73cd658
               <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
               <div className="aspect-[16/9] mb-8 rounded-xl overflow-hidden">
                 <img
