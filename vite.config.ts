@@ -5,10 +5,11 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: "/", // Ensure the base path is correct (e.g., "/subdirectory/" if deployed in a subfolder)
   server: {
     host: "::",
     port: 8080,
-    allowedHosts: ["blog-p93i.onrender.com"], // Added this line
+    allowedHosts: ["blog-p93i.onrender.com"],
   },
   plugins: [
     react(),
