@@ -18,7 +18,7 @@ interface Post {
 }
 
 const AuthorCard = ({ author, date }: { author: string; date: string }) => (
-  <Card className="p-6 lg:sticky lg:top-8">
+  <Card className="p-6 lg:sticky lg:top-8 shadow-md rounded-lg">
     <div className="flex flex-col items-center text-center">
       <div className="w-20 h-20 rounded-full bg-gray-200 mb-4 overflow-hidden">
         <img
@@ -29,12 +29,7 @@ const AuthorCard = ({ author, date }: { author: string; date: string }) => (
       </div>
       <h3 className="font-semibold text-lg mb-2">{author}</h3>
       <p className="text-sm text-muted-foreground mb-4">Graphic Designer</p>
-      
-      <div className="text-sm text-muted-foreground">
-        
-        
-      </div>
-      
+      <p className="text-sm text-muted-foreground">{date}</p>
     </div>
   </Card>
 );
@@ -63,9 +58,9 @@ const BlogPost = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
-        <div className="container mx-auto px-4 py-16 flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-grow items-center justify-center">
           <LoadingSpinner />
         </div>
       </div>
@@ -74,7 +69,7 @@ const BlogPost = () => {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-3xl font-bold mb-4">Post not found</h1>
@@ -87,43 +82,40 @@ const BlogPost = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <article className="container mx-auto px-4 py-16">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8 bg-inherit">
-            <Link to="/" className="text-primary hover:underline mb-8 inline-block">
-              ← Back to all posts
-            </Link>
-          </div>
-
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="flex-1">
-              {post.category && (
-                <span className="text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded-full">
-                  {post.category}
-                </span>
+      <article className="container mx-auto px-4 py-16 max-w-6xl">
+        <div className="mb-8">
+          <Link to="/" className="text-primary hover:underline">
+            ← Back to all posts
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            {post.category && (
+              <span className="text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded-full">
+                {post.category}
+              </span>
+            )}
+            <h1 className="text-4xl font-bold my-4">{post.title}</h1>
+            <div className="aspect-[16/9] mb-8 rounded-xl overflow-hidden shadow-md">
+              <img
+                src={post.image || "https://images.unsplash.com/photo-1498050108023-c5249f4df085"}
+                alt={post.title}
+                className="object-cover w-full h-full transition-transform hover:scale-105"
+              />
+            </div>
+            <div className="prose prose-lg dark:prose-invert leading-relaxed space-y-6">
+              {post.content ? (
+                <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              ) : (
+                <p>No content available.</p>
               )}
-              <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
-              <div className="aspect-[16/9] mb-8 rounded-xl overflow-hidden">
-                <img
-                  src={post.image || "https://images.unsplash.com/photo-1498050108023-c5249f4df085"}
-                  alt={post.title}
-                  className="object-cover w-full h-full transition-transform hover:scale-105"
-                />
-              </div>
-              <div className="prose prose-xl max-w-none dark:prose-invert">
-                {post.content ? (
-                  <div dangerouslySetInnerHTML={{ __html: post.content }} />
-                ) : (
-                  <p className="leading-relaxed mb-6">No content available.</p>
-                )}
-              </div>
-            </div>
-            <div className="lg:w-80">
-              <AuthorCard author={post.author || "Anonymous"} date={post.date || new Date().toLocaleDateString()} />
             </div>
           </div>
+          <aside>
+            <AuthorCard author={post.author || "Anonymous"} date={post.date || new Date().toLocaleDateString()} />
+          </aside>
         </div>
       </article>
     </div>
