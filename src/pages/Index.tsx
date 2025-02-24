@@ -37,8 +37,9 @@ const Index = () => {
       // Fetch the featured post
       const { data: featuredData, error: featuredError } = await supabase
         .from("posts")
-        .select<any, Post>("*")
+        .select("*")
         .eq("featured", true)
+        .returns<Post>()
         .order("created_at", { ascending: false })
         .limit(1)
         .single();
@@ -48,7 +49,6 @@ const Index = () => {
         .from("posts")
         .select("*")
         .neq("featured", true)
-        .returns<Post>()
         .order("created_at", { ascending: false });
 
       if (featuredError && featuredError.code !== "PGRST116") throw featuredError;
