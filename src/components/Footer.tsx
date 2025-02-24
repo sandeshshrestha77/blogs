@@ -9,25 +9,9 @@ const Footer = () => {
             <p className="text-sm">Exploring design, and creativity through thoughtful articles and insights.</p>
           </div>
           
-          <div>
-            
-            <ul className="space-y-2">
-              
-              
-              
-              
-            </ul>
-          </div>
           
-          <div>
-            
-            <ul className="space-y-2">
-              
-              
-              
-              
-            </ul>
-          </div>
+          
+          
           
           <div>
             <h4 className="font-semibold text-white mb-4">Follow Us</h4>
