@@ -4,20 +4,47 @@ import Index from "./pages/Index";
 import BlogPost from "./pages/BlogPost";
 import Admin from "./pages/Admin";
 import AdminPostForm from "./pages/AdminPostForm";
+import Login from "./pages/Login";
 import { Toaster } from "sonner";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/blog/:slug" element={<BlogPost />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/create" element={<AdminPostForm />} />
-        <Route path="/admin/edit/:id" element={<AdminPostForm />} />
-      </Routes>
-      <Toaster />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/create"
+            element={
+              <ProtectedRoute>
+                <AdminPostForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/edit/:id"
+            element={
+              <ProtectedRoute>
+                <AdminPostForm />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+        <Toaster />
+      </Router>
+    </AuthProvider>
   );
 }
 

@@ -1,10 +1,17 @@
 
 import Navbar from "./Navbar";
 import { Button } from "./ui/button";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -18,6 +25,9 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             </Button>
             <Button variant="outline" onClick={() => navigate("/admin/create")}>
               Create Post
+            </Button>
+            <Button variant="outline" onClick={handleSignOut}>
+              Sign Out
             </Button>
           </div>
         </div>
