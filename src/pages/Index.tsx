@@ -1,6 +1,8 @@
+
 import Navbar from "@/components/Navbar";
 import BlogCard from "@/components/BlogCard";
 import Footer from "@/components/Footer";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import { Button } from "@/components/ui/button";
 
 const FEATURED_POST = {
@@ -78,6 +80,7 @@ const Index = () => {
               Join our community of designers, developers, and creative professionals. 
               Get weekly insights on design, technology, and business.
             </p>
+            <NewsletterSignup />
           </div>
         </div>
       </div>
