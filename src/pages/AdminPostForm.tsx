@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
@@ -31,6 +30,7 @@ const AdminPostForm = () => {
     slug: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -53,9 +53,26 @@ const AdminPostForm = () => {
     setFormData(data);
   };
 
+  const handleImageUpload = async () => {
+    if (!imageFile) return;
+    const fileName = `${Date.now()}-${imageFile.name}`;
+    const { data, error } = await supabase.storage.from('images').upload(fileName, imageFile);
+    
+    if (error) {
+      toast.error("Image upload failed");
+      return;
+    }
+    
+    const imageUrl = supabase.storage.from('images').getPublicUrl(fileName).data.publicUrl;
+    setFormData((prev) => ({ ...prev, image: imageUrl }));
+    toast.success("Image uploaded successfully");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    if (imageFile) await handleImageUpload();
 
     try {
       if (id) {
@@ -96,88 +113,43 @@ const AdminPostForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Title</label>
-                <Input
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                />
+                <Input name="title" value={formData.title} onChange={handleChange} required />
               </div>
               
               <div className="space-y-2">
                 <label className="text-sm font-medium">Author</label>
-                <Input
-                  name="author"
-                  value={formData.author}
-                  onChange={handleChange}
-                  required
-                />
+                <Input name="author" value={formData.author} onChange={handleChange} required />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Category</label>
-                <Input
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  required
-                />
+                <Input name="category" value={formData.category} onChange={handleChange} required />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Date</label>
-                <Input
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleChange}
-                  required
-                />
+                <Input type="date" name="date" value={formData.date} onChange={handleChange} required />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Image URL</label>
-                <Input
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  required
-                />
+                <label className="text-sm font-medium">Image</label>
+                <Input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Slug</label>
-                <Input
-                  name="slug"
-                  value={formData.slug}
-                  onChange={handleChange}
-                  required
-                />
+                <Input name="slug" value={formData.slug} onChange={handleChange} required />
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Content</label>
-              <textarea
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
-                required
-                className="w-full min-h-[200px] px-3 py-2 text-sm rounded-md border border-input"
-              />
+              <textarea name="content" value={formData.content} onChange={handleChange} required className="w-full min-h-[200px] px-3 py-2 text-sm rounded-md border border-input" />
             </div>
 
             <div className="flex justify-end gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/admin")}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : (id ? "Update" : "Create")}
-              </Button>
+              <Button type="button" variant="outline" onClick={() => navigate("/admin")}>Cancel</Button>
+              <Button type="submit" disabled={isLoading}>{isLoading ? "Saving..." : (id ? "Update" : "Create")}</Button>
             </div>
           </form>
         </CardContent>

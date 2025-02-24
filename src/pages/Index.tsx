@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import BlogCard from "@/components/BlogCard";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 interface Post {
+  id: string;
   title: string;
   excerpt: string | null;
   image: string | null;
@@ -16,85 +17,76 @@ interface Post {
   date: string | null;
   category: string | null;
   slug: string;
+  read_time: string | null;
+  featured: boolean;
 }
 
 const Index = () => {
   const navigate = useNavigate();
   const [featuredPost, setFeaturedPost] = useState<Post | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const [showAllPosts, setShowAllPosts] = useState(false);
 
+  // Fetch posts from Supabase
+  const fetchPosts = useCallback(async () => {
+    try {
+      setUpdating(true);
+
+      // Fetch the featured post
+      const { data: featuredData, error: featuredError } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("featured", true)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      // Fetch all non-featured posts
+      const { data: allPostsData, error: allPostsError } = await supabase
+        .from("posts")
+        .select("*")
+        .neq("featured", true)
+        .order("created_at", { ascending: false });
+
+      if (featuredError && featuredError.code !== "PGRST116") throw featuredError;
+      if (allPostsError) throw allPostsError;
+
+      setFeaturedPost(featuredData || null);
+      setPosts(allPostsData || []);
+
+    } catch (error) {
+      toast.error("Error loading posts");
+    } finally {
+      setInitialLoading(false);
+      setUpdating(false);
+    }
+  }, []);
+
+  // Fetch posts on component mount and listen for real-time updates
   useEffect(() => {
     fetchPosts();
 
-    // Set up realtime subscription
     const channel = supabase
-      .channel('posts-channel')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'posts'
-      }, () => {
-        fetchPosts(); // Refetch posts when changes occur
-      })
+      .channel("posts-channel")
+      .on("postgres_changes", { event: "*", schema: "public", table: "posts" }, fetchPosts)
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchPosts]);
 
-  const fetchPosts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false });
+  const handleViewAll = () => setShowAllPosts(true);
 
-      if (error) throw error;
-
-      if (data && data.length > 0) {
-        setFeaturedPost(data[0]);
-        setPosts(data.slice(1));
-      }
-    } catch (error) {
-      toast.error("Error loading posts");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Function to handle showing all posts
-  const handleViewAll = () => {
-    setShowAllPosts(true);
-  };
-
-  // Filter posts based on showAllPosts state
-  const displayedPosts = showAllPosts ? posts : posts.slice(0, 6);
+  const displayedPosts = useMemo(() => (showAllPosts ? posts : posts.slice(0, 6)), [showAllPosts, posts]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
-      <div className="relative bg-primary overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-800 opacity-90"></div>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519681393784-d120267933ba')] bg-cover bg-center mix-blend-overlay"></div>
-        <div className="relative container mx-auto px-4 py-32">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white leading-tight">
-              Insights for Creative Minds
-            </h1>
-            <p className="text-xl md:text-2xl mb-12 text-white/90 leading-relaxed">
-              Join our community of designers, developers, and creative professionals. 
-              Get weekly insights on design, technology, and business.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <main className="container mx-auto px-4 py-24">
-        {loading ? (
+      <main className="container mx-auto px-6 py-20">
+        {initialLoading ? (
           <div className="flex items-center justify-center min-h-[40vh]">
             <LoadingSpinner />
           </div>
@@ -102,79 +94,67 @@ const Index = () => {
           <>
             {/* Featured Post */}
             {featuredPost && (
-              <div className="mb-24">
-                <h2 className="text-3xl font-bold mb-12 text-left">Featured Story</h2>
-                <div className="bg-card rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                  <div className="grid md:grid-cols-2 gap-0">
-                    <div className="aspect-w-16 aspect-h-9 md:aspect-h-full">
-                      <img
-                        src={featuredPost.image || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085'}
-                        alt={featuredPost.title}
-                        className="object-cover w-full h-full transition-transform hover:scale-105"
-                      />
+              <section className="mb-20">
+                <div className="relative rounded-xl overflow-hidden shadow-lg group">
+                  <img 
+                    src={featuredPost.image || "https://source.unsplash.com/1200x800/?technology"} 
+                    alt={featuredPost.title} 
+                    className="object-cover w-full h-[450px] md:h-[550px] transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-60"></div>
+                  <div className="absolute bottom-10 left-10 text-white">
+                    <span className="bg-blue-600 px-3 py-1 rounded-md text-sm font-semibold">
+                      {featuredPost.category}
+                    </span>
+                    <h3 className="text-4xl font-bold mt-4">{featuredPost.title}</h3>
+                    <p className="text-lg mt-2">{featuredPost.excerpt}</p>
+                    <div className="mt-4 flex items-center gap-3 text-gray-300">
+                      <span>{featuredPost.author}</span>
+                      <span>•</span>
+                      <span>{featuredPost.date}</span>
+                      <span>•</span>
+                      <span>{featuredPost.read_time} min read</span>
                     </div>
-                    <div className="p-12 flex flex-col justify-center">
-                      <div className="flex gap-2 mb-4">
-                        {featuredPost.category && (
-                          <span className="text-xs font-medium px-3 py-1 bg-primary/10 rounded-full text-gray-950">
-                            {featuredPost.category}
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-3xl font-bold mb-6">{featuredPost.title}</h3>
-                      <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
-                        {featuredPost.excerpt}
-                      </p>
-                      <div className="flex items-center text-sm text-muted-foreground mb-8">
-                        <span className="font-medium">{featuredPost.author}</span>
-                        <span className="mx-2">•</span>
-                        <span>{featuredPost.date}</span>
-                      </div>
-                      <Button
-                        size="lg"
-                        onClick={() => navigate(`/blog/${featuredPost.slug}`)}
-                        className="self-start text-primary-foreground bg-black"
-                      >
-                        Read More
-                      </Button>
-                    </div>
+                    <Button 
+                      size="lg" 
+                      onClick={() => navigate(`/blog/${featuredPost.slug}`)} 
+                      className="mt-5 bg-white text-black px-6 py-3 rounded-lg hover:bg-gray-200 transition-all"
+                    >
+                      Read More
+                    </Button>
                   </div>
                 </div>
-              </div>
+              </section>
             )}
 
             {/* Latest Posts */}
             {posts.length > 0 && (
-              <div>
+              <section>
                 <div className="flex justify-between items-center mb-12">
-                  <h2 className="text-3xl font-bold">Latest Stories</h2>
+                  <h2 className="text-4xl font-extrabold">Latest Stories</h2>
                   {!showAllPosts && posts.length > 6 && (
-                    <Button variant="outline" size="lg" onClick={handleViewAll}>
+                    <Button variant="outline" size="lg" onClick={handleViewAll} className="text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white">
                       View All
                     </Button>
                   )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {displayedPosts.map(post => (
-                    <BlogCard
-                      key={post.slug}
-                      {...post}
-                      categories={post.category ? [post.category] : []}
-                    />
+                    <BlogCard key={post.slug} {...post} categories={post.category ? [post.category] : []} />
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
-            {!loading && !featuredPost && posts.length === 0 && (
+            {/* No Posts Available */}
+            {!updating && !featuredPost && posts.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">No posts available.</p>
+                <p className="text-gray-500 text-lg">No posts available.</p>
               </div>
             )}
           </>
         )}
       </main>
-
       <Footer />
     </div>
   );

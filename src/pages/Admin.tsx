@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Star, StarOff } from "lucide-react";
 
 interface Post {
   id: string;
@@ -22,6 +21,7 @@ interface Post {
   date: string | null;
   category: string | null;
   slug: string;
+  featured: boolean; // New field for featured posts
 }
 
 const Admin = () => {
@@ -29,22 +29,20 @@ const Admin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Initial fetch
     fetchPosts();
 
-    // Set up real-time subscription
     const channel = supabase
-      .channel('posts-channel')
+      .channel("posts-channel")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'posts'
+          event: "*",
+          schema: "public",
+          table: "posts",
         },
         (payload) => {
-          console.log('Change received!', payload);
-          fetchPosts(); // Refetch posts when changes occur
+          console.log("Change received!", payload);
+          fetchPosts();
         }
       )
       .subscribe();
@@ -56,9 +54,9 @@ const Admin = () => {
 
   const fetchPosts = async () => {
     const { data, error } = await supabase
-      .from('posts')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("posts")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) {
       toast.error("Error fetching posts");
@@ -69,10 +67,7 @@ const Admin = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase
-      .from('posts')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from("posts").delete().eq("id", id);
 
     if (error) {
       toast.error("Error deleting post");
@@ -80,6 +75,21 @@ const Admin = () => {
     }
 
     toast.success("Post deleted successfully");
+  };
+
+  const toggleFeaturePost = async (id: string, currentStatus: boolean) => {
+    const { error } = await supabase
+      .from("posts")
+      .update({ featured: !currentStatus }) // Toggle the featured status
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Error updating feature status");
+      return;
+    }
+
+    toast.success(`Post ${!currentStatus ? "featured" : "unfeatured"} successfully`);
+    fetchPosts(); // Refresh data
   };
 
   return (
@@ -117,6 +127,17 @@ const Admin = () => {
                       onClick={() => handleDelete(post.id)}
                     >
                       <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant={post.featured ? "success" : "outline"}
+                      size="sm"
+                      onClick={() => toggleFeaturePost(post.id, post.featured)}
+                    >
+                      {post.featured ? (
+                        <Star className="h-4 w-4 text-yellow-500" />
+                      ) : (
+                        <StarOff className="h-4 w-4 text-gray-500" />
+                      )}
                     </Button>
                   </div>
                 </TableCell>
