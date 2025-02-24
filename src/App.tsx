@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "./contexts/ThemeProvider";
 import Index from "./pages/Index";
 import BlogPost from "./pages/BlogPost";
 import Admin from "./pages/Admin";
@@ -10,40 +11,42 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <Admin />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/create"
-            element={
-              <ProtectedRoute>
-                <AdminPostForm />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/edit/:id"
-            element={
-              <ProtectedRoute>
-                <AdminPostForm />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-        <Toaster />
-      </Router>
-    </AuthProvider>
+    <ThemeProvider defaultTheme="system" storageKey="blog-theme">
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/create"
+              element={
+                <ProtectedRoute>
+                  <AdminPostForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <AdminPostForm />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+          <Toaster />
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
