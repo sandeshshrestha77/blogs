@@ -6,7 +6,7 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 
 // Get the current site URL
 const siteUrl = import.meta.env.PROD 
-  ? (import.meta.env.VITE_SITE_URL || 'https://blog.sandeshshrestha.xyz/')
+  ? (import.meta.env.VITE_SITE_URL || 'https://p-216481-git-main-forsakenx.vercel.app/')
   : 'http://localhost:8080';
 
 export const supabase = createClient<Database>(
