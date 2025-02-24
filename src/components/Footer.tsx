@@ -5,7 +5,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white">Sandesh Shrestha</h3>
+            <h3 className="text-xl font-bold text-white">404 Aesthetics</h3>
             <p className="text-sm">Exploring design, and creativity through thoughtful articles and insights.</p>
           </div>
           
