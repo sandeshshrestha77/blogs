@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,7 @@ export function SearchDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl">
+        <DialogTitle className="sr-only">Search Posts</DialogTitle>
         <div className="space-y-4">
           <Input
             placeholder="Search posts..."
