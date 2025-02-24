@@ -23,6 +23,7 @@ const Index = () => {
   const [featuredPost, setFeaturedPost] = useState<Post | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAllPosts, setShowAllPosts] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -63,6 +64,14 @@ const Index = () => {
       setLoading(false);
     }
   };
+
+  // Function to handle showing all posts
+  const handleViewAll = () => {
+    setShowAllPosts(true);
+  };
+
+  // Filter posts based on showAllPosts state
+  const displayedPosts = showAllPosts ? posts : posts.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-background">
@@ -139,10 +148,14 @@ const Index = () => {
               <div>
                 <div className="flex justify-between items-center mb-12">
                   <h2 className="text-3xl font-bold">Latest Stories</h2>
-                  <Button variant="outline" size="lg">View All</Button>
+                  {!showAllPosts && posts.length > 6 && (
+                    <Button variant="outline" size="lg" onClick={handleViewAll}>
+                      View All
+                    </Button>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {posts.map(post => (
+                  {displayedPosts.map(post => (
                     <BlogCard
                       key={post.slug}
                       {...post}
