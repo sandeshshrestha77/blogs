@@ -21,7 +21,12 @@ interface Post {
   date: string | null;
   category: string | null;
   slug: string;
-  featured: boolean; // New field for featured posts
+  featured: boolean;
+  content: string;
+  created_at: string;
+  excerpt: string;
+  image: string;
+  read_time: string;
 }
 
 const Admin = () => {
@@ -63,7 +68,10 @@ const Admin = () => {
       return;
     }
 
-    setPosts(data);
+    setPosts(data.map(post => ({
+      ...post,
+      featured: post.featured ?? false
+    })));
   };
 
   const handleDelete = async (id: string) => {

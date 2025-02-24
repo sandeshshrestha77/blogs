@@ -39,6 +39,7 @@ const Index = () => {
         .from("posts")
         .select("*")
         .eq("featured", true)
+        .returns<Post>()
         .order("created_at", { ascending: false })
         .limit(1)
         .single();
