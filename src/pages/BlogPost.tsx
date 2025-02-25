@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -56,6 +57,15 @@ const BlogPost = () => {
     fetchPost();
   }, [fetchPost]);
 
+  const formatContent = (content: string) => {
+    // Split content by double newlines to create paragraphs
+    return content.split('\n\n').map((paragraph, index) => (
+      <p key={index} className="mb-6 text-gray-700 leading-relaxed">
+        {paragraph}
+      </p>
+    ));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
@@ -82,7 +92,7 @@ const BlogPost = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
       <article className="container mx-auto px-4 py-16 max-w-6xl">
         <Link 
@@ -100,7 +110,7 @@ const BlogPost = () => {
                 {post.category}
               </span>
             )}
-            <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
+            <h1 className="text-4xl font-bold mb-8 text-gray-900">{post.title}</h1>
             <div className="aspect-video mb-8 rounded-xl overflow-hidden shadow-md">
               <img
                 src={post.image || "https://images.unsplash.com/photo-1498050108023-c5249f4df085"}
@@ -109,11 +119,11 @@ const BlogPost = () => {
                 loading="lazy"
               />
             </div>
-            <div className="prose prose-lg max-w-none dark:prose-invert">
+            <div className="prose prose-lg max-w-none">
               {post.content ? (
-                <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                formatContent(post.content)
               ) : (
-                <p>No content available.</p>
+                <p className="text-gray-700">No content available.</p>
               )}
             </div>
           </div>

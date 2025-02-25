@@ -25,7 +25,7 @@ const BlogCard = ({
   return (
     <Link
       to={`/blog/${slug}`}
-      className="group flex flex-col bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+      className="group flex flex-col bg-white rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
     >
       <div className="aspect-[16/9] overflow-hidden">
         <img
@@ -41,22 +41,22 @@ const BlogCard = ({
           {categories.map((category) => (
             <span
               key={category}
-              className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full"
+              className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
             >
               {category}
             </span>
           ))}
         </div>
 
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
           {title}
         </h3>
 
-        <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mb-4 flex-grow">
+        <p className="text-gray-600 text-sm line-clamp-2 mb-4 flex-grow">
           {excerpt}
         </p>
 
-        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex items-center justify-between text-sm text-gray-500 mt-auto pt-4 border-t border-gray-100">
           <span className="font-medium">{author}</span>
           <div className="flex items-center gap-2">
             <span>{date}</span>
