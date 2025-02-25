@@ -1,6 +1,5 @@
-
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import BlogCard from "@/components/BlogCard";
 import Footer from "@/components/Footer";
@@ -8,19 +7,9 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import type { Database } from "@/integrations/supabase/types";
 
-interface Post {
-  id: string;
-  title: string;
-  excerpt: string | null;
-  image: string | null;
-  author: string | null;
-  date: string | null;
-  category: string | null;
-  slug: string;
-  read_time: string | null;
-  featured: boolean;
-}
+type Post = Database['public']['Tables']['posts']['Row'];
 
 const Index = () => {
   const navigate = useNavigate();
@@ -33,23 +22,28 @@ const Index = () => {
   const fetchPosts = useCallback(async () => {
     try {
       setUpdating(true);
-      const { data: featuredData, error: featuredError } = await supabase
-        .from("posts")
-        .select("*")
-        .eq("featured", true)
-        .single();
+      const [featuredResponse, postsResponse] = await Promise.all([
+        supabase
+          .from("posts")
+          .select()
+          .match({ featured: true })
+          .single(),
+        supabase
+          .from("posts")
+          .select()
+          .match({ featured: false })
+          .order("created_at", { ascending: false })
+      ]);
 
-      const { data: allPostsData, error: allPostsError } = await supabase
-        .from("posts")
-        .select("*")
-        .eq("featured", false)
-        .order("created_at", { ascending: false });
+      if (featuredResponse.error && featuredResponse.error.code !== 'PGRST116') {
+        throw featuredResponse.error;
+      }
+      if (postsResponse.error) {
+        throw postsResponse.error;
+      }
 
-      if (featuredError && featuredError.code !== "PGRST116") throw featuredError;
-      if (allPostsError) throw allPostsError;
-
-      setFeaturedPost(featuredData || null);
-      setPosts(allPostsData || []);
+      setFeaturedPost(featuredResponse.data);
+      setPosts(postsResponse.data || []);
     } catch (error) {
       toast.error("Error loading posts");
     } finally {

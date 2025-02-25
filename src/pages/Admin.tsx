@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,8 +33,7 @@ const Admin = () => {
           schema: "public",
           table: "posts",
         },
-        (payload) => {
-          console.log("Change received!", payload);
+        () => {
           fetchPosts();
         }
       )
@@ -47,46 +45,47 @@ const Admin = () => {
   }, []);
 
   const fetchPosts = async () => {
-    const { data, error } = await supabase
-      .from("posts")
-      .select("*")
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("posts")
+        .select()
+        .order("created_at", { ascending: false });
 
-    if (error) {
+      if (error) throw error;
+      setPosts(data || []);
+    } catch (error) {
       toast.error("Error fetching posts");
-      return;
     }
-
-    setPosts(data || []);
   };
 
-  const handleDelete = async (id: string) => {
-    const { error } = await supabase
-      .from("posts")
-      .delete()
-      .eq("id", id);
+  const handleDelete = async (postId: string) => {
+    try {
+      const { error } = await supabase
+        .from("posts")
+        .delete()
+        .match({ id: postId });
 
-    if (error) {
+      if (error) throw error;
+      toast.success("Post deleted successfully");
+      fetchPosts();
+    } catch (error) {
       toast.error("Error deleting post");
-      return;
     }
-
-    toast.success("Post deleted successfully");
   };
 
-  const toggleFeaturePost = async (id: string, currentStatus: boolean) => {
-    const { error } = await supabase
-      .from("posts")
-      .update({ featured: !currentStatus })
-      .eq("id", id);
+  const toggleFeaturePost = async (postId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("posts")
+        .update({ featured: !currentStatus })
+        .match({ id: postId });
 
-    if (error) {
+      if (error) throw error;
+      toast.success(`Post ${!currentStatus ? "featured" : "unfeatured"} successfully`);
+      fetchPosts();
+    } catch (error) {
       toast.error("Error updating feature status");
-      return;
     }
-
-    toast.success(`Post ${!currentStatus ? "featured" : "unfeatured"} successfully`);
-    fetchPosts();
   };
 
   return (

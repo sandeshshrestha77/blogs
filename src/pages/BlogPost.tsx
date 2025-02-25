@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -8,16 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ArrowLeft } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
 
-interface Post {
-  title: string;
-  content: string | null;
-  image: string | null;
-  author: string | null;
-  date: string | null;
-  category: string | null;
-  slug: string;
-}
+type Post = Database['public']['Tables']['posts']['Row'];
 
 const AuthorCard = ({ author, date }: { author: string; date: string }) => (
   <Card className="p-6 lg:sticky lg:top-8 shadow-md rounded-lg">
@@ -46,8 +38,8 @@ const BlogPost = () => {
     try {
       const { data, error } = await supabase
         .from("posts")
-        .select("*")
-        .eq("slug", slug)
+        .select()
+        .match({ slug })
         .single();
 
       if (error) throw error;

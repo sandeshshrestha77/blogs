@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
@@ -12,20 +11,10 @@ import type { Database } from "@/integrations/supabase/types";
 type Post = Database['public']['Tables']['posts']['Row'];
 type PostInput = Database['public']['Tables']['posts']['Insert'];
 
-interface PostFormData extends Omit<PostInput, 'id' | 'created_at'> {
-  title: string;
-  author: string;
-  content: string;
-  category: string;
-  date: string;
-  image: string;
-  slug: string;
-}
-
 const AdminPostForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<PostFormData>({
+  const [formData, setFormData] = useState<PostInput>({
     title: "",
     author: "",
     content: "",
@@ -47,56 +36,62 @@ const AdminPostForm = () => {
   }, [id]);
 
   const fetchPost = async () => {
-    const { data, error } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('id', id)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select()
+        .match({ id })
+        .single();
 
-    if (error) {
+      if (error) throw error;
+      if (data) {
+        setFormData(data);
+      }
+    } catch (error) {
       toast.error("Error fetching post");
-      return;
-    }
-
-    if (data) {
-      setFormData(data);
     }
   };
 
   const handleImageUpload = async () => {
     if (!imageFile) return;
     const fileName = `${Date.now()}-${imageFile.name}`;
-    const { data, error } = await supabase.storage.from('images').upload(fileName, imageFile);
-    
-    if (error) {
+    try {
+      const { error } = await supabase.storage
+        .from('images')
+        .upload(fileName, imageFile);
+      
+      if (error) throw error;
+      
+      const imageUrl = supabase.storage
+        .from('images')
+        .getPublicUrl(fileName).data.publicUrl;
+      
+      setFormData((prev) => ({ ...prev, image: imageUrl }));
+      toast.success("Image uploaded successfully");
+    } catch (error) {
       toast.error("Image upload failed");
-      return;
     }
-    
-    const imageUrl = supabase.storage.from('images').getPublicUrl(fileName).data.publicUrl;
-    setFormData((prev) => ({ ...prev, image: imageUrl }));
-    toast.success("Image uploaded successfully");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (imageFile) await handleImageUpload();
-
     try {
+      if (imageFile) await handleImageUpload();
+
       if (id) {
         const { error } = await supabase
           .from('posts')
           .update(formData)
-          .eq('id', id);
+          .match({ id });
 
         if (error) throw error;
         toast.success("Post updated successfully");
       } else {
         const { error } = await supabase
           .from('posts')
-          .insert([formData]);
+          .insert(formData);
 
         if (error) throw error;
         toast.success("Post created successfully");
