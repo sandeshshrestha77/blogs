@@ -91,16 +91,20 @@ const Admin = () => {
 
   return (
     <AdminLayout>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <h2 className="text-xl font-semibold text-gray-800">Blog Posts</h2>
+          <p className="text-sm text-gray-500 mt-1">Manage and organize your blog content</p>
+        </div>
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50 hover:bg-gray-50">
+              <TableRow className="bg-gray-50">
                 <TableHead className="font-semibold text-gray-700">Title</TableHead>
                 <TableHead className="font-semibold text-gray-700">Author</TableHead>
                 <TableHead className="font-semibold text-gray-700">Category</TableHead>
                 <TableHead className="font-semibold text-gray-700">Date</TableHead>
-                <TableHead className="font-semibold text-gray-700">Actions</TableHead>
+                <TableHead className="font-semibold text-gray-700 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -110,28 +114,37 @@ const Admin = () => {
                   className="hover:bg-gray-50 transition-colors"
                 >
                   <TableCell className="font-medium text-gray-900">{post.title}</TableCell>
-                  <TableCell className="text-gray-600">{post.author}</TableCell>
                   <TableCell>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                        <span className="text-sm font-medium text-gray-600">
+                          {post.author?.[0]?.toUpperCase()}
+                        </span>
+                      </div>
+                      <span className="text-gray-600">{post.author}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
                       {post.category}
                     </span>
                   </TableCell>
                   <TableCell className="text-gray-600">{post.date}</TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 justify-end">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate(`/admin/edit/${post.id}`)}
-                        className="hover:bg-gray-100"
+                        className="hover:bg-blue-50 hover:text-blue-600"
                       >
-                        <Pencil className="h-4 w-4 text-gray-600" />
+                        <Pencil className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(post.id)}
-                        className="hover:bg-red-50 text-red-600 hover:text-red-700"
+                        className="hover:bg-red-50 hover:text-red-600"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -139,7 +152,10 @@ const Admin = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => toggleFeaturePost(post.id, post.featured || false)}
-                        className={post.featured ? "text-yellow-600 hover:bg-yellow-50" : "text-gray-400 hover:bg-gray-100"}
+                        className={post.featured ? 
+                          "text-yellow-600 hover:bg-yellow-50" : 
+                          "text-gray-400 hover:bg-gray-100"
+                        }
                       >
                         {post.featured ? (
                           <Star className="h-4 w-4" />
