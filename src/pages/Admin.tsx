@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -90,57 +91,69 @@ const Admin = () => {
 
   return (
     <AdminLayout>
-      <div className="bg-white rounded-lg shadow">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Author</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {posts.map((post) => (
-              <TableRow key={post.id}>
-                <TableCell className="font-medium">{post.title}</TableCell>
-                <TableCell>{post.author}</TableCell>
-                <TableCell>{post.category}</TableCell>
-                <TableCell>{post.date}</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/admin/edit/${post.id}`)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(post.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant={post.featured ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleFeaturePost(post.id, post.featured || false)}
-                    >
-                      {post.featured ? (
-                        <Star className="h-4 w-4 text-yellow-500" />
-                      ) : (
-                        <StarOff className="h-4 w-4 text-gray-500" />
-                      )}
-                    </Button>
-                  </div>
-                </TableCell>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                <TableHead className="font-semibold text-gray-700">Title</TableHead>
+                <TableHead className="font-semibold text-gray-700">Author</TableHead>
+                <TableHead className="font-semibold text-gray-700">Category</TableHead>
+                <TableHead className="font-semibold text-gray-700">Date</TableHead>
+                <TableHead className="font-semibold text-gray-700">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {posts.map((post) => (
+                <TableRow 
+                  key={post.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <TableCell className="font-medium text-gray-900">{post.title}</TableCell>
+                  <TableCell className="text-gray-600">{post.author}</TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {post.category}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-gray-600">{post.date}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate(`/admin/edit/${post.id}`)}
+                        className="hover:bg-gray-100"
+                      >
+                        <Pencil className="h-4 w-4 text-gray-600" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(post.id)}
+                        className="hover:bg-red-50 text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleFeaturePost(post.id, post.featured || false)}
+                        className={post.featured ? "text-yellow-600 hover:bg-yellow-50" : "text-gray-400 hover:bg-gray-100"}
+                      >
+                        {post.featured ? (
+                          <Star className="h-4 w-4" />
+                        ) : (
+                          <StarOff className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </AdminLayout>
   );
