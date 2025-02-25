@@ -1,8 +1,6 @@
 import { Github, Twitter, Linkedin } from "lucide-react";
-
 const Footer = () => {
-  return (
-    <footer className="bg-[#0D1117] text-gray-400 border-t border-gray-800">
+  return <footer className="text-gray-400 border-t border-gray-800 bg-gray-950">
       <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between text-center md:text-left">
         {/* About Section */}
         <div className="mb-6 md:mb-0">
@@ -14,28 +12,13 @@ const Footer = () => {
 
         {/* Social Links */}
         <div className="flex space-x-4">
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-white transition-colors"
-          >
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
             <Github size={22} />
           </a>
-          <a
-            href="https://twitter.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-white transition-colors"
-          >
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
             <Twitter size={22} />
           </a>
-          <a
-            href="https://linkedin.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-white transition-colors"
-          >
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
             <Linkedin size={22} />
           </a>
         </div>
@@ -45,8 +28,6 @@ const Footer = () => {
       <div className="border-t border-gray-800 mt-8 pt-6 text-sm text-center">
         <p>&copy; {new Date().getFullYear()} Sandesh Shrestha. All rights reserved.</p>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;

@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -9,9 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import type { Database } from "@/integrations/supabase/types";
-
 type Post = Database['public']['Tables']['posts']['Row'];
-
 const Index = () => {
   const navigate = useNavigate();
   const [featuredPost, setFeaturedPost] = useState<Post | null>(null);
@@ -19,30 +16,22 @@ const Index = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [showAllPosts, setShowAllPosts] = useState(false);
-
   const fetchPosts = useCallback(async () => {
     try {
       setUpdating(true);
-      const [featuredResponse, postsResponse] = await Promise.all([
-        supabase
-          .from("posts")
-          .select()
-          .match({ featured: true })
-          .single(),
-        supabase
-          .from("posts")
-          .select()
-          .match({ featured: false })
-          .order("created_at", { ascending: false })
-      ]);
-
+      const [featuredResponse, postsResponse] = await Promise.all([supabase.from("posts").select().match({
+        featured: true
+      }).single(), supabase.from("posts").select().match({
+        featured: false
+      }).order("created_at", {
+        ascending: false
+      })]);
       if (featuredResponse.error && featuredResponse.error.code !== 'PGRST116') {
         throw featuredResponse.error;
       }
       if (postsResponse.error) {
         throw postsResponse.error;
       }
-
       setFeaturedPost(featuredResponse.data);
       setPosts(postsResponse.data || []);
     } catch (error) {
@@ -52,49 +41,29 @@ const Index = () => {
       setUpdating(false);
     }
   }, []);
-
   useEffect(() => {
     fetchPosts();
-
-    const channel = supabase
-      .channel("posts-channel")
-      .on("postgres_changes", { event: "*", schema: "public", table: "posts" }, fetchPosts)
-      .subscribe();
-
+    const channel = supabase.channel("posts-channel").on("postgres_changes", {
+      event: "*",
+      schema: "public",
+      table: "posts"
+    }, fetchPosts).subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
   }, [fetchPosts]);
-
   const handleViewAll = () => setShowAllPosts(true);
-
-  const displayedPosts = useMemo(() => 
-    showAllPosts ? posts : posts.slice(0, 6), 
-    [showAllPosts, posts]
-  );
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+  const displayedPosts = useMemo(() => showAllPosts ? posts : posts.slice(0, 6), [showAllPosts, posts]);
+  return <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
-        {initialLoading ? (
-          <div className="flex items-center justify-center min-h-[50vh]">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 bg-slate-50">
+        {initialLoading ? <div className="flex items-center justify-center min-h-[50vh]">
             <LoadingSpinner />
-          </div>
-        ) : (
-          <>
-            {featuredPost && (
-              <section className="mb-16 lg:mb-24">
-                <Link 
-                  to={`/blog/${featuredPost.slug}`}
-                  className="relative rounded-2xl overflow-hidden shadow-2xl group block bg-white dark:bg-gray-800 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-3xl"
-                >
+          </div> : <>
+            {featuredPost && <section className="mb-16 lg:mb-24">
+                <Link to={`/blog/${featuredPost.slug}`} className="relative rounded-2xl overflow-hidden shadow-2xl group block bg-white dark:bg-gray-800 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-3xl">
                   <div className="aspect-[16/9] overflow-hidden">
-                    <img 
-                      src={featuredPost.image || "https://source.unsplash.com/1200x800/?technology"} 
-                      alt={featuredPost.title} 
-                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
-                    />
+                    <img src={featuredPost.image || "https://source.unsplash.com/1200x800/?technology"} alt={featuredPost.title} className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110" />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 lg:p-10">
@@ -114,19 +83,14 @@ const Index = () => {
                       <span className="w-1 h-1 rounded-full bg-gray-300"></span>
                       <span className="text-sm">{featuredPost.read_time} min read</span>
                     </div>
-                    <Button 
-                      size="lg"
-                      className="mt-6 bg-white text-gray-900 hover:bg-gray-100 transition-all duration-300"
-                    >
+                    <Button size="lg" className="mt-6 bg-white text-gray-900 hover:bg-gray-100 transition-all duration-300">
                       Read Article
                     </Button>
                   </div>
                 </Link>
-              </section>
-            )}
+              </section>}
 
-            {posts.length > 0 && (
-              <section className="space-y-10">
+            {posts.length > 0 && <section className="space-y-10">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                   <div>
                     <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
@@ -136,27 +100,16 @@ const Index = () => {
                       Discover our most recent articles and insights
                     </p>
                   </div>
-                  {!showAllPosts && posts.length > 6 && (
-                    <Button 
-                      variant="outline" 
-                      size="lg" 
-                      onClick={handleViewAll}
-                      className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300"
-                    >
+                  {!showAllPosts && posts.length > 6 && <Button variant="outline" size="lg" onClick={handleViewAll} className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300">
                       View All Articles
-                    </Button>
-                  )}
+                    </Button>}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-                  {displayedPosts.map(post => (
-                    <BlogCard key={post.id} {...post} categories={post.category ? [post.category] : []} />
-                  ))}
+                  {displayedPosts.map(post => <BlogCard key={post.id} {...post} categories={post.category ? [post.category] : []} />)}
                 </div>
-              </section>
-            )}
+              </section>}
 
-            {!updating && !featuredPost && posts.length === 0 && (
-              <div className="text-center py-20">
+            {!updating && !featuredPost && posts.length === 0 && <div className="text-center py-20">
                 <div className="max-w-md mx-auto">
                   <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                     No Posts Available
@@ -165,14 +118,10 @@ const Index = () => {
                     Check back later for new content and updates.
                   </p>
                 </div>
-              </div>
-            )}
-          </>
-        )}
+              </div>}
+          </>}
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
