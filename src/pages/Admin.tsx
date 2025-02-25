@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,21 +14,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pencil, Trash2, Star, StarOff } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
 
-interface Post {
-  id: string;
-  title: string;
-  author: string | null;
-  date: string | null;
-  category: string | null;
-  slug: string;
-  featured: boolean;
-  content: string;
-  created_at: string;
-  excerpt: string;
-  image: string;
-  read_time: string;
-}
+type Post = Database['public']['Tables']['posts']['Row'];
 
 const Admin = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -68,14 +57,14 @@ const Admin = () => {
       return;
     }
 
-    setPosts(data.map(post => ({
-      ...post,
-      featured: post.featured ?? false
-    })));
+    setPosts(data || []);
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("posts").delete().eq("id", id);
+    const { error } = await supabase
+      .from("posts")
+      .delete()
+      .eq("id", id);
 
     if (error) {
       toast.error("Error deleting post");
@@ -88,7 +77,7 @@ const Admin = () => {
   const toggleFeaturePost = async (id: string, currentStatus: boolean) => {
     const { error } = await supabase
       .from("posts")
-      .update({ featured: !currentStatus }) // Toggle the featured status
+      .update({ featured: !currentStatus })
       .eq("id", id);
 
     if (error) {
@@ -97,7 +86,7 @@ const Admin = () => {
     }
 
     toast.success(`Post ${!currentStatus ? "featured" : "unfeatured"} successfully`);
-    fetchPosts(); // Refresh data
+    fetchPosts();
   };
 
   return (
@@ -137,9 +126,9 @@ const Admin = () => {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                     <Button
-                      variant={post.featured ? "success" : "outline"}
+                      variant={post.featured ? "default" : "outline"}
                       size="sm"
-                      onClick={() => toggleFeaturePost(post.id, post.featured)}
+                      onClick={() => toggleFeaturePost(post.id, post.featured || false)}
                     >
                       {post.featured ? (
                         <Star className="h-4 w-4 text-yellow-500" />

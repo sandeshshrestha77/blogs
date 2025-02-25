@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
@@ -6,8 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
+import type { Database } from "@/integrations/supabase/types";
 
-interface PostFormData {
+type Post = Database['public']['Tables']['posts']['Row'];
+type PostInput = Database['public']['Tables']['posts']['Insert'];
+
+interface PostFormData extends Omit<PostInput, 'id' | 'created_at'> {
   title: string;
   author: string;
   content: string;
@@ -28,6 +33,9 @@ const AdminPostForm = () => {
     date: new Date().toISOString().split('T')[0],
     image: "",
     slug: "",
+    excerpt: "",
+    featured: false,
+    read_time: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -50,7 +58,9 @@ const AdminPostForm = () => {
       return;
     }
 
-    setFormData(data);
+    if (data) {
+      setFormData(data);
+    }
   };
 
   const handleImageUpload = async () => {
@@ -118,17 +128,17 @@ const AdminPostForm = () => {
               
               <div className="space-y-2">
                 <label className="text-sm font-medium">Author</label>
-                <Input name="author" value={formData.author} onChange={handleChange} required />
+                <Input name="author" value={formData.author || ''} onChange={handleChange} required />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Category</label>
-                <Input name="category" value={formData.category} onChange={handleChange} required />
+                <Input name="category" value={formData.category || ''} onChange={handleChange} required />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Date</label>
-                <Input type="date" name="date" value={formData.date} onChange={handleChange} required />
+                <Input type="date" name="date" value={formData.date || ''} onChange={handleChange} required />
               </div>
 
               <div className="space-y-2">
@@ -144,7 +154,13 @@ const AdminPostForm = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Content</label>
-              <textarea name="content" value={formData.content} onChange={handleChange} required className="w-full min-h-[200px] px-3 py-2 text-sm rounded-md border border-input" />
+              <textarea 
+                name="content" 
+                value={formData.content || ''} 
+                onChange={handleChange} 
+                required 
+                className="w-full min-h-[200px] px-3 py-2 text-sm rounded-md border border-input" 
+              />
             </div>
 
             <div className="flex justify-end gap-4">

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
@@ -38,7 +39,11 @@ export function SearchDialog() {
       .ilike('title', `%${search}%`)
       .limit(5);
 
-    setResults(data || []);
+    if (data) {
+      setResults(data as SearchResult[]);
+    } else {
+      setResults([]);
+    }
   };
 
   const handleSelect = (slug: string) => {
