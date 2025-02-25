@@ -17,6 +17,7 @@ export type Database = {
           created_at: string
           date: string | null
           excerpt: string | null
+          featured: boolean | null
           id: string
           image: string | null
           read_time: string | null
@@ -30,6 +31,7 @@ export type Database = {
           created_at?: string
           date?: string | null
           excerpt?: string | null
+          featured?: boolean | null
           id?: string
           image?: string | null
           read_time?: string | null
@@ -43,6 +45,7 @@ export type Database = {
           created_at?: string
           date?: string | null
           excerpt?: string | null
+          featured?: boolean | null
           id?: string
           image?: string | null
           read_time?: string | null
@@ -56,7 +59,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      add_post: {
+        Args: {
+          title: string
+          slug: string
+          excerpt: string
+          content: string
+          image: string
+          category: string
+          read_time: string
+          featured?: boolean
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
