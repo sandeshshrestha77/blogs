@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -6,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { ArrowLeft } from "lucide-react";
 
 interface Post {
   title: string;
@@ -25,10 +27,11 @@ const AuthorCard = ({ author, date }: { author: string; date: string }) => (
           src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${author}`}
           alt={`${author}'s avatar`}
           className="w-full h-full object-cover"
+          loading="lazy"
         />
       </div>
       <h3 className="font-semibold text-lg mb-2">{author}</h3>
-      <p className="text-sm text-muted-foreground mb-4">Graphic Designer</p>
+      <p className="text-sm text-muted-foreground mb-4">Content Creator</p>
       <p className="text-sm text-muted-foreground">{date}</p>
     </div>
   </Card>
@@ -41,7 +44,12 @@ const BlogPost = () => {
 
   const fetchPost = useCallback(async () => {
     try {
-      const { data, error } = await supabase.from("posts").select("*").eq("slug", slug).single();
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("slug", slug)
+        .single();
+
       if (error) throw error;
       setPost(data);
     } catch (error) {
@@ -85,27 +93,31 @@ const BlogPost = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <article className="container mx-auto px-4 py-16 max-w-6xl">
-        <div className="mb-8">
-          <Link to="/" className="text-primary hover:underline">
-            ← Back to all posts
-          </Link>
-        </div>
+        <Link 
+          to="/" 
+          className="inline-flex items-center text-primary hover:text-primary/80 transition-colors mb-8"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to all posts
+        </Link>
+        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             {post.category && (
-              <span className="text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded-full">
+              <span className="inline-block text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded-full mb-4">
                 {post.category}
               </span>
             )}
-            <h1 className="text-4xl font-bold my-4">{post.title}</h1>
-            <div className="aspect-[16/9] mb-8 rounded-xl overflow-hidden shadow-md">
+            <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
+            <div className="aspect-video mb-8 rounded-xl overflow-hidden shadow-md">
               <img
                 src={post.image || "https://images.unsplash.com/photo-1498050108023-c5249f4df085"}
                 alt={post.title}
                 className="object-cover w-full h-full transition-transform hover:scale-105"
+                loading="lazy"
               />
             </div>
-            <div className="prose prose-lg dark:prose-invert leading-relaxed space-y-6">
+            <div className="prose prose-lg max-w-none dark:prose-invert">
               {post.content ? (
                 <div dangerouslySetInnerHTML={{ __html: post.content }} />
               ) : (
@@ -114,7 +126,10 @@ const BlogPost = () => {
             </div>
           </div>
           <aside>
-            <AuthorCard author={post.author || "Anonymous"} date={post.date || new Date().toLocaleDateString()} />
+            <AuthorCard 
+              author={post.author || "Anonymous"} 
+              date={post.date || new Date().toLocaleDateString()} 
+            />
           </aside>
         </div>
       </article>
