@@ -1,5 +1,6 @@
+
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import BlogCard from "@/components/BlogCard";
 import Footer from "@/components/Footer";
