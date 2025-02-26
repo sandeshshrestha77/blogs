@@ -10,7 +10,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { Database } from "@/integrations/supabase/types";
 
 type Post = Database['public']['Tables']['posts']['Row'];
-type PostInput = Database['public']['Tables']['posts']['Insert'];
+type PostInput = Partial<Omit<Post, 'id' | 'created_at'>> & {
+  title: string;
+  slug: string;
+};
 
 const AdminPostForm = () => {
   const { id } = useParams();
@@ -30,28 +33,40 @@ const AdminPostForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      fetchPost();
-    }
-  }, [id]);
-
   const fetchPost = async () => {
+    if (!id) return;
     try {
       const { data, error } = await supabase
         .from('posts')
         .select()
-        .match({ id })
+        .eq('id', id)
         .maybeSingle();
 
       if (error) throw error;
       if (data) {
-        setFormData(data as PostInput);
+        setFormData({
+          title: data.title,
+          slug: data.slug,
+          author: data.author || "",
+          content: data.content || "",
+          category: data.category || "",
+          date: data.date || "",
+          image: data.image || "",
+          excerpt: data.excerpt || "",
+          featured: data.featured || false,
+          read_time: data.read_time || "",
+        });
       }
     } catch (error) {
       toast.error("Error fetching post");
     }
   };
+
+  useEffect(() => {
+    if (id) {
+      fetchPost();
+    }
+  }, [id]);
 
   const handleImageUpload = async () => {
     if (!imageFile) return;
@@ -67,7 +82,7 @@ const AdminPostForm = () => {
         .from('images')
         .getPublicUrl(fileName).data.publicUrl;
       
-      setFormData((prev) => ({ ...prev, image: imageUrl }));
+      setFormData(prev => ({ ...prev, image: imageUrl }));
       toast.success("Image uploaded successfully");
     } catch (error) {
       toast.error("Image upload failed");
@@ -84,15 +99,16 @@ const AdminPostForm = () => {
       if (id) {
         const { error } = await supabase
           .from('posts')
-          .update(formData as Post)
-          .match({ id });
+          .update(formData)
+          .eq('id', id);
 
         if (error) throw error;
         toast.success("Post updated successfully");
       } else {
         const { error } = await supabase
           .from('posts')
-          .insert([formData]);
+          .insert([formData])
+          .select();
 
         if (error) throw error;
         toast.success("Post created successfully");

@@ -36,15 +36,16 @@ const BlogPost = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchPost = useCallback(async () => {
+    if (!slug) return;
     try {
       const { data, error } = await supabase
         .from("posts")
         .select()
-        .match({ slug })
+        .eq('slug', slug)
         .maybeSingle();
 
       if (error) throw error;
-      setPost(data);
+      if (data) setPost(data);
     } catch (error) {
       toast.error("Error loading post");
       console.error("Error:", error);

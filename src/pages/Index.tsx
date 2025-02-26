@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -26,12 +27,12 @@ const Index = () => {
         supabase
           .from("posts")
           .select()
-          .match({ featured: true })
+          .eq('featured', true)
           .maybeSingle(),
         supabase
           .from("posts")
           .select()
-          .match({ featured: false })
+          .eq('featured', false)
           .order("created_at", { ascending: false })
       ]);
 
@@ -42,8 +43,8 @@ const Index = () => {
         throw postsResponse.error;
       }
 
-      setFeaturedPost(featuredResponse.data);
-      setPosts(postsResponse.data || []);
+      if (featuredResponse.data) setFeaturedPost(featuredResponse.data);
+      if (postsResponse.data) setPosts(postsResponse.data);
     } catch (error) {
       toast.error("Error loading posts");
     } finally {

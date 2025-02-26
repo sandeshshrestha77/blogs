@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,29 +21,6 @@ const Admin = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchPosts();
-
-    const channel = supabase
-      .channel("posts-channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "posts",
-        },
-        () => {
-          fetchPosts();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
   const fetchPosts = async () => {
     try {
       const { data, error } = await supabase
@@ -53,7 +29,7 @@ const Admin = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setPosts(data || []);
+      if (data) setPosts(data);
     } catch (error) {
       toast.error("Error fetching posts");
     }
@@ -78,8 +54,9 @@ const Admin = () => {
     try {
       const { error } = await supabase
         .from("posts")
-        .update({ featured: !currentStatus } as Post)
-        .match({ id: postId });
+        .update({ featured: !currentStatus })
+        .match({ id: postId })
+        .select('featured');
 
       if (error) throw error;
       toast.success(`Post ${!currentStatus ? "featured" : "unfeatured"} successfully`);
@@ -88,6 +65,23 @@ const Admin = () => {
       toast.error("Error updating feature status");
     }
   };
+
+  useEffect(() => {
+    fetchPosts();
+
+    const channel = supabase
+      .channel("posts-channel")
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "posts",
+      }, fetchPosts)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   return (
     <AdminLayout>
