@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -9,9 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import type { Database } from "@/integrations/supabase/types";
-
 type Post = Database['public']['Tables']['posts']['Row'];
-
 const Index = () => {
   const navigate = useNavigate();
   const [featuredPost, setFeaturedPost] = useState<Post | null>(null);
@@ -19,30 +16,18 @@ const Index = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [showAllPosts, setShowAllPosts] = useState(false);
-
   const fetchPosts = useCallback(async () => {
     try {
       setUpdating(true);
-      const [featuredResponse, postsResponse] = await Promise.all([
-        supabase
-          .from("posts")
-          .select()
-          .eq('featured', true)
-          .maybeSingle(),
-        supabase
-          .from("posts")
-          .select()
-          .eq('featured', false)
-          .order("created_at", { ascending: false })
-      ]);
-
+      const [featuredResponse, postsResponse] = await Promise.all([supabase.from("posts").select().eq('featured', true).maybeSingle(), supabase.from("posts").select().eq('featured', false).order("created_at", {
+        ascending: false
+      })]);
       if (featuredResponse.error && featuredResponse.error.code !== 'PGRST116') {
         throw featuredResponse.error;
       }
       if (postsResponse.error) {
         throw postsResponse.error;
       }
-
       if (featuredResponse.data) setFeaturedPost(featuredResponse.data);
       if (postsResponse.data) setPosts(postsResponse.data);
     } catch (error) {
@@ -52,7 +37,6 @@ const Index = () => {
       setUpdating(false);
     }
   }, []);
-
   useEffect(() => {
     fetchPosts();
     const channel = supabase.channel("posts-channel").on("postgres_changes", {
@@ -64,11 +48,8 @@ const Index = () => {
       supabase.removeChannel(channel);
     };
   }, [fetchPosts]);
-
   const handleViewAll = () => setShowAllPosts(true);
-
   const displayedPosts = useMemo(() => showAllPosts ? posts : posts.slice(0, 6), [showAllPosts, posts]);
-
   return <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 bg-slate-50">
@@ -108,7 +89,7 @@ const Index = () => {
             {posts.length > 0 && <section className="space-y-10">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                   <div>
-                    <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+                    <h2 className="text-3xl lg:text-4xl font-bold text-zinc-950">
                       Latest Stories
                     </h2>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -139,5 +120,4 @@ const Index = () => {
       <Footer />
     </div>;
 };
-
 export default Index;
