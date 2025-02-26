@@ -41,7 +41,7 @@ const BlogPost = () => {
         .from("posts")
         .select()
         .match({ slug })
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       setPost(data);

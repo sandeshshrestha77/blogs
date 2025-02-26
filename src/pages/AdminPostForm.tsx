@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
@@ -41,11 +42,11 @@ const AdminPostForm = () => {
         .from('posts')
         .select()
         .match({ id })
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       if (data) {
-        setFormData(data);
+        setFormData(data as PostInput);
       }
     } catch (error) {
       toast.error("Error fetching post");
@@ -83,7 +84,7 @@ const AdminPostForm = () => {
       if (id) {
         const { error } = await supabase
           .from('posts')
-          .update(formData)
+          .update(formData as Post)
           .match({ id });
 
         if (error) throw error;
@@ -91,7 +92,7 @@ const AdminPostForm = () => {
       } else {
         const { error } = await supabase
           .from('posts')
-          .insert(formData);
+          .insert([formData]);
 
         if (error) throw error;
         toast.success("Post created successfully");

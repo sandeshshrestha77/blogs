@@ -78,7 +78,7 @@ const Admin = () => {
     try {
       const { error } = await supabase
         .from("posts")
-        .update({ featured: !currentStatus })
+        .update({ featured: !currentStatus } as Post)
         .match({ id: postId });
 
       if (error) throw error;
