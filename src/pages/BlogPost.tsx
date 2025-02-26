@@ -21,7 +21,7 @@ const AuthorCard = ({
         <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${author}`} alt={`${author}'s avatar`} className="w-full h-full object-cover" loading="lazy" />
       </div>
       <h3 className="font-semibold text-lg mb-2">{author}</h3>
-      <p className="text-sm text-muted-foreground mb-4">Graphic Designer</p>
+      <p className="text-sm text-muted-foreground mb-4">Content Creator</p>
       <p className="text-sm text-muted-foreground">{date}</p>
     </div>
   </Card>;
@@ -77,7 +77,7 @@ const BlogPost = () => {
   }
   return <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
-      <article className="container mx-auto px-4 py-16 max-w-6xl bg-zinc-200">
+      <article className="container mx-auto px-4 py-16 max-w-6xl">
         <Link to="/" className="inline-flex items-center text-primary hover:text-primary/80 transition-colors mb-8">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to all posts
