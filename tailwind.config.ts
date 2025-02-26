@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -20,30 +19,39 @@ export default {
     },
     extend: {
       colors: {
-        // Main color (70%) - Shades of blue
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#4169E1", // Royal Blue
-          light: "#E6EEFF",
-          dark: "#1E3A8A",
+          DEFAULT: "#4169E1",
           foreground: "#FFFFFF",
         },
-        // Secondary color (20%) - Shades of black/gray
         secondary: {
-          DEFAULT: "#2C3E50",
-          light: "#34495E",
-          dark: "#1A252F",
-          foreground: "#FFFFFF",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
-        // Accent color (10%) - Light shades
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
         accent: {
-          DEFAULT: "#F8FAFC",
-          dark: "#E2E8F0",
-          foreground: "#1E293B",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
-        border: "#E2E8F0",
-        input: "#E2E8F0",
-        background: "#FFFFFF",
-        foreground: "#1E293B",
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
