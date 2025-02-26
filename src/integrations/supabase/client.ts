@@ -20,6 +20,7 @@ export const supabase = createClient<Database>(
       detectSessionInUrl: true,
       flowType: 'pkce',
       storage: window.localStorage,
+      redirectTo: `${siteUrl}/auth/callback`
     },
   }
 );
