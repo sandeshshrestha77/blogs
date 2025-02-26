@@ -1,6 +1,6 @@
 import { Github, Twitter, Linkedin } from "lucide-react";
 const Footer = () => {
-  return <footer className="text-gray-400 border-t border-gray-800 bg-gray-950">
+  return <footer className="text-gray-400 border-t border-gray-800 bg-zinc-950">
       <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between text-center md:text-left">
         {/* About Section */}
         <div className="mb-6 md:mb-0">
