@@ -19,8 +19,13 @@ export const supabase = createClient<Database>(
       persistSession: true,
       detectSessionInUrl: true,
       flowType: 'pkce',
-      storage: window.localStorage,
-      redirectTo: `${siteUrl}/auth/callback`
+      storage: window.localStorage
     },
+    global: {
+      headers: {
+        'x-application-redirect': `${siteUrl}/auth/callback`
+      }
+    }
   }
 );
+
