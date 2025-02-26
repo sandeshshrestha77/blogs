@@ -7,7 +7,8 @@ const Navbar = () => {
           {/* Logo and Branding */}
           <Link to="/" className="flex items-center space-x-3">
             <img src="/logo.png" // Replace with your logo path
-          alt="Logo" className="h-48 w-auto object-contain" />
+          alt="Logo" className="h-12 w-auto" // Adjusted logo size
+          />
           </Link>
 
           {/* Search Button */}
