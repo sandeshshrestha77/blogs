@@ -169,37 +169,62 @@ const AdminPostForm = () => {
 
   return (
     <AdminLayout>
-      <Card>
+      <Card className="bg-[#1A1B1E] border-zinc-800 shadow-xl">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Title</label>
-                <Input name="title" value={formData.title} onChange={handleChange} required />
+                <label className="text-sm font-medium text-gray-300">Title</label>
+                <Input 
+                  name="title" 
+                  value={formData.title} 
+                  onChange={handleChange} 
+                  required
+                  className="bg-zinc-900 border-zinc-700 text-white"
+                />
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium">Author</label>
-                <Input name="author" value={formData.author} onChange={handleChange} required />
+                <label className="text-sm font-medium text-gray-300">Author</label>
+                <Input 
+                  name="author" 
+                  value={formData.author} 
+                  onChange={handleChange} 
+                  required
+                  className="bg-zinc-900 border-zinc-700 text-white"
+                />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Category</label>
-                <Input name="category" value={formData.category} onChange={handleChange} required />
+                <label className="text-sm font-medium text-gray-300">Category</label>
+                <Input 
+                  name="category" 
+                  value={formData.category} 
+                  onChange={handleChange} 
+                  required
+                  className="bg-zinc-900 border-zinc-700 text-white"
+                />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Date</label>
-                <Input type="date" name="date" value={formData.date} onChange={handleChange} required />
+                <label className="text-sm font-medium text-gray-300">Date</label>
+                <Input 
+                  type="date" 
+                  name="date" 
+                  value={formData.date} 
+                  onChange={handleChange} 
+                  required
+                  className="bg-zinc-900 border-zinc-700 text-white"
+                />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Image</label>
+                <label className="text-sm font-medium text-gray-300">Image</label>
                 <Input 
                   type="file" 
                   accept="image/*" 
                   onChange={handleImageChange}
-                  className="mb-2"
+                  className="bg-zinc-900 border-zinc-700 text-white file:bg-zinc-800 file:text-white file:border-0"
                 />
                 {imagePreview && (
                   <div className="mt-2">
@@ -213,30 +238,53 @@ const AdminPostForm = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Slug</label>
-                <Input name="slug" value={formData.slug} onChange={handleChange} required />
+                <label className="text-sm font-medium text-gray-300">Slug</label>
+                <Input 
+                  name="slug" 
+                  value={formData.slug} 
+                  onChange={handleChange} 
+                  required
+                  className="bg-zinc-900 border-zinc-700 text-white"
+                />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium">Excerpt</label>
-                <Input name="excerpt" value={formData.excerpt} onChange={handleChange} required />
+                <label className="text-sm font-medium text-gray-300">Excerpt</label>
+                <Input 
+                  name="excerpt" 
+                  value={formData.excerpt} 
+                  onChange={handleChange} 
+                  required
+                  className="bg-zinc-900 border-zinc-700 text-white"
+                />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Content</label>
+              <label className="text-sm font-medium text-gray-300">Content</label>
               <textarea 
                 name="content" 
                 value={formData.content} 
                 onChange={handleChange} 
                 required 
-                className="w-full min-h-[200px] px-3 py-2 text-sm rounded-md border border-input" 
+                className="w-full min-h-[200px] px-3 py-2 text-sm rounded-md bg-zinc-900 border border-zinc-700 text-white" 
               />
             </div>
 
             <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" onClick={() => navigate("/admin")}>Cancel</Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => navigate("/admin")}
+                className="border-zinc-700 text-gray-300 hover:bg-zinc-800"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
                 {isLoading ? "Saving..." : (id ? "Update" : "Create")}
               </Button>
             </div>

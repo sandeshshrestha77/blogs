@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -85,52 +86,52 @@ const Admin = () => {
 
   return (
     <AdminLayout>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-xl font-semibold text-gray-800">Blog Posts</h2>
-          <p className="text-sm text-gray-500 mt-1">Manage and organize your blog content</p>
+      <div className="bg-[#1A1B1E] rounded-xl shadow-xl border border-zinc-800 overflow-hidden">
+        <div className="p-6 border-b border-zinc-800">
+          <h2 className="text-xl font-semibold text-white">Blog Posts</h2>
+          <p className="text-sm text-gray-400 mt-1">Manage and organize your blog content</p>
         </div>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50">
-                <TableHead className="font-semibold text-gray-700">Title</TableHead>
-                <TableHead className="font-semibold text-gray-700">Author</TableHead>
-                <TableHead className="font-semibold text-gray-700">Category</TableHead>
-                <TableHead className="font-semibold text-gray-700">Date</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-right">Actions</TableHead>
+              <TableRow className="hover:bg-zinc-900/50">
+                <TableHead className="font-semibold text-gray-300">Title</TableHead>
+                <TableHead className="font-semibold text-gray-300">Author</TableHead>
+                <TableHead className="font-semibold text-gray-300">Category</TableHead>
+                <TableHead className="font-semibold text-gray-300">Date</TableHead>
+                <TableHead className="font-semibold text-gray-300 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {posts.map((post) => (
                 <TableRow 
                   key={post.id}
-                  className="hover:bg-gray-50 transition-colors"
+                  className="hover:bg-zinc-900/50 border-zinc-800"
                 >
-                  <TableCell className="font-medium text-gray-900">{post.title}</TableCell>
+                  <TableCell className="font-medium text-white">{post.title}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                        <span className="text-sm font-medium text-gray-600">
+                      <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
+                        <span className="text-sm font-medium text-gray-300">
                           {post.author?.[0]?.toUpperCase()}
                         </span>
                       </div>
-                      <span className="text-gray-600">{post.author}</span>
+                      <span className="text-gray-300">{post.author}</span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-600/10 text-blue-400 border border-blue-500/20">
                       {post.category}
                     </span>
                   </TableCell>
-                  <TableCell className="text-gray-600">{post.date}</TableCell>
+                  <TableCell className="text-gray-400">{post.date}</TableCell>
                   <TableCell>
                     <div className="flex gap-2 justify-end">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate(`/admin/edit/${post.id}`)}
-                        className="hover:bg-blue-50 hover:text-blue-600"
+                        className="hover:bg-blue-600/10 hover:text-blue-400 text-gray-400"
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -138,7 +139,7 @@ const Admin = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(post.id)}
-                        className="hover:bg-red-50 hover:text-red-600"
+                        className="hover:bg-red-600/10 hover:text-red-400 text-gray-400"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -147,8 +148,8 @@ const Admin = () => {
                         size="sm"
                         onClick={() => toggleFeaturePost(post.id, post.featured || false)}
                         className={post.featured ? 
-                          "text-yellow-600 hover:bg-yellow-50" : 
-                          "text-gray-400 hover:bg-gray-100"
+                          "text-yellow-400 hover:bg-yellow-600/10" : 
+                          "text-gray-400 hover:bg-gray-600/10"
                         }
                       >
                         {post.featured ? (
