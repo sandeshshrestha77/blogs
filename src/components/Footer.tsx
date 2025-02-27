@@ -1,16 +1,11 @@
-
 import { Github, Twitter, Linkedin } from "lucide-react";
-
 const Footer = () => {
-  return (
-    <footer className="text-gray-400 border-t border-gray-800 bg-zinc-950">
+  return <footer className="text-gray-400 border-t border-gray-800 bg-zinc-950">
       <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between text-center md:text-left">
         {/* About Section */}
         <div className="mb-6 md:mb-0">
           <h3 className="text-xl font-bold text-white">Sandesh Shrestha</h3>
-          <p className="text-sm mt-2 max-w-sm">
-            Exploring design and creativity through thoughtful articles and insights.
-          </p>
+          <p className="text-sm mt-2 max-w-sm">Exploring design and creativity through articles and insights.</p>
         </div>
 
         {/* Social Links */}
@@ -31,8 +26,6 @@ const Footer = () => {
       <div className="border-t border-gray-800 mt-8 pt-6 text-sm text-center">
         <p>&copy; {new Date().getFullYear()} Sandesh Shrestha. All rights reserved.</p>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
