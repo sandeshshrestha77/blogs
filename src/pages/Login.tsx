@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -36,31 +35,31 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-6">
-      <div className="max-w-5xl w-full bg-[#1A1B1E] shadow-2xl rounded-2xl overflow-hidden grid md:grid-cols-2 border border-zinc-800">
-        {/* Left Side - Decorative */}
-        <div className="relative hidden md:block bg-zinc-900 p-12">
-          <div className="relative z-10">
-            <h2 className="text-3xl font-bold text-white mb-4">Welcome back!</h2>
-            <p className="text-gray-400">Sign in to access your admin dashboard</p>
-          </div>
-          
-          {/* Decorative Elements */}
-          <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-            <div className="absolute top-12 left-8 w-32 h-32 border border-zinc-800 rounded-full opacity-20"></div>
-            <div className="absolute bottom-24 right-8 w-48 h-48 border border-zinc-800 rounded-full opacity-20"></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-zinc-800 rounded-full opacity-10"></div>
-          </div>
-        </div>
+    <div className="min-h-screen flex bg-zinc-950">
+      {/* Left Side - Image (60%) */}
+      <div className="hidden lg:block w-[60%] relative overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1500673922987-e212871fec22"
+          alt="Login Background"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-transparent to-transparent opacity-50" />
+      </div>
 
-        {/* Right Side - Form */}
-        <div className="p-12 w-full flex flex-col justify-center">
-          <div className="max-w-sm w-full mx-auto">
-            <h3 className="text-2xl font-bold text-white mb-8">Sign In</h3>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300">Email</label>
+      {/* Right Side - Form (40%) */}
+      <div className="w-full lg:w-[40%] flex items-center justify-center p-8">
+        <div className="w-full max-w-md space-y-8">
+          <div>
+            <h2 className="text-3xl font-bold text-white">Welcome back</h2>
+            <p className="mt-2 text-sm text-gray-400">Sign in to your admin account</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+                  Email
+                </label>
                 <Input
                   id="email"
                   type="email"
@@ -69,14 +68,16 @@ const Login = () => {
                   required
                   autoFocus
                   disabled={loading}
-                  className="bg-zinc-900 border-zinc-700 text-white placeholder-gray-500"
+                  className="mt-1 bg-zinc-900/50 border-zinc-800 text-white placeholder-gray-500"
                   placeholder="Enter your email"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300">Password</label>
-                <div className="relative">
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+                  Password
+                </label>
+                <div className="relative mt-1">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
@@ -84,7 +85,7 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={loading}
-                    className="bg-zinc-900 border-zinc-700 text-white placeholder-gray-500"
+                    className="bg-zinc-900/50 border-zinc-800 text-white placeholder-gray-500"
                     placeholder="Enter your password"
                   />
                   <button
@@ -96,18 +97,22 @@ const Login = () => {
                   </button>
                 </div>
               </div>
+            </div>
 
-              {error && <p className="text-red-400 text-sm">{error}</p>}
+            {error && (
+              <div className="text-sm text-red-400 text-center">
+                {error}
+              </div>
+            )}
 
-              <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6" 
-                disabled={loading}
-              >
-                {loading ? "Signing in..." : "Sign in"}
-              </Button>
-            </form>
-          </div>
+            <Button 
+              type="submit" 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6" 
+              disabled={loading}
+            >
+              {loading ? "Signing in..." : "Sign in"}
+            </Button>
+          </form>
         </div>
       </div>
     </div>
