@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,11 +17,9 @@ import { Pencil, Trash2, Star, StarOff } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type Post = Database['public']['Tables']['posts']['Row'];
-type Comment = Database['public']['Tables']['comments']['Row'];
 
 const Admin = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [comments, setComments] = useState<Comment[]>([]);
   const navigate = useNavigate();
 
   const fetchPosts = async () => {
@@ -29,29 +28,21 @@ const Admin = () => {
         .from("posts")
         .select()
         .order("created_at", { ascending: false });
+
       if (error) throw error;
-      setPosts(data);
+      if (data) setPosts(data);
     } catch (error) {
       toast.error("Error fetching posts");
     }
   };
 
-  const fetchComments = async () => {
+  const handleDelete = async (postId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("comments")
-        .select()
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      setComments(data);
-    } catch (error) {
-      toast.error("Error fetching comments");
-    }
-  };
+      const { error } = await supabase
+        .from("posts")
+        .delete()
+        .match({ id: postId });
 
-  const handleDeletePost = async (postId: string) => {
-    try {
-      const { error } = await supabase.from("posts").delete().match({ id: postId });
       if (error) throw error;
       toast.success("Post deleted successfully");
       fetchPosts();
@@ -60,34 +51,36 @@ const Admin = () => {
     }
   };
 
-  const handleDeleteComment = async (commentId: string) => {
+  const toggleFeaturePost = async (postId: string, currentStatus: boolean) => {
     try {
-      const { error } = await supabase.from("comments").delete().match({ id: commentId });
+      const { error } = await supabase
+        .from("posts")
+        .update({ featured: !currentStatus })
+        .match({ id: postId })
+        .select('featured');
+
       if (error) throw error;
-      toast.success("Comment deleted successfully");
-      fetchComments();
+      toast.success(`Post ${!currentStatus ? "featured" : "unfeatured"} successfully`);
+      fetchPosts();
     } catch (error) {
-      toast.error("Error deleting comment");
+      toast.error("Error updating feature status");
     }
   };
 
   useEffect(() => {
     fetchPosts();
-    fetchComments();
 
-    const postChannel = supabase
+    const channel = supabase
       .channel("posts-channel")
-      .on("postgres_changes", { event: "*", schema: "public", table: "posts" }, fetchPosts)
-      .subscribe();
-
-    const commentChannel = supabase
-      .channel("comments-channel")
-      .on("postgres_changes", { event: "*", schema: "public", table: "comments" }, fetchComments)
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "posts",
+      }, fetchPosts)
       .subscribe();
 
     return () => {
-      supabase.removeChannel(postChannel);
-      supabase.removeChannel(commentChannel);
+      supabase.removeChannel(channel);
     };
   }, []);
 
@@ -96,55 +89,82 @@ const Admin = () => {
       <div className="bg-[#1A1B1E] rounded-xl shadow-xl border border-zinc-800 overflow-hidden">
         <div className="p-6 border-b border-zinc-800">
           <h2 className="text-xl font-semibold text-white">Blog Posts</h2>
+          <p className="text-sm text-gray-400 mt-1">Manage and organize your blog content</p>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {posts.map((post) => (
-              <TableRow key={post.id}>
-                <TableCell>{post.title}</TableCell>
-                <TableCell>
-                  <Button onClick={() => handleDeletePost(post.id)}>
-                    <Trash2 />
-                  </Button>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-zinc-900/50">
+                <TableHead className="font-semibold text-gray-300">Title</TableHead>
+                <TableHead className="font-semibold text-gray-300">Author</TableHead>
+                <TableHead className="font-semibold text-gray-300">Category</TableHead>
+                <TableHead className="font-semibold text-gray-300">Date</TableHead>
+                <TableHead className="font-semibold text-gray-300 text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      <div className="bg-[#1A1B1E] rounded-xl shadow-xl border border-zinc-800 overflow-hidden mt-6">
-        <div className="p-6 border-b border-zinc-800">
-          <h2 className="text-xl font-semibold text-white">Blog Comments</h2>
+            </TableHeader>
+            <TableBody>
+              {posts.map((post) => (
+                <TableRow 
+                  key={post.id}
+                  className="hover:bg-zinc-900/50 border-zinc-800"
+                >
+                  <TableCell className="font-medium text-white">{post.title}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
+                        <span className="text-sm font-medium text-gray-300">
+                          {post.author?.[0]?.toUpperCase()}
+                        </span>
+                      </div>
+                      <span className="text-gray-300">{post.author}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-600/10 text-blue-400 border border-blue-500/20">
+                      {post.category}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-gray-400">{post.date}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate(`/admin/edit/${post.id}`)}
+                        className="hover:bg-blue-600/10 hover:text-blue-400 text-gray-400"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(post.id)}
+                        className="hover:bg-red-600/10 hover:text-red-400 text-gray-400"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleFeaturePost(post.id, post.featured || false)}
+                        className={post.featured ? 
+                          "text-yellow-400 hover:bg-yellow-600/10" : 
+                          "text-gray-400 hover:bg-gray-600/10"
+                        }
+                      >
+                        {post.featured ? (
+                          <Star className="h-4 w-4" />
+                        ) : (
+                          <StarOff className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Comment</TableHead>
-              <TableHead>Author</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {comments.map((comment) => (
-              <TableRow key={comment.id}>
-                <TableCell>{comment.content}</TableCell>
-                <TableCell>{comment.author}</TableCell>
-                <TableCell>
-                  <Button onClick={() => handleDeleteComment(comment.id)}>
-                    <Trash2 />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
       </div>
     </AdminLayout>
   );
