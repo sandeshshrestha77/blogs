@@ -61,9 +61,9 @@ const Index = () => {
     };
   }, [fetchPosts]);
 
-  const handleViewAll = () => setShowAllPosts(true);
+  const handleViewAll = () => navigate("/blog");
 
-  const displayedPosts = useMemo(() => showAllPosts ? posts : posts.slice(0, 6), [showAllPosts, posts]);
+  const displayedPosts = useMemo(() => posts.slice(0, 6), [posts]);
 
   return (
     <div className="min-h-screen bg-zinc-950">
@@ -77,52 +77,59 @@ const Index = () => {
         <>
           {/* Hero Section with Featured Post */}
           {featuredPost && (
-            <section className="relative pt-20 pb-32 overflow-hidden">
+            <section className="relative mt-20 pt-16 pb-24 overflow-hidden">
               <div className="container mx-auto px-4">
-                <div className="flex flex-col lg:flex-row gap-12 items-center">
-                  {/* Left column - Text content */}
-                  <div className="w-full lg:w-1/2 space-y-6">
-                    <div className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-blue-600/20 text-blue-400 border border-blue-500/20">
-                      {featuredPost.category}
-                    </div>
+                <div className="max-w-5xl mx-auto text-center mb-12">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+                    Welcome to Sandesh's Blog
+                  </h1>
+                  <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Exploring technology, design, and development through thoughtful articles
+                  </p>
+                </div>
+                
+                <div className="rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-900/50 shadow-xl">
+                  <div className="relative aspect-video w-full">
+                    <img
+                      src={featuredPost.image || "https://source.unsplash.com/1600x900/?technology"}
+                      alt={featuredPost.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent"></div>
                     
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                      {featuredPost.title}
-                    </h1>
-                    
-                    <p className="text-lg text-gray-300 leading-relaxed">
-                      {featuredPost.excerpt}
-                    </p>
-                    
-                    <div className="flex items-center gap-6 text-gray-400 pt-2">
-                      <div className="flex items-center gap-2">
-                        <User size={18} />
-                        <span>{featuredPost.author}</span>
+                    <div className="absolute bottom-0 left-0 w-full p-8 md:p-12">
+                      <div className="max-w-3xl">
+                        <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-600/20 text-blue-400 border border-blue-500/20 mb-4">
+                          {featuredPost.category || "Featured"}
+                        </div>
+                        
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4">
+                          {featuredPost.title}
+                        </h2>
+                        
+                        <p className="text-base md:text-lg text-gray-300 mb-6 line-clamp-2">
+                          {featuredPost.excerpt}
+                        </p>
+                        
+                        <div className="flex flex-wrap items-center gap-6 text-gray-400 mb-6">
+                          <div className="flex items-center gap-2">
+                            <User size={18} />
+                            <span>{featuredPost.author}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock size={18} />
+                            <span>{featuredPost.read_time} min read</span>
+                          </div>
+                        </div>
+                        
+                        <Link 
+                          to={`/blog/${featuredPost.slug}`} 
+                          className="inline-flex items-center py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors group"
+                        >
+                          Read Featured Article
+                          <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
+                        </Link>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Clock size={18} />
-                        <span>{featuredPost.read_time} min read</span>
-                      </div>
-                    </div>
-                    
-                    <Link 
-                      to={`/blog/${featuredPost.slug}`} 
-                      className="inline-flex items-center py-3 px-6 mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors group"
-                    >
-                      Read Article 
-                      <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
-                    </Link>
-                  </div>
-                  
-                  {/* Right column - Featured image */}
-                  <div className="w-full lg:w-1/2">
-                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-zinc-800/30 aspect-[4/3]">
-                      <img
-                        src={featuredPost.image || "https://source.unsplash.com/1200x800/?technology"}
-                        alt={featuredPost.title}
-                        className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/40 to-transparent"></div>
                     </div>
                   </div>
                 </div>
@@ -148,16 +155,14 @@ const Index = () => {
                     </p>
                   </div>
                   
-                  {!showAllPosts && posts.length > 6 && (
-                    <Button
-                      variant="outline"
-                      onClick={handleViewAll}
-                      className="border-blue-600/40 text-blue-400 hover:bg-blue-600/10 hover:text-blue-300 transition-all"
-                    >
-                      View All Articles
-                      <ChevronRight className="ml-1 h-4 w-4" />
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    onClick={handleViewAll}
+                    className="border-blue-600/40 text-blue-400 hover:bg-blue-600/10 hover:text-blue-300 transition-all"
+                  >
+                    View All Articles
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -184,7 +189,7 @@ const Index = () => {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button 
-                      onClick={() => navigate("/")}
+                      onClick={() => navigate("/blog")}
                       className="bg-blue-600 hover:bg-blue-700 text-white"
                     >
                       Explore All Articles
