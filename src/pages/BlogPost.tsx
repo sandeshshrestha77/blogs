@@ -322,10 +322,7 @@ const BlogPost = () => {
       <Navbar />
       
       <article className="container mx-auto px-4 py-16 max-w-6xl">
-        <Link to="/" className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors mb-8">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to all posts
-        </Link>
+        
         
         {/* Featured Image */}
         <div className="aspect-video mb-8 rounded-xl overflow-hidden shadow-lg">
