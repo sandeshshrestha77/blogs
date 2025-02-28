@@ -56,10 +56,10 @@ const Admin = () => {
         .from("posts")
         .update({ featured: !currentStatus })
         .match({ id: postId })
-        .select('featured');
+        .select("featured");
 
       if (error) throw error;
-     toast.success(`Post ${!currentStatus ? "featured" : "unfeatured"} successfully`);
+      toast.success(`Post ${!currentStatus ? "featured" : "unfeatured"} successfully`);
       fetchPosts();
     } catch (error) {
       toast.error("Error updating feature status");
@@ -71,11 +71,11 @@ const Admin = () => {
 
     const channel = supabase
       .channel("posts-channel")
-      .on("postgres_changes", {
-        event: "*",
-        schema: "public",
-        table: "posts",
-      }, fetchPosts)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "posts" },
+        () => fetchPosts() // Ensuring fetchPosts runs properly
+      )
       .subscribe();
 
     return () => {
@@ -129,7 +129,7 @@ const Admin = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => navigate(/admin/edit/${post.id})}
+                        onClick={() => navigate(`/admin/edit/${post.id}`)} // Fixed Route
                         className="hover:bg-blue-600/10 hover:text-blue-400 text-gray-400"
                       >
                         <Pencil className="h-4 w-4" />
