@@ -59,7 +59,7 @@ const Admin = () => {
         .select('featured');
 
       if (error) throw error;
-      toast.success(Post ${!currentStatus ? "featured" : "unfeatured"} successfully);
+     toast.success(`Post ${!currentStatus ? "featured" : "unfeatured"} successfully`);
       fetchPosts();
     } catch (error) {
       toast.error("Error updating feature status");
