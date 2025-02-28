@@ -1,5 +1,6 @@
 
 import { Link } from "react-router-dom";
+import { Calendar, Clock } from "lucide-react";
 
 interface BlogCardProps {
   title: string;
@@ -25,9 +26,9 @@ const BlogCard = ({
   return (
     <Link
       to={`/blog/${slug}`}
-      className="group relative flex flex-col bg-[#1A1B1E] rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl border border-zinc-800/50"
+      className="group flex flex-col bg-zinc-900/50 rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl border border-zinc-800/50 h-full"
     >
-      <div className="aspect-[16/9] overflow-hidden bg-zinc-900">
+      <div className="aspect-[16/9] overflow-hidden bg-zinc-800">
         <img
           src={image || "https://source.unsplash.com/1200x800/?technology"}
           alt={title}
@@ -56,15 +57,20 @@ const BlogCard = ({
           {excerpt}
         </p>
 
-        <div className="flex items-center justify-between text-sm text-gray-500 mt-auto pt-4 border-t border-zinc-800">
+        <div className="flex items-center justify-between text-sm text-gray-500 mt-auto pt-4 border-t border-zinc-800/50">
           <span className="font-medium text-gray-400">{author}</span>
-          <div className="flex items-center gap-2">
-            <span>{date}</span>
+          <div className="flex items-center gap-3">
+            {date && (
+              <div className="flex items-center gap-1">
+                <Calendar size={14} />
+                <span>{date}</span>
+              </div>
+            )}
             {read_time && (
-              <>
-                <span>•</span>
-                <span>{read_time} min read</span>
-              </>
+              <div className="flex items-center gap-1">
+                <Clock size={14} />
+                <span>{read_time} min</span>
+              </div>
             )}
           </div>
         </div>
