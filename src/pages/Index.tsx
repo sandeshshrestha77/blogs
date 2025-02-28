@@ -134,7 +134,7 @@ const Index = () => {
 
           {/* CTA Section */}
           <section className="py-20">
-            <div className="container mx-auto px-4">
+            <div className="container my-0 mx-0 py-[19px] px-[3px]">
               <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-3xl p-12 relative overflow-hidden border border-blue-500/10">
                 <div className="max-w-2xl mx-auto text-center relative z-10">
                   <h2 className="text-3xl font-bold text-white mb-4">Stay Updated with Latest Articles</h2>
@@ -150,8 +150,8 @@ const Index = () => {
                 
                 {/* Decorative elements */}
                 <div className="absolute top-0 left-0 w-full h-full opacity-30">
-                  <div className="absolute top-10 right-10 w-32 h-32 border border-blue-500/20 rounded-full"></div>
-                  <div className="absolute bottom-10 left-10 w-40 h-40 border border-purple-500/20 rounded-full"></div>
+                  
+                  
                 </div>
               </div>
             </div>
