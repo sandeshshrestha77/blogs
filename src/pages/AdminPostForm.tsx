@@ -75,6 +75,17 @@ const AdminPostForm = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validate file type and size
+      const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!validImageTypes.includes(file.type)) {
+        toast.error("Invalid file type. Please select an image file.");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error("File size too large. Please select a file smaller than 5MB.");
+        return;
+      }
+      
       setImageFile(file);
       // Create preview URL for the selected image
       const previewUrl = URL.createObjectURL(file);
