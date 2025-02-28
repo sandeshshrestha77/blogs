@@ -1,6 +1,5 @@
 
 import { Github, Twitter, Linkedin, Mail } from "lucide-react";
-import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -52,10 +51,10 @@ const Footer = () => {
             <h3 className="text-lg font-semibold text-white">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link>
+                <a href="/" className="text-gray-400 hover:text-white transition-colors">Home</a>
               </li>
               <li>
-                <Link to="/blog" className="text-gray-400 hover:text-white transition-colors">All Articles</Link>
+                <a href="/" className="text-gray-400 hover:text-white transition-colors">All Articles</a>
               </li>
               <li>
                 <a href="/" className="text-gray-400 hover:text-white transition-colors">Categories</a>
@@ -71,16 +70,16 @@ const Footer = () => {
             <h3 className="text-lg font-semibold text-white">Categories</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/blog" className="text-gray-400 hover:text-white transition-colors">Technology</Link>
+                <a href="/" className="text-gray-400 hover:text-white transition-colors">Technology</a>
               </li>
               <li>
-                <Link to="/blog" className="text-gray-400 hover:text-white transition-colors">Design</Link>
+                <a href="/" className="text-gray-400 hover:text-white transition-colors">Design</a>
               </li>
               <li>
-                <Link to="/blog" className="text-gray-400 hover:text-white transition-colors">Development</Link>
+                <a href="/" className="text-gray-400 hover:text-white transition-colors">Development</a>
               </li>
               <li>
-                <Link to="/blog" className="text-gray-400 hover:text-white transition-colors">Creativity</Link>
+                <a href="/" className="text-gray-400 hover:text-white transition-colors">Creativity</a>
               </li>
             </ul>
           </div>
@@ -91,12 +90,12 @@ const Footer = () => {
             <p className="text-sm text-gray-400">
               Join our newsletter to stay updated with the latest articles and insights.
             </p>
-            <Link 
-              to="/blog" 
+            <a 
+              href="/" 
               className="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm"
             >
-              Read All Articles
-            </Link>
+              Subscribe Now
+            </a>
           </div>
         </div>
 
