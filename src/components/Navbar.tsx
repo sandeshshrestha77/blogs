@@ -11,7 +11,7 @@ const Navbar = () => {
           
           {/* Navigation Links - Only show on larger screens */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
+            
             
             
             <Link to="/" className="text-gray-300 hover:text-white transition-colors">About</Link>
