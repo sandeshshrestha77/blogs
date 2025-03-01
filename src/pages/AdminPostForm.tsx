@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
@@ -299,7 +300,6 @@ const AdminPostForm = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">Content</label>
               <Editor
-                apiKey="aibg3cyy6946yso31q62h722hpgkare8isqicgayzqbt0l4b"
                 onInit={(evt, editor) => editorRef.current = editor}
                 initialValue={formData.content}
                 onEditorChange={handleEditorChange}
