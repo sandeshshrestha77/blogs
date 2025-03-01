@@ -166,7 +166,20 @@ const RelatedPostCard = ({
       </div>
     </div>
   </Link>;
-const ShareButtons = () => {};
+const ShareButtons = () => {
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => window.navigator.share?.({ url: window.location.href })}
+      >
+        <Share2 className="h-4 w-4 mr-2" />
+        Share
+      </Button>
+    </div>
+  );
+};
 const TableOfContents = ({
   content
 }: {
