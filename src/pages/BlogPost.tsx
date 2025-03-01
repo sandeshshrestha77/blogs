@@ -35,9 +35,7 @@ const AuthorCard = ({
           <p className="text-sm text-gray-400">Posted on {date}</p>
         </div>
       </div>
-      <p className="text-gray-300 text-sm">
-        Writer and content creator passionate about sharing knowledge and insights.
-      </p>
+      <p className="text-gray-300 text-sm">Graphic Designer</p>
     </div>;
 };
 const CommentForm = ({
