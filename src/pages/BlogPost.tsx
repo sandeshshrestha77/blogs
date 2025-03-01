@@ -104,7 +104,7 @@ const CommentForm = ({
         <textarea id="comment" value={content} onChange={e => setContent(e.target.value)} rows={4} className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required />
       </div>
       
-      <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-zinc-100 font-medium">
         {isSubmitting ? "Submitting..." : "Post Comment"}
       </Button>
     </form>;
