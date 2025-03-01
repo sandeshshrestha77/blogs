@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
@@ -77,23 +76,20 @@ const AdminPostForm = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type and size
       const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
       if (!validImageTypes.includes(file.type)) {
         toast.error("Invalid file type. Please select an image file.");
         return;
       }
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
         toast.error("File size too large. Please select a file smaller than 5MB.");
         return;
       }
       
       setImageFile(file);
-      // Create preview URL for the selected image
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
       
-      // Cleanup preview URL when component unmounts
       return () => URL.revokeObjectURL(previewUrl);
     }
   };
@@ -102,11 +98,9 @@ const AdminPostForm = () => {
     if (!imageFile) return null;
 
     try {
-      // Generate a unique file name
       const fileExt = imageFile.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-      // Upload the file to Supabase storage
       const { error: uploadError, data } = await supabase.storage
         .from('images')
         .upload(fileName, imageFile, {
@@ -116,7 +110,6 @@ const AdminPostForm = () => {
 
       if (uploadError) throw uploadError;
 
-      // Get the public URL of the uploaded file
       const { data: { publicUrl } } = supabase.storage
         .from('images')
         .getPublicUrl(fileName);
@@ -143,7 +136,6 @@ const AdminPostForm = () => {
         }
       }
 
-      // Get content from editor
       const content = editorRef.current ? editorRef.current.getContent() : formData.content;
 
       const postData = {
@@ -307,7 +299,7 @@ const AdminPostForm = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">Content</label>
               <Editor
-                apiKey="no-api-key"
+                apiKey="aibg3cyy6946yso31q62h722hpgkare8isqicgayzqbt0l4b"
                 onInit={(evt, editor) => editorRef.current = editor}
                 initialValue={formData.content}
                 onEditorChange={handleEditorChange}
