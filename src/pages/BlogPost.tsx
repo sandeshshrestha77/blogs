@@ -26,7 +26,28 @@ const AuthorCard = ({
 }: {
   author: string;
   date: string;
-}) => {};
+}) => {
+  return (
+    <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6 mb-6">
+      <div className="flex items-center mb-4">
+        <div className="w-14 h-14 rounded-full bg-zinc-800 overflow-hidden mr-4">
+          <img 
+            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${author}`} 
+            alt={`${author}'s avatar`} 
+            className="w-full h-full object-cover" 
+          />
+        </div>
+        <div>
+          <h3 className="font-semibold text-white text-lg">{author}</h3>
+          <p className="text-sm text-gray-400">Posted on {date}</p>
+        </div>
+      </div>
+      <p className="text-gray-300 text-sm">
+        Writer and content creator passionate about sharing knowledge and insights.
+      </p>
+    </div>
+  );
+};
 
 const CommentForm = ({
   postId,
