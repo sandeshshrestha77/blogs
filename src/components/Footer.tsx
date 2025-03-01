@@ -22,10 +22,10 @@ const Footer = () => {
             </p>
             <div className="flex space-x-4 pt-2">
               {[
-          { icon: Github, href: "https://github.com", label: "GitHub" },
-          { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
-          { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-          { icon: Mail, href: "mailto:contact@example.com", label: "Email" },
+          { icon: Github, href: "https://github.com/sandeshshrestha77", label: "GitHub" },
+          { icon: Twitter, href: "https://twitter.com/sandeshstha8", label: "Twitter" },
+          { icon: Linkedin, href: "https://linkedin.com/sandeshshrestha7", label: "LinkedIn" },
+          { icon: Mail, href: "mailto:sandeshstha7@gmail.com", label: "Email" },
               ].map(({ icon: Icon, href, label }) => (
           <a
             key={label}
