@@ -9,7 +9,6 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ArrowLeft, MessageCircle, Calendar, Clock, Share2, ArrowRight } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import Footer from "@/components/Footer";
-
 type Post = Database['public']['Tables']['posts']['Row'];
 interface Comment {
   id: string;
@@ -19,7 +18,6 @@ interface Comment {
   content: string;
   created_at: string;
 }
-
 const AuthorCard = ({
   author,
   date
@@ -27,15 +25,10 @@ const AuthorCard = ({
   author: string;
   date: string;
 }) => {
-  return (
-    <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6 mb-6">
+  return <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6 mb-6">
       <div className="flex items-center mb-4">
         <div className="w-14 h-14 rounded-full bg-zinc-800 overflow-hidden mr-4">
-          <img 
-            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${author}`} 
-            alt={`${author}'s avatar`} 
-            className="w-full h-full object-cover" 
-          />
+          <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${author}`} alt={`${author}'s avatar`} className="w-full h-full object-cover" />
         </div>
         <div>
           <h3 className="font-semibold text-white text-lg">{author}</h3>
@@ -45,10 +38,8 @@ const AuthorCard = ({
       <p className="text-gray-300 text-sm">
         Writer and content creator passionate about sharing knowledge and insights.
       </p>
-    </div>
-  );
+    </div>;
 };
-
 const CommentForm = ({
   postId,
   onCommentAdded
@@ -60,7 +51,6 @@ const CommentForm = ({
   const [email, setEmail] = useState("");
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !content) {
@@ -90,7 +80,6 @@ const CommentForm = ({
       setIsSubmitting(false);
     }
   };
-
   return <form onSubmit={handleSubmit} className="space-y-4 bg-zinc-900/50 p-6 rounded-lg border border-zinc-800">
       <h3 className="text-xl font-semibold text-white mb-4">Leave a Comment</h3>
       
@@ -122,7 +111,6 @@ const CommentForm = ({
       </Button>
     </form>;
 };
-
 const CommentsList = ({
   comments
 }: {
@@ -154,7 +142,6 @@ const CommentsList = ({
         </div>)}
     </div>;
 };
-
 const RelatedPostCard = ({
   post
 }: {
@@ -181,14 +168,7 @@ const RelatedPostCard = ({
       </div>
     </div>
   </Link>;
-
-const ShareButtons = () => <div className="flex gap-3 my-6">
-    <button className="p-2 bg-blue-600/20 text-blue-400 rounded-full hover:bg-blue-600/30 transition-colors">
-      <Share2 size={18} />
-    </button>
-    {/* Add other social media share buttons as needed */}
-  </div>;
-
+const ShareButtons = () => {};
 const TableOfContents = ({
   content
 }: {
@@ -210,7 +190,6 @@ const TableOfContents = ({
       </ul>
     </div>;
 };
-
 const BlogPost = () => {
   const {
     slug
@@ -222,7 +201,6 @@ const BlogPost = () => {
   const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
-
   const fetchPost = useCallback(async () => {
     if (!slug) return;
     try {
@@ -239,7 +217,6 @@ const BlogPost = () => {
       setLoading(false);
     }
   }, [slug]);
-
   const fetchComments = useCallback(async (postId: string) => {
     try {
       setCommentsLoading(true);
@@ -258,7 +235,6 @@ const BlogPost = () => {
       setCommentsLoading(false);
     }
   }, []);
-
   const fetchRelatedContent = useCallback(async () => {
     try {
       // Fetch recent posts (excluding current post)
@@ -276,12 +252,10 @@ const BlogPost = () => {
       console.error("Error fetching related content:", error);
     }
   }, [slug]);
-
   useEffect(() => {
     fetchPost();
     fetchRelatedContent();
   }, [fetchPost, fetchRelatedContent]);
-
   useEffect(() => {
     if (post?.id) {
       fetchComments(post.id);
@@ -302,7 +276,6 @@ const BlogPost = () => {
       };
     }
   }, [post?.id, fetchComments]);
-
   const handleCommentAdded = () => {
     // No need to manually update comments as they will be updated via real-time subscription
     // But we might want to refresh them anyway in case of network issues
@@ -310,13 +283,14 @@ const BlogPost = () => {
       fetchComments(post.id);
     }
   };
-
   const formatContent = (content: string) => {
     // Check if the content is HTML (from the rich text editor)
     if (content && (content.includes('<p>') || content.includes('<h'))) {
-      return <div dangerouslySetInnerHTML={{ __html: content }} className="prose prose-invert max-w-none" />;
+      return <div dangerouslySetInnerHTML={{
+        __html: content
+      }} className="prose prose-invert max-w-none" />;
     }
-    
+
     // Legacy content formatting (for old posts without HTML)
     let headingIndex = 0;
     return content.split('\n\n').map((paragraph, index) => {
@@ -343,7 +317,6 @@ const BlogPost = () => {
         </p>;
     });
   };
-
   if (loading) {
     return <div className="min-h-screen bg-zinc-950 flex flex-col">
         <Navbar />
@@ -352,7 +325,6 @@ const BlogPost = () => {
         </div>
       </div>;
   }
-
   if (!post) {
     return <div className="min-h-screen flex flex-col bg-zinc-950">
         <Navbar />
@@ -364,7 +336,6 @@ const BlogPost = () => {
         </div>
       </div>;
   }
-
   return <div className="min-h-screen bg-zinc-950 flex flex-col">
       <Navbar />
       
@@ -460,5 +431,4 @@ const BlogPost = () => {
       <Footer />
     </div>;
 };
-
 export default BlogPost;
