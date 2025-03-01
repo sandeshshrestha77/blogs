@@ -9,7 +9,6 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ArrowLeft, MessageCircle, Calendar, Clock, Share2, ArrowRight } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import Footer from "@/components/Footer";
-
 type Post = Database['public']['Tables']['posts']['Row'];
 interface Comment {
   id: string;
@@ -19,18 +18,29 @@ interface Comment {
   content: string;
   created_at: string;
 }
-
-const AuthorCard = ({ author, date }: { author: string; date: string }) => (
-  <div className="text-white">
-    <p>{author}</p>
-    <p>Posted on {date}</p>
-    <p>Graphic Designer</p>
-  </div>
-);
-
+const AuthorCard = ({
+  author,
+  date
+}: {
+  author: string;
+  date: string;
+}) => {
+  return <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6 mb-6">
+      <div className="flex items-center mb-4">
+        <div className="w-14 h-14 rounded-full bg-zinc-800 overflow-hidden mr-4">
+          <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${author}`} alt={`${author}'s avatar`} className="w-full h-full object-cover" />
+        </div>
+        <div>
+          <h3 className="font-semibold text-white text-lg">{author}</h3>
+          <p className="text-sm text-gray-400">Posted on {date}</p>
+        </div>
+      </div>
+      <p className="text-gray-300 text-sm">Graphic Designer</p>
+    </div>;
+};
 const CommentForm = ({
   postId,
-  onCommentAdded,
+  onCommentAdded
 }: {
   postId: string;
   onCommentAdded: () => void;
@@ -39,7 +49,6 @@ const CommentForm = ({
   const [email, setEmail] = useState("");
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !content) {
@@ -48,11 +57,13 @@ const CommentForm = ({
     }
     try {
       setIsSubmitting(true);
-      const { error } = await supabase.from("comments").insert({
+      const {
+        error
+      } = await supabase.from('comments').insert({
         post_id: postId,
         name,
         email: email || null,
-        content,
+        content
       });
       if (error) throw error;
       toast.success("Comment submitted successfully");
@@ -67,95 +78,152 @@ const CommentForm = ({
       setIsSubmitting(false);
     }
   };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="text-xl font-bold text-white">Leave a Comment</h3>
-      <input
-        type="text"
-        placeholder="Name *"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <input
-        type="email"
-        placeholder="Email (optional)"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <textarea
-        placeholder="Comment *"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        rows={4}
-        className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <Button type="submit" disabled={isSubmitting}>
+  return <form onSubmit={handleSubmit} className="space-y-4 bg-zinc-900/50 p-6 rounded-lg border border-zinc-800">
+      <h3 className="text-xl font-semibold text-white mb-4">Leave a Comment</h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-1">
+            Name *
+          </label>
+          <input id="name" type="text" value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+        </div>
+        
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-1">
+            Email (optional)
+          </label>
+          <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+      </div>
+      
+      <div>
+        <label htmlFor="comment" className="block text-sm font-medium text-gray-400 mb-1">
+          Comment *
+        </label>
+        <textarea id="comment" value={content} onChange={e => setContent(e.target.value)} rows={4} className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+      </div>
+      
+      <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
         {isSubmitting ? "Submitting..." : "Post Comment"}
       </Button>
-    </form>
-  );
+    </form>;
 };
-
-const CommentsList = ({ comments }: { comments: Comment[] }) => {
+const CommentsList = ({
+  comments
+}: {
+  comments: Comment[];
+}) => {
   if (comments.length === 0) {
-    return <p className="text-white">Be the first to comment on this article!</p>;
+    return <div className="text-center py-8">
+        <p className="text-gray-400">Be the first to comment on this article!</p>
+      </div>;
   }
-
-  return (
-    <div className="space-y-4">
-      {comments.map((comment) => (
-        <div key={comment.id} className="border-b border-zinc-700 pb-4">
-          <p className="font-bold text-white">{comment.name}</p>
-          <p className="text-sm text-gray-400">
-            {new Date(comment.created_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
+  return <div className="space-y-6">
+      {comments.map(comment => <div key={comment.id} className="bg-zinc-900/50 p-6 rounded-lg border border-zinc-800">
+          <div className="flex items-center mb-3">
+            <div className="w-10 h-10 rounded-full bg-zinc-800 overflow-hidden mr-3">
+              <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.name}`} alt={`${comment.name}'s avatar`} className="w-full h-full object-cover" loading="lazy" />
+            </div>
+            <div>
+              <h4 className="font-medium text-white">{comment.name}</h4>
+              <p className="text-xs text-gray-500">
+                {new Date(comment.created_at).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
             })}
-          </p>
-          <p className="text-white">{comment.content}</p>
-        </div>
-      ))}
-    </div>
-  );
+              </p>
+            </div>
+          </div>
+          <p className="text-gray-300">{comment.content}</p>
+        </div>)}
+    </div>;
 };
+const RelatedPostCard = ({
+  post
+}: {
+  post: Post;
+}) => <Link to={`/blog/${post.slug}`} className="group">
+    <div className="flex gap-4 items-start">
+      <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
+        <img src={post.image || "https://source.unsplash.com/100x100/?technology"} alt={post.title} className="w-full h-full object-contain" loading="lazy" />
+      </div>
+      <div>
+        <h4 className="font-medium text-white group-hover:text-blue-400 transition-colors line-clamp-2">
+          {post.title}
+        </h4>
+        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+          <span className="flex items-center gap-1">
+            <Calendar size={12} />
+            {post.date}
+          </span>
+          {post.read_time && <span className="flex items-center gap-1">
+              <Clock size={12} />
+              {post.read_time} min
+            </span>}
+        </div>
+      </div>
+    </div>
+  </Link>;
+const ShareButtons = () => {};
+const TableOfContents = ({
+  content
+}: {
+  content: string;
+}) => {
+  // Extract headings from the content (This is a simplified approach)
+  const headings = content.split('\n\n').filter(para => para.startsWith('#') || para.startsWith('##')).map(heading => heading.replace(/^#+\s/, '').trim()).slice(0, 5); // Limit to 5 headings
 
+  if (headings.length === 0) return null;
+  return <div className="mb-8 p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
+      <h3 className="text-lg font-semibold text-white mb-3">Table of Contents</h3>
+      <ul className="space-y-2">
+        {headings.map((heading, index) => <li key={index} className="text-blue-400 hover:text-blue-300">
+            <a href={`#heading-${index}`} className="flex items-center">
+              <span className="mr-2">•</span>
+              <span className="line-clamp-1">{heading}</span>
+            </a>
+          </li>)}
+      </ul>
+    </div>;
+};
 const BlogPost = () => {
-  const { slug } = useParams();
+  const {
+    slug
+  } = useParams();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
   const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
-
+  const contentRef = useRef<HTMLDivElement>(null);
   const fetchPost = useCallback(async () => {
     if (!slug) return;
     try {
-      const { data, error } = await supabase.from("posts").select().eq("slug", slug).maybeSingle();
+      const {
+        data,
+        error
+      } = await supabase.from("posts").select().eq('slug', slug).maybeSingle();
       if (error) throw error;
       if (data) setPost(data);
     } catch (error) {
       toast.error("Error loading post");
-      console.error("Error: ", error);
+      console.error("Error:", error);
     } finally {
       setLoading(false);
     }
   }, [slug]);
-
   const fetchComments = useCallback(async (postId: string) => {
     try {
       setCommentsLoading(true);
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*")
-        .eq("post_id", postId)
-        .order("created_at", { ascending: false });
+      const {
+        data,
+        error
+      } = await supabase.from('comments').select('*').eq('post_id', postId).order('created_at', {
+        ascending: false
+      });
       if (error) throw error;
       if (data) setComments(data as Comment[]);
     } catch (error) {
@@ -165,106 +233,200 @@ const BlogPost = () => {
       setCommentsLoading(false);
     }
   }, []);
+  const fetchRelatedContent = useCallback(async () => {
+    try {
+      // Fetch recent posts (excluding current post)
+      const {
+        data: recentData
+      } = await supabase.from("posts").select().neq('slug', slug || '').order('created_at', {
+        ascending: false
+      }).limit(4);
+      if (recentData) setRecentPosts(recentData);
 
+      // In a real app, trending posts might be based on view counts or other metrics
+      // For demo purposes, we'll just use the same recent posts
+      setTrendingPosts(recentData || []);
+    } catch (error) {
+      console.error("Error fetching related content:", error);
+    }
+  }, [slug]);
   useEffect(() => {
     fetchPost();
-  }, [fetchPost]);
-
+    fetchRelatedContent();
+  }, [fetchPost, fetchRelatedContent]);
   useEffect(() => {
     if (post?.id) {
       fetchComments(post.id);
+
+      // Set up real-time subscription for comments
+      const channel = supabase.channel('comments-channel').on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'comments',
+        filter: `post_id=eq.${post.id}`
+      }, payload => {
+        // Add the new comment to the state
+        const newComment = payload.new as Comment;
+        setComments(prevComments => [newComment, ...prevComments]);
+      }).subscribe();
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [post?.id, fetchComments]);
-
   const handleCommentAdded = () => {
+    // No need to manually update comments as they will be updated via real-time subscription
+    // But we might want to refresh them anyway in case of network issues
     if (post?.id) {
       fetchComments(post.id);
     }
   };
-
   const formatContent = (content: string) => {
-    if (content && (content.includes("<p>") || content.includes("<h"))) {
-      return <div className="post-content" dangerouslySetInnerHTML={{ __html: content }} />;
+    // Check if the content is HTML (from the rich text editor)
+    if (content && (content.includes('<p>') || content.includes('<h'))) {
+      return <div dangerouslySetInnerHTML={{
+        __html: content
+      }} className="prose prose-invert max-w-none" />;
     }
 
+    // Legacy content formatting (for old posts without HTML)
     let headingIndex = 0;
-    return content.split("\n\n").map((paragraph, index) => {
-      if (paragraph.startsWith("#") || paragraph.startsWith("##")) {
+    return content.split('\n\n').map((paragraph, index) => {
+      // Check if paragraph is a heading
+      if (paragraph.startsWith('#') || paragraph.startsWith('##')) {
         const id = `heading-${headingIndex}`;
         headingIndex++;
-        if (paragraph.startsWith("##")) {
-          return (
-            <h3 key={id} className="text-white">
-              {paragraph.replace(/^##\s/, "")}
-            </h3>
-          );
+
+        // Determine heading level (h2 or h3)
+        if (paragraph.startsWith('##')) {
+          return <h3 id={id} key={index} className="text-xl font-bold text-white mt-10 mb-4">
+              {paragraph.replace(/^##\s/, '')}
+            </h3>;
         } else {
-          return (
-            <h2 key={id} className="text-white">
-              {paragraph.replace(/^#\s/, "")}
-            </h2>
-          );
+          return <h2 id={id} key={index} className="text-2xl font-bold text-white mt-12 mb-6">
+              {paragraph.replace(/^#\s/, '')}
+            </h2>;
         }
       }
-      return (
-        <p key={index} className="text-white">
+
+      // Regular paragraph
+      return <p key={index} className="mb-6 text-gray-300 leading-relaxed">
           {paragraph}
-        </p>
-      );
+        </p>;
     });
   };
-
   if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!post) {
-    return (
-      <div className="text-white">
-        <p>Post not found</p>
-        <Link to="/">Return Home</Link>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-zinc-900 text-white">
-      <Navbar />
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-7 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-5">
-            <h1 className="text-4xl font-bold">{post.title}</h1>
-            <AuthorCard author={post.author || "Anonymous"} date={post.date || ""} />
-            <div className="mt-4">{formatContent(post.content)}</div>
-            <CommentsList comments={comments} />
-            <CommentForm postId={post.id} onCommentAdded={handleCommentAdded} />
-          </div>
-
-          {/* Sidebar */}
-          <div className="lg:col-span-2 space-y-8">
-            <Card className="p-4 bg-zinc-800">
-              <h3 className="text-xl font-bold">Trending Posts</h3>
-              {trendingPosts.slice(0, 3).map((post) => (
-                <Link key={post.id} to={`/blog/${post.slug}`} className="block mt-2 text-blue-400">
-                  {post.title}
-                </Link>
-              ))}
-            </Card>
-            <Card className="p-4 bg-zinc-800">
-              <h3 className="text-xl font-bold">Recent Articles</h3>
-              {recentPosts.slice(0, 3).map((post) => (
-                <Link key={post.id} to={`/blog/${post.slug}`} className="block mt-2 text-blue-400">
-                  {post.title}
-                </Link>
-              ))}
-            </Card>
-          </div>
+    return <div className="min-h-screen bg-zinc-950 flex flex-col">
+        <Navbar />
+        <div className="flex flex-grow items-center justify-center">
+          <LoadingSpinner />
         </div>
-      </main>
+      </div>;
+  }
+  if (!post) {
+    return <div className="min-h-screen flex flex-col bg-zinc-950">
+        <Navbar />
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="text-3xl font-bold mb-4 text-white">Post not found</h1>
+          <Link to="/">
+            <Button>Return Home</Button>
+          </Link>
+        </div>
+      </div>;
+  }
+  return <div className="min-h-screen bg-zinc-950 flex flex-col">
+      <Navbar />
+      
+      <article className="container mx-auto px-4 py-16 max-w-6xl">
+        
+        
+        {/* Featured Image */}
+        <div className="aspect-video mb-8 rounded-xl overflow-hidden shadow-lg">
+          <img src={post.image || "https://images.unsplash.com/photo-1498050108023-c5249f4df085"} alt={post.title} className="object-cover w-full h-full" loading="lazy" />
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-7 gap-8">
+          {/* Main Content (5 columns on large screens) */}
+          <div className="lg:col-span-5">
+            <header className="mb-8">
+              {post.category && <span className="inline-block text-xs font-medium px-3 py-1 bg-blue-600/10 text-blue-400 rounded-full mb-4">
+                  {post.category}
+                </span>}
+              <h1 className="text-3xl md:text-4xl font-bold mb-6 text-white">{post.title}</h1>
+              
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-6">
+                <div className="flex items-center gap-2">
+                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author}`} alt={`${post.author}'s avatar`} className="w-6 h-6 rounded-full" />
+                  <span>{post.author || "Anonymous"}</span>
+                </div>
+                
+                {post.date && <div className="flex items-center gap-1">
+                    <Calendar size={16} />
+                    <span>{post.date}</span>
+                  </div>}
+                
+                {post.read_time && <div className="flex items-center gap-1">
+                    <Clock size={16} />
+                    <span>{post.read_time} min read</span>
+                  </div>}
+                
+                <div className="flex items-center gap-1">
+                  <MessageCircle size={16} />
+                  <span>{comments.length} comments</span>
+                </div>
+              </div>
+              
+              <ShareButtons />
+              
+              {/* Table of Contents - only for longer articles */}
+              {post.content && post.content.length > 1000 && <TableOfContents content={post.content} />}
+            </header>
+            
+            <div ref={contentRef} className="prose prose-lg max-w-none prose-dark">
+              {post.content ? formatContent(post.content) : <p className="text-gray-300">No content available.</p>}
+            </div>
+            
+            <div className="mt-12 pt-8 border-t border-zinc-800">
+              <h2 className="text-2xl font-bold text-white mb-6">Comments ({comments.length})</h2>
+              
+              {commentsLoading ? <div className="flex justify-center py-8">
+                  <LoadingSpinner />
+                </div> : <CommentsList comments={comments} />}
+              
+              <div className="mt-8">
+                <CommentForm postId={post.id} onCommentAdded={handleCommentAdded} />
+              </div>
+            </div>
+          </div>
+          
+          {/* Sidebar (2 columns on large screens) */}
+          <aside className="lg:col-span-2 space-y-8">
+            <AuthorCard author={post.author || "Anonymous"} date={post.date || new Date().toLocaleDateString()} />
+            
+            {/* Trending Posts Section */}
+            <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Trending Posts</h3>
+              <div className="space-y-6">
+                {trendingPosts.slice(0, 3).map(post => <RelatedPostCard key={post.id} post={post} />)}
+              </div>
+            </div>
+            
+            {/* Recent Posts Section */}
+            <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Recent Articles</h3>
+              <div className="space-y-6">
+                {recentPosts.slice(0, 3).map(post => <RelatedPostCard key={post.id} post={post} />)}
+                <Link to="/blog" className="inline-flex items-center text-blue-400 hover:text-blue-300 mt-4">
+                  View all articles
+                  <ArrowRight size={16} className="ml-1" />
+                </Link>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+      
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default BlogPost;
