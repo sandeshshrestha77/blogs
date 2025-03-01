@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Database } from "@/integrations/supabase/types";
+import { Editor } from "@tinymce/tinymce-react";
 
 type Post = Database['public']['Tables']['posts']['Row'];
 type PostInput = Partial<Omit<Post, 'id' | 'created_at'>> & {
@@ -18,6 +19,7 @@ type PostInput = Partial<Omit<Post, 'id' | 'created_at'>> & {
 const AdminPostForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const editorRef = useRef<any>(null);
   const [formData, setFormData] = useState<PostInput>({
     title: "",
     author: "",
@@ -141,9 +143,13 @@ const AdminPostForm = () => {
         }
       }
 
+      // Get content from editor
+      const content = editorRef.current ? editorRef.current.getContent() : formData.content;
+
       const postData = {
         ...formData,
         image: imageUrl,
+        content: content,
       };
 
       if (id) {
@@ -176,6 +182,10 @@ const AdminPostForm = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditorChange = (content: string) => {
+    setFormData((prev) => ({ ...prev, content }));
   };
 
   return (
@@ -269,16 +279,54 @@ const AdminPostForm = () => {
                   className="bg-zinc-900 border-zinc-700 text-white"
                 />
               </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Read Time (in minutes)</label>
+                <Input 
+                  name="read_time" 
+                  value={formData.read_time} 
+                  onChange={handleChange} 
+                  placeholder="e.g. 5"
+                  className="bg-zinc-900 border-zinc-700 text-white"
+                />
+              </div>
+
+              <div className="space-y-2 flex items-center">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.featured === true}
+                    onChange={() => setFormData(prev => ({ ...prev, featured: !prev.featured }))}
+                    className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out mr-2"
+                  />
+                  <span className="text-sm font-medium text-gray-300">Featured Post</span>
+                </label>
+              </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">Content</label>
-              <textarea 
-                name="content" 
-                value={formData.content} 
-                onChange={handleChange} 
-                required 
-                className="w-full min-h-[200px] px-3 py-2 text-sm rounded-md bg-zinc-900 border border-zinc-700 text-white" 
+              <Editor
+                apiKey="no-api-key"
+                onInit={(evt, editor) => editorRef.current = editor}
+                initialValue={formData.content}
+                onEditorChange={handleEditorChange}
+                init={{
+                  height: 500,
+                  menubar: true,
+                  plugins: [
+                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                  ],
+                  toolbar: 'undo redo | blocks | ' +
+                    'bold italic forecolor | alignleft aligncenter ' +
+                    'alignright alignjustify | bullist numlist outdent indent | ' +
+                    'removeformat | help',
+                  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                  skin: 'oxide-dark',
+                  content_css: 'dark',
+                }}
               />
             </div>
 
