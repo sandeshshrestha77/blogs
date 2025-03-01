@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Database } from "@/integrations/supabase/types";
-import { Editor } from "@tinymce/tinymce-react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 type Post = Database['public']['Tables']['posts']['Row'];
 type PostInput = Partial<Omit<Post, 'id' | 'created_at'>> & {
@@ -19,7 +20,7 @@ type PostInput = Partial<Omit<Post, 'id' | 'created_at'>> & {
 const AdminPostForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const editorRef = useRef<any>(null);
+  // Using the state directly instead of a ref for content
   const [formData, setFormData] = useState<PostInput>({
     title: "",
     author: "",
@@ -35,6 +36,24 @@ const AdminPostForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+
+  // Define Quill modules and formats
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      ['link', 'image', 'code-block'],
+      ['clean']
+    ]
+  };
+
+  const formats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet',
+    'link', 'image', 'code-block'
+  ];
 
   const fetchPost = async () => {
     if (!id) return;
@@ -137,12 +156,9 @@ const AdminPostForm = () => {
         }
       }
 
-      const content = editorRef.current ? editorRef.current.getContent() : formData.content;
-
       const postData = {
         ...formData,
         image: imageUrl,
-        content: content,
       };
 
       if (id) {
@@ -177,7 +193,7 @@ const AdminPostForm = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleEditorChange = (content: string) => {
+  const handleContentChange = (content: string) => {
     setFormData((prev) => ({ ...prev, content }));
   };
 
@@ -299,27 +315,16 @@ const AdminPostForm = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">Content</label>
-              <Editor
-                onInit={(evt, editor) => editorRef.current = editor}
-                initialValue={formData.content}
-                onEditorChange={handleEditorChange}
-                init={{
-                  height: 500,
-                  menubar: true,
-                  plugins: [
-                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                  ],
-                  toolbar: 'undo redo | blocks | ' +
-                    'bold italic forecolor | alignleft aligncenter ' +
-                    'alignright alignjustify | bullist numlist outdent indent | ' +
-                    'removeformat | help',
-                  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                  skin: 'oxide-dark',
-                  content_css: 'dark',
-                }}
-              />
+              <div className="bg-white rounded">
+                <ReactQuill 
+                  theme="snow"
+                  value={formData.content}
+                  onChange={handleContentChange}
+                  modules={modules}
+                  formats={formats}
+                  className="h-[400px] mb-12" /* Adding bottom margin for Quill toolbar */
+                />
+              </div>
             </div>
 
             <div className="flex justify-end gap-4">
