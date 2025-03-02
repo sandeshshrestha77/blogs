@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { supabase } from "./utils/supabase"; 
@@ -11,6 +10,7 @@ import Login from "./pages/Login";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop"; // ✅ Added ScrollToTop
 
 function App() {
   const [todos, setTodos] = useState<any[]>([]);
@@ -34,6 +34,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop /> {/* ✅ Ensures every page starts from the top */}
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/blogs" element={<Blogs />} />
