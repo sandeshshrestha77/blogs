@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -82,9 +81,20 @@ const Index = () => {
           {featuredPost && (
             <section className="relative pt-32 pb-24 overflow-hidden">
               <div className="container mx-auto px-4">
-                <div className="flex flex-col lg:flex-row gap-16 items-center">
-                  {/* Left column - Text content */}
-                  <div className="w-full lg:w-1/2 space-y-8">
+                {/* Full-width featured image for mobile and desktop */}
+                <div className="mb-10 w-full">
+                  <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-zinc-800/30 aspect-[16/9]">
+                    <img 
+                      src={featuredPost.image || "https://source.unsplash.com/1200x800/?technology"} 
+                      alt={featuredPost.title} 
+                      className="object-cover w-full h-full hover:scale-105 transition-transform duration-700" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/50 to-transparent"></div>
+                  </div>
+                </div>
+                
+                <div className="max-w-4xl mx-auto">
+                  <div className="w-full space-y-8">
                     <div className="inline-flex items-center px-5 py-2 rounded-full text-sm font-medium bg-blue-600/20 text-blue-400 border border-blue-500/20">
                       {featuredPost.category}
                     </div>
@@ -118,18 +128,6 @@ const Index = () => {
                       Read Article 
                       <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
                     </Link>
-                  </div>
-                  
-                  {/* Right column - Featured image */}
-                  <div className="w-full lg:w-1/2">
-                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-zinc-800/30 aspect-[4/3]">
-                      <img 
-                        src={featuredPost.image || "https://source.unsplash.com/1200x800/?technology"} 
-                        alt={featuredPost.title} 
-                        className="object-cover w-full h-full hover:scale-105 transition-transform duration-700" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/50 to-transparent"></div>
-                    </div>
                   </div>
                 </div>
               </div>
