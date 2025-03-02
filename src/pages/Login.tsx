@@ -39,7 +39,7 @@ const Login = () => {
       {/* Left Side - Image (60%) */}
       <div className="hidden lg:block w-[60%] relative overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1500673922987-e212871fec22"
+          src="https://images.unsplash.com/photo-1740165886179-c2be3d6447ca?q=80&w=1976&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="Login Background"
           className="absolute inset-0 w-full h-full object-cover"
         />
