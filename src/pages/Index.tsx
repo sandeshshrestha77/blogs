@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -153,16 +154,28 @@ const Index = () => {
                     </p>
                   </div>
                   
-                  {!showAllPosts && posts.length > 6 && (
-                    <Button 
-                      variant="outline" 
-                      onClick={handleViewAll} 
-                      className="border-blue-600/40 text-blue-400 hover:bg-blue-600/10 hover:text-blue-300 transition-all"
-                    >
-                      View All Articles
-                      <ChevronRight className="ml-1 h-4 w-4" />
-                    </Button>
-                  )}
+                  <div className="flex gap-3">
+                    {!showAllPosts && posts.length > 6 && (
+                      <Button 
+                        variant="outline" 
+                        onClick={handleViewAll} 
+                        className="border-blue-600/40 text-blue-400 hover:bg-blue-600/10 hover:text-blue-300 transition-all"
+                      >
+                        View More
+                        <ChevronRight className="ml-1 h-4 w-4" />
+                      </Button>
+                    )}
+                    
+                    <Link to="/blogs">
+                      <Button 
+                        variant="outline" 
+                        className="border-blue-600/40 text-blue-400 hover:bg-blue-600/10 hover:text-blue-300 transition-all"
+                      >
+                        All Articles
+                        <ArrowRight className="ml-1 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

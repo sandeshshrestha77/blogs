@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { supabase } from "./utils/supabase"; 
 import Index from "./pages/Index";
+import Blogs from "./pages/Blogs";
 import BlogPost from "./pages/BlogPost";
 import Admin from "./pages/Admin";
 import AdminPostForm from "./pages/AdminPostForm";
@@ -35,6 +36,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/blogs" element={<Blogs />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<Login />} />
