@@ -25,7 +25,11 @@ const Index = () => {
       setUpdating(true);
       const [featuredResponse, postsResponse] = await Promise.all([
         supabase.from("posts").select().eq('featured', true).maybeSingle(),
-        supabase.from("posts").select().eq('featured', false).order("created_at", { ascending: false })
+        supabase.from("posts")
+          .select()
+          .eq('featured', false)
+          .order("created_at", { ascending: false })
+          .limit(8)
       ]);
       
       if (featuredResponse.error && featuredResponse.error.code !== 'PGRST116') {
@@ -81,19 +85,15 @@ const Index = () => {
           {featuredPost && (
             <section className="relative pt-32 pb-24 overflow-hidden">
               <div className="container mx-auto px-4">
-                {/* Featured image with content overlay */}
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-zinc-800/30 aspect-[16/9] mb-16">
-                  {/* Image */}
                   <img 
                     src={featuredPost.image || "https://source.unsplash.com/1200x800/?technology"} 
                     alt={featuredPost.title} 
                     className="object-cover w-full h-full hover:scale-105 transition-transform duration-700" 
                   />
                   
-                  {/* Gradient overlay - from left to right */}
                   <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/70 to-transparent"></div>
                   
-                  {/* Content positioned inside the image */}
                   <div className="absolute inset-0 flex items-center">
                     <div className="max-w-2xl px-8 sm:px-12 space-y-6">
                       <div className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-blue-600/20 text-blue-400 border border-blue-500/20">
@@ -134,23 +134,22 @@ const Index = () => {
                 </div>
               </div>
               
-              {/* Background decorative elements */}
               <div className="absolute top-40 right-0 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl -z-10"></div>
               <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl -z-10"></div>
             </section>
           )}
 
-          {/* Latest Posts Section */}
+          {/* Trending Posts Section */}
           {posts.length > 0 && (
             <section className="py-24 bg-zinc-900/30">
               <div className="container mx-auto px-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-16">
                   <div>
                     <h2 className="text-3xl lg:text-4xl font-bold text-white">
-                      Latest Stories
+                      Trending Stories
                     </h2>
                     <p className="mt-3 text-xl text-gray-400">
-                      Discover our most recent articles and insights
+                      Discover our most popular articles and insights
                     </p>
                   </div>
                   
