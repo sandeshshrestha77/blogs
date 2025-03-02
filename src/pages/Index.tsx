@@ -81,53 +81,55 @@ const Index = () => {
           {featuredPost && (
             <section className="relative pt-32 pb-24 overflow-hidden">
               <div className="container mx-auto px-4">
-                {/* Full-width featured image for mobile and desktop */}
-                <div className="mb-10 w-full">
-                  <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-zinc-800/30 aspect-[16/9]">
-                    <img 
-                      src={featuredPost.image || "https://source.unsplash.com/1200x800/?technology"} 
-                      alt={featuredPost.title} 
-                      className="object-cover w-full h-full hover:scale-105 transition-transform duration-700" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/50 to-transparent"></div>
-                  </div>
-                </div>
-                
-                <div className="max-w-4xl mx-auto">
-                  <div className="w-full space-y-8">
-                    <div className="inline-flex items-center px-5 py-2 rounded-full text-sm font-medium bg-blue-600/20 text-blue-400 border border-blue-500/20">
-                      {featuredPost.category}
-                    </div>
-                    
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                      {featuredPost.title}
-                    </h1>
-                    
-                    <p className="text-xl text-gray-300 leading-relaxed">
-                      {featuredPost.excerpt}
-                    </p>
-                    
-                    <div className="flex items-center gap-8 text-gray-400 pt-2">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-blue-600/20 p-1.5 rounded-full">
-                          <User size={16} className="text-blue-400" />
-                        </div>
-                        <span>{featuredPost.author}</span>
+                {/* Featured image with content overlay */}
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-zinc-800/30 aspect-[16/9] mb-16">
+                  {/* Image */}
+                  <img 
+                    src={featuredPost.image || "https://source.unsplash.com/1200x800/?technology"} 
+                    alt={featuredPost.title} 
+                    className="object-cover w-full h-full hover:scale-105 transition-transform duration-700" 
+                  />
+                  
+                  {/* Gradient overlay - from left to right */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/70 to-transparent"></div>
+                  
+                  {/* Content positioned inside the image */}
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="max-w-2xl px-8 sm:px-12 space-y-6">
+                      <div className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-blue-600/20 text-blue-400 border border-blue-500/20">
+                        {featuredPost.category}
                       </div>
-                      {featuredPost.read_time && (
+                      
+                      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                        {featuredPost.title}
+                      </h1>
+                      
+                      <p className="text-lg text-gray-300 leading-relaxed line-clamp-3">
+                        {featuredPost.excerpt}
+                      </p>
+                      
+                      <div className="flex items-center gap-8 text-gray-400">
                         <div className="flex items-center gap-2">
                           <div className="bg-blue-600/20 p-1.5 rounded-full">
-                            <Clock size={16} className="text-blue-400" />
+                            <User size={16} className="text-blue-400" />
                           </div>
-                          <span>{featuredPost.read_time} min read</span>
+                          <span>{featuredPost.author}</span>
                         </div>
-                      )}
+                        {featuredPost.read_time && (
+                          <div className="flex items-center gap-2">
+                            <div className="bg-blue-600/20 p-1.5 rounded-full">
+                              <Clock size={16} className="text-blue-400" />
+                            </div>
+                            <span>{featuredPost.read_time} min read</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <Link to={`/blog/${featuredPost.slug}`} className="inline-flex items-center py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors group shadow-lg shadow-blue-900/20">
+                        Read Article 
+                        <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
+                      </Link>
                     </div>
-                    
-                    <Link to={`/blog/${featuredPost.slug}`} className="inline-flex items-center py-4 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors group shadow-lg shadow-blue-900/20">
-                      Read Article 
-                      <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
-                    </Link>
                   </div>
                 </div>
               </div>
