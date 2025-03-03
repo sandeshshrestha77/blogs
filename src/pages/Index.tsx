@@ -81,7 +81,7 @@ const Index = () => {
           <LoadingSpinner />
         </div> : <>
           {/* Hero Section with Featured Post */}
-          {featuredPost && <section className="relative pt-32 pb-20 overflow-hidden py-[100px] px-0">
+          {featuredPost && <section className="relative pt-32 pb-20 overflow-hidden px-0 py-[60px]">
               <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl"></div>
