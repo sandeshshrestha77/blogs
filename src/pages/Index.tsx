@@ -99,7 +99,7 @@ const Index = () => {
                     Hey there, I'm Sandesh Shrestha
                   </h2>
                   <p className="text-zinc-300 leading-relaxed">
-                    I'm passionate about technology, design, and creating meaningful digital experiences...
+                    I'm Sandesh Shrestha, a Graphic & Motion Designer passionate about branding, visual storytelling, and motion graphics.
                   </p>
                   
                   <Link to="/blogs">
