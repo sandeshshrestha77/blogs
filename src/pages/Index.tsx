@@ -65,7 +65,7 @@ const Index = () => {
           <LoadingSpinner />
         </div> : <>
           {/* About Section - Moved to Top */}
-          <section className="relative overflow-hidden py-[60px]">
+          <section className="relative overflow-hidden py-[120px]">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
               <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl"></div>
@@ -107,7 +107,7 @@ const Index = () => {
     view my work
     <ArrowUpRight className="ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" size={16} />
   </Button>
-</Link>
+              </Link>
 
                 </div>
               </div>
@@ -166,7 +166,7 @@ const Index = () => {
             </section>}
 
           {/* Latest Posts Section - Moved to Third */}
-          {posts.length > 0 && <section className="bg-zinc-900/30 py-[60px]">
+          {posts.length > 0 && <section className="py-[61px] bg-zinc-950">
               <div className="container mx-auto px-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
                   <div>
