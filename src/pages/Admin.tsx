@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,13 +13,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Pencil, Trash2, Star, StarOff } from "lucide-react";
+import {
+  LayoutDashboard,
+  Pencil,
+  Trash2,
+  Star,
+  StarOff,
+  Eye,
+  MessageSquare,
+  Calendar,
+} from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 type Post = Database['public']['Tables']['posts']['Row'];
 
 const Admin = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   // Helper function for displaying toast messages
@@ -33,6 +46,7 @@ const Admin = () => {
   // Fetch posts from Supabase
   const fetchPosts = async () => {
     try {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from("posts")
         .select()
@@ -45,6 +59,8 @@ const Admin = () => {
     } catch (error) {
       console.error("Error fetching posts:", error);
       showToast("error", "Error fetching posts");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -106,107 +122,206 @@ const Admin = () => {
 
   return (
     <AdminLayout>
-      <div className="bg-[#1A1B1E] rounded-xl shadow-xl border border-zinc-800 overflow-hidden">
-        <div className="p-6 border-b border-zinc-800">
-          <h2 className="text-xl font-semibold text-white">Blog Posts</h2>
-          <p className="text-sm text-gray-400 mt-1">
-            Manage and organize your blog content
+      <div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-medium text-gray-800 flex items-center">
+            <LayoutDashboard className="mr-2 h-7 w-7 text-[#2271b1]" />
+            Dashboard
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Welcome to your blog management dashboard
           </p>
         </div>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-zinc-900/50">
-                <TableHead className="font-semibold text-gray-300">
-                  Title
-                </TableHead>
-                <TableHead className="font-semibold text-gray-300">
-                  Author
-                </TableHead>
-                <TableHead className="font-semibold text-gray-300">
-                  Category
-                </TableHead>
-                <TableHead className="font-semibold text-gray-300">
-                  Date
-                </TableHead>
-                <TableHead className="font-semibold text-gray-300 text-right">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {posts.map(({ id, title, author, category, date, featured }) => (
-                <TableRow key={id} className="hover:bg-zinc-900/50 border-zinc-800">
-                  <TableCell className="font-medium text-white">
-                    {title}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
-                        <span className="text-sm font-medium text-gray-300">
-                          {author?.[0]?.toUpperCase() || "N/A"}
-                        </span>
-                      </div>
-                      <span className="text-gray-300">{author || "Unknown"}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-600/10 text-blue-400 border border-blue-500/20">
-                      {category || "Uncategorized"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-gray-400">
-                    {new Date(date).toLocaleDateString() || "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2 justify-end">
-                      {/* Edit Button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate(`/admin/edit/${id}`)}
-                        aria-label={`Edit post: ${title}`}
-                        className="hover:bg-blue-600/10 hover:text-blue-400 text-gray-400"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
 
-                      {/* Delete Button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(id)}
-                        aria-label={`Delete post: ${title}`}
-                        className="hover:bg-red-600/10 hover:text-red-400 text-gray-400"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-
-                      {/* Feature Toggle Button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleFeaturePost(id, featured ?? false)}
-                        aria-label={`Toggle featured status for post: ${title}`}
-                        className={
-                          featured
-                            ? "text-yellow-400 hover:bg-yellow-600/10"
-                            : "text-gray-400 hover:bg-gray-600/10"
-                        }
-                      >
-                        {featured ? (
-                          <Star className="h-4 w-4" />
-                        ) : (
-                          <StarOff className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-white shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-4xl font-semibold text-[#2271b1]">{posts.length}</p>
+                  <p className="text-gray-500 mt-1">Total Posts</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#2271b1]/10 flex items-center justify-center">
+                  <FileText className="h-6 w-6 text-[#2271b1]" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-4xl font-semibold text-green-600">{posts.filter(p => p.featured).length}</p>
+                  <p className="text-gray-500 mt-1">Featured Posts</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
+                  <Star className="h-6 w-6 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-4xl font-semibold text-blue-600">0</p>
+                  <p className="text-gray-500 mt-1">Comments</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
+                  <MessageSquare className="h-6 w-6 text-blue-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
+
+        <Card className="bg-white shadow-sm border border-gray-200 mb-8">
+          <CardHeader className="border-b border-gray-100 bg-white px-6 py-4">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-xl font-medium text-gray-800">Latest Posts</CardTitle>
+              <Button 
+                onClick={() => navigate("/admin/create")}
+                variant="default"
+                size="sm"
+                className="bg-[#2271b1] hover:bg-[#135e96] text-white"
+              >
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add New
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-gray-50 border-gray-200">
+                    <TableHead className="font-medium text-gray-600">
+                      Title
+                    </TableHead>
+                    <TableHead className="font-medium text-gray-600">
+                      Author
+                    </TableHead>
+                    <TableHead className="font-medium text-gray-600">
+                      Category
+                    </TableHead>
+                    <TableHead className="font-medium text-gray-600">
+                      Date
+                    </TableHead>
+                    <TableHead className="font-medium text-gray-600 text-right">
+                      Actions
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-8">
+                        <div className="flex justify-center">
+                          <svg className="animate-spin h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : posts.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                        No posts found. Create your first post!
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    posts.map(({ id, title, author, category, date, featured }) => (
+                      <TableRow key={id} className="hover:bg-gray-50 border-gray-200">
+                        <TableCell className="font-medium text-[#2271b1] hover:text-[#135e96] transition-colors">
+                          <a href={`/admin/edit/${id}`} className="hover:underline">
+                            {title}
+                          </a>
+                          <div className="flex items-center gap-2 mt-1">
+                            <button 
+                              onClick={() => navigate(`/blog/${id}`)} 
+                              className="text-xs text-gray-500 hover:text-gray-700 inline-flex items-center"
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              View
+                            </button>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                              <span className="text-sm font-medium text-gray-600">
+                                {author?.[0]?.toUpperCase() || "A"}
+                              </span>
+                            </div>
+                            <span className="text-gray-600">{author || "Unknown"}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                            {category || "Uncategorized"}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-gray-600">
+                          <div className="flex items-center">
+                            <Calendar className="h-3 w-3 mr-1 text-gray-400" />
+                            {new Date(date).toLocaleDateString() || "N/A"}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2 justify-end">
+                            {/* Edit Button */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => navigate(`/admin/edit/${id}`)}
+                              aria-label={`Edit post: ${title}`}
+                              className="hover:bg-[#2271b1]/10 hover:text-[#2271b1] text-gray-500"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+
+                            {/* Delete Button */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(id)}
+                              aria-label={`Delete post: ${title}`}
+                              className="hover:bg-red-50 hover:text-red-500 text-gray-500"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+
+                            {/* Feature Toggle Button */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleFeaturePost(id, featured ?? false)}
+                              aria-label={`Toggle featured status for post: ${title}`}
+                              className={
+                                featured
+                                  ? "text-yellow-500 hover:bg-yellow-50"
+                                  : "text-gray-500 hover:bg-gray-100"
+                              }
+                            >
+                              {featured ? (
+                                <Star className="h-4 w-4" />
+                              ) : (
+                                <StarOff className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );
