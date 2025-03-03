@@ -77,7 +77,7 @@ const Index = () => {
                   <div className="rounded-2xl overflow-hidden border border-zinc-800/50 shadow-xl">
                     <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" alt="About" className="w-full h-auto" />
                   </div>
-                  <div className="absolute -bottom-6 -right-6 bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-xl">
+                  <div className="absolute -bottom-6 -right-6 border border-zinc-800 rounded-xl p-4 shadow-xl bg-gray-950">
                     <div className="flex items-center gap-4">
                       <div className="bg-blue-600/20 p-3 rounded-full">
                         <BookOpen size={24} className="text-blue-400" />
