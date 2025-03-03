@@ -17,7 +17,6 @@ const Footer = () => {
           <div className="space-y-6 lg:col-span-2">
             <div className="flex items-center space-x-3">
               <img src="/logo.png" alt="Sandesh Shrestha Logo" className="h-12 w-auto" />
-              <span className="text-white font-semibold text-xl">Sandesh Shrestha</span>
             </div>
             <p className="text-zinc-400 max-w-md leading-relaxed">
               Exploring design and creativity through articles and insights on technology,
