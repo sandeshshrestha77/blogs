@@ -65,7 +65,7 @@ const Index = () => {
           <LoadingSpinner />
         </div> : <>
           {/* About Section - Moved to Top */}
-          <section className="relative overflow-hidden py-[144px]">
+          <section className="relative overflow-hidden py-[80px]">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
               <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl"></div>
@@ -77,7 +77,7 @@ const Index = () => {
                   <div className="rounded-2xl overflow-hidden border border-zinc-800/50 shadow-xl">
                     <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" alt="About" className="w-full h-auto" />
                   </div>
-                  <div className="absolute -bottom-6 -right-6 border border-zinc-800 rounded-xl p-4 shadow-xl bg-gray-950">
+                  <div className="absolute -bottom-6 -right-6 border border-zinc-800 rounded-xl p-4 shadow-xl bg-inherit">
                     <div className="flex items-center gap-4">
                       <div className="bg-blue-600/20 p-3 rounded-full">
                         <BookOpen size={24} className="text-blue-400" />
@@ -115,7 +115,7 @@ const Index = () => {
           </section>
 
           {/* Featured Post Section - Moved to Second */}
-          {featuredPost && <section className="relative pt-32 pb-20 overflow-hidden px-0 py-[60px]">
+          {featuredPost && <section className="relative pt-32 pb-20 overflow-hidden px-0 py-[80px]">
               <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl"></div>
