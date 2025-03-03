@@ -1,18 +1,9 @@
-
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   LayoutDashboard,
   Pencil,
@@ -22,6 +13,8 @@ import {
   Eye,
   MessageSquare,
   Calendar,
+  FileText as FileTextIcon,
+  PlusCircle as PlusCircleIcon,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +27,6 @@ const Admin = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Helper function for displaying toast messages
   const showToast = (type: "success" | "error", message: string) => {
     if (type === "success") {
       toast.success(message);
@@ -43,7 +35,6 @@ const Admin = () => {
     }
   };
 
-  // Fetch posts from Supabase
   const fetchPosts = async () => {
     try {
       setIsLoading(true);
@@ -54,7 +45,7 @@ const Admin = () => {
 
       if (error) throw error;
       if (data && JSON.stringify(data) !== JSON.stringify(posts)) {
-        setPosts(data); // Update state only if data has changed
+        setPosts(data);
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -64,7 +55,6 @@ const Admin = () => {
     }
   };
 
-  // Delete a post
   const handleDelete = async (postId: string) => {
     try {
       const { error } = await supabase
@@ -81,7 +71,6 @@ const Admin = () => {
     }
   };
 
-  // Toggle featured status of a post
   const toggleFeaturePost = async (postId: string, currentStatus: boolean) => {
     try {
       const { error } = await supabase
@@ -102,7 +91,6 @@ const Admin = () => {
     }
   };
 
-  // Set up real-time subscription and cleanup
   useEffect(() => {
     fetchPosts();
 
@@ -116,7 +104,7 @@ const Admin = () => {
       .subscribe();
 
     return () => {
-      channel.unsubscribe(); // Properly unsubscribe from the channel
+      channel.unsubscribe();
     };
   }, []);
 
@@ -142,7 +130,7 @@ const Admin = () => {
                   <p className="text-gray-500 mt-1">Total Posts</p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-[#2271b1]/10 flex items-center justify-center">
-                  <FileText className="h-6 w-6 text-[#2271b1]" />
+                  <FileTextIcon className="h-6 w-6 text-[#2271b1]" />
                 </div>
               </div>
             </CardContent>
@@ -187,7 +175,7 @@ const Admin = () => {
                 size="sm"
                 className="bg-[#2271b1] hover:bg-[#135e96] text-white"
               >
-                <PlusCircle className="h-4 w-4 mr-2" />
+                <PlusCircleIcon className="h-4 w-4 mr-2" />
                 Add New
               </Button>
             </div>
@@ -272,7 +260,6 @@ const Admin = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2 justify-end">
-                            {/* Edit Button */}
                             <Button
                               variant="ghost"
                               size="sm"
@@ -283,7 +270,6 @@ const Admin = () => {
                               <Pencil className="h-4 w-4" />
                             </Button>
 
-                            {/* Delete Button */}
                             <Button
                               variant="ghost"
                               size="sm"
@@ -294,7 +280,6 @@ const Admin = () => {
                               <Trash2 className="h-4 w-4" />
                             </Button>
 
-                            {/* Feature Toggle Button */}
                             <Button
                               variant="ghost"
                               size="sm"
