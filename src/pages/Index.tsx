@@ -99,15 +99,16 @@ const Index = () => {
                     Hey there, I'm Sandesh Shrestha
                   </h2>
                   <p className="text-zinc-300 leading-relaxed">
-                    I'm Sandesh Shrestha, a Graphic & Motion Designer passionate about branding, visual storytelling, and motion graphics.
+                    I'm Sandesh Shrestha, a Graphic & Motion Designer passionate about design, creativity, and technology. This blog is where I share insights on design, motion graphics. Stay tuned for tips, tutorials, and creative inspiration! 🚀
                   </p>
                   
-                  <Link to="/blogs">
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white group mx-0 my-[20px]">
-                      Explore My Articles
-                      <ArrowUpRight className="ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" size={16} />
-                    </Button>
-                  </Link>
+                  <Link to="https://sandeshshrestha.xyz" target="_blank" rel="noopener noreferrer">
+  <Button className="bg-blue-600 hover:bg-blue-700 text-white group mx-0 my-[20px]">
+    view my work
+    <ArrowUpRight className="ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" size={16} />
+  </Button>
+</Link>
+
                 </div>
               </div>
             </div>
