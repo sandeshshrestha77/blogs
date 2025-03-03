@@ -51,7 +51,6 @@ const Navbar = () => {
               alt="Logo"
               className="h-9 w-auto transition-transform duration-300 group-hover:scale-105"
             />
-            <span className="text-white font-semibold text-xl">Sandesh</span>
           </Link>
 
           {/* Navigation Links - Only show on larger screens */}
