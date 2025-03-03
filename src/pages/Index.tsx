@@ -166,7 +166,7 @@ const Index = () => {
             </section>}
 
           {/* Latest Posts Section - Moved to Third */}
-          {posts.length > 0 && <section className="py-[61px] bg-zinc-950">
+          {posts.length > 0 && <section className="bg-zinc-950 py-[60px]">
               <div className="container mx-auto px-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
                   <div>
