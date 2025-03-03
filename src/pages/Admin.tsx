@@ -29,9 +29,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
-  comments?: { count: number }; // Add comments count to post type
+  comments?: { count: number };
 };
-type Comment = Database['public']['Tables']['comments']['Row'];
+type Comment = Database['public']['Tables']['comments']['Row'] & {
+  posts?: { title: string }; // Join with posts to get title
+};
 
 const Admin = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -74,7 +76,10 @@ const Admin = () => {
     try {
       const { data, error } = await supabase
         .from("comments")
-        .select()
+        .select(`
+          *,
+          posts(title)
+        `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -335,6 +340,68 @@ const Admin = () => {
                                 <StarOff className="h-4 w-4" />
                               )}
                             </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* New Comments Section */}
+        <Card className="bg-white shadow-sm border border-gray-200">
+          <CardHeader className="border-b border-gray-100 bg-white px-6 py-4">
+            <CardTitle className="text-xl font-medium text-gray-800">Latest Comments</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-gray-50 border-gray-200">
+                    <TableHead className="font-medium text-gray-600">Comment</TableHead>
+                    <TableHead className="font-medium text-gray-600">Post</TableHead>
+                    <TableHead className="font-medium text-gray-600">Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={3} className="text-center py-8">
+                        <div className="flex justify-center">
+                          <svg className="animate-spin h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : comments.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={3} className="text-center py-8 text-gray-500">
+                        No comments found.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    comments.map(({ id, content, created_at, posts }) => (
+                      <TableRow key={id} className="hover:bg-gray-50 border-gray-200">
+                        <TableCell className="text-gray-600">
+                          {content || "No content"}
+                        </TableCell>
+                        <TableCell className="text-gray-600">
+                          <a 
+                            href={`/admin/edit/${id}`} 
+                            className="text-[#2271b1] hover:text-[#135e96] hover:underline"
+                          >
+                            {posts?.title || "Unknown Post"}
+                          </a>
+                        </TableCell>
+                        <TableCell className="text-gray-600">
+                          <div className="flex items-center">
+                            <Calendar className="h-3 w-3 mr-1 text-gray-400" />
+                            {new Date(created_at).toLocaleDateString() || "N/A"}
                           </div>
                         </TableCell>
                       </TableRow>
