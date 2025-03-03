@@ -172,7 +172,7 @@ const Index = () => {
             </section>}
 
           {/* About Section */}
-          <section className="relative overflow-hidden py-[20px]">
+          <section className="relative overflow-hidden py-[60px]">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
               <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl"></div>

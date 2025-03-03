@@ -8,15 +8,7 @@ const Footer = () => {
         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="container mx-auto pt-16 pb-8 sm:px-6 lg:px-8 relative z-10 px-0 py-0">
-        {/* Main Grid */}
-        
-
-        {/* Copyright Section */}
-        <div className="border-t border-zinc-800/30 mt-16 pt-8 text-sm text-center text-zinc-400">
-          <p className="py-[20px]">&copy; {new Date().getFullYear()} Sandesh Shrestha. All rights reserved.</p>
-        </div>
-      </div>
+      
     </footer>;
 };
 export default Footer;
