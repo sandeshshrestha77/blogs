@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://blog.sandeshshrestha.xyz/api/sitemap
+Sitemap: https://blog.sandeshshrestha.xyz/sitemap.xml
