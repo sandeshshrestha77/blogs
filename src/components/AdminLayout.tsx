@@ -42,10 +42,7 @@ const AdminLayout = ({
               
               
               
-              <Button onClick={() => navigate("/admin")} variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#2c3338] pl-2">
-                <FileText className="h-5 w-5 mr-2" />
-                All Posts
-              </Button>
+              
               
               <Button onClick={() => navigate("/admin/create")} variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#2c3338] pl-2">
                 <PlusCircle className="h-5 w-5 mr-2" />
