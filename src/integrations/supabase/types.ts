@@ -46,6 +46,7 @@ export type Database = {
       }
       posts: {
         Row: {
+          alt_text: string | null
           author: string | null
           category: string | null
           content: string | null
@@ -55,11 +56,16 @@ export type Database = {
           featured: boolean | null
           id: string
           image: string | null
+          keywords: string | null
+          meta_description: string | null
+          meta_title: string | null
           read_time: string | null
           slug: string
           title: string
+          updated_at: string | null
         }
         Insert: {
+          alt_text?: string | null
           author?: string | null
           category?: string | null
           content?: string | null
@@ -69,11 +75,16 @@ export type Database = {
           featured?: boolean | null
           id?: string
           image?: string | null
+          keywords?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
           read_time?: string | null
           slug: string
           title: string
+          updated_at?: string | null
         }
         Update: {
+          alt_text?: string | null
           author?: string | null
           category?: string | null
           content?: string | null
@@ -83,9 +94,13 @@ export type Database = {
           featured?: boolean | null
           id?: string
           image?: string | null
+          keywords?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
           read_time?: string | null
           slug?: string
           title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

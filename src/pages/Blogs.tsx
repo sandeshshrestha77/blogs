@@ -7,7 +7,8 @@ import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Search, Filter } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { Database } from "@/integrations/supabase/types";
 
 type Post = Database['public']['Tables']['posts']['Row'];
@@ -17,6 +18,7 @@ const Blogs = () => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -30,7 +32,19 @@ const Blogs = () => {
       const { data, error } = await query.order("created_at", { ascending: false });
       
       if (error) throw error;
-      if (data) setPosts(data);
+      
+      // Apply search filter on client side
+      let filteredData = data || [];
+      if (searchQuery) {
+        const lowercaseQuery = searchQuery.toLowerCase();
+        filteredData = filteredData.filter(post => 
+          post.title.toLowerCase().includes(lowercaseQuery) ||
+          (post.excerpt && post.excerpt.toLowerCase().includes(lowercaseQuery)) ||
+          (post.category && post.category.toLowerCase().includes(lowercaseQuery))
+        );
+      }
+      
+      setPosts(filteredData);
       
       // Get unique categories for the filter
       if (!selectedCategory) {
@@ -45,7 +59,7 @@ const Blogs = () => {
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, searchQuery]);
   
   useEffect(() => {
     fetchPosts();
@@ -67,40 +81,73 @@ const Blogs = () => {
     setSelectedCategory(category);
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchPosts();
+  };
+
   return (
     <div className="min-h-screen bg-zinc-950">
       <Navbar />
       
       {/* Hero Section */}
       <section className="pt-36 pb-16 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl"></div>
+        </div>
+        
         <div className="container mx-auto px-4 text-center relative z-10">
           <div className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-blue-600/20 text-blue-400 border border-blue-500/20 mb-6">
             <BookOpen size={16} className="mr-2" />
             All Articles
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight">
-            Our Blog Articles
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+            Explore Our Articles
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-zinc-300 max-w-2xl mx-auto mb-10">
             Discover in-depth articles, tutorials, and insights on technology, design, and development.
           </p>
+          
+          <form onSubmit={handleSearch} className="max-w-xl mx-auto relative">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search size={18} className="text-zinc-500" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search articles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-zinc-900/80 border border-zinc-800 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <Button 
+                type="submit"
+                className="absolute inset-y-1 right-1 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+              >
+                Search
+              </Button>
+            </div>
+          </form>
         </div>
-        
-        <div className="absolute top-20 right-0 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl -z-0"></div>
-        <div className="absolute bottom-10 left-20 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl -z-0"></div>
       </section>
       
       {/* Category Filter */}
       {categories.length > 0 && (
-        <section className="py-8 border-y border-zinc-800/50">
+        <section className="py-8 border-y border-zinc-800/50 bg-zinc-900/30">
           <div className="container mx-auto px-4">
-            <div className="flex flex-wrap items-center gap-4 justify-center">
+            <div className="flex flex-wrap items-center gap-3 justify-center">
+              <div className="flex items-center pr-2 text-zinc-400 mr-2">
+                <Filter size={16} className="mr-2" />
+                <span>Filter by:</span>
+              </div>
+              
               <button 
                 onClick={() => handleCategorySelect(null)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   selectedCategory === null 
                     ? 'bg-blue-600 text-white' 
-                    : 'bg-zinc-800/50 text-gray-300 hover:bg-zinc-700/50'
+                    : 'bg-zinc-800/70 text-zinc-300 hover:bg-zinc-700/50 hover:text-white'
                 }`}
               >
                 All Categories
@@ -113,7 +160,7 @@ const Blogs = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedCategory === category 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-zinc-800/50 text-gray-300 hover:bg-zinc-700/50'
+                      : 'bg-zinc-800/70 text-zinc-300 hover:bg-zinc-700/50 hover:text-white'
                   }`}
                 >
                   {category}
@@ -142,22 +189,30 @@ const Blogs = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-20">
+            <div className="text-center py-20 bg-zinc-900/20 rounded-2xl border border-zinc-800/50">
+              <div className="inline-flex justify-center items-center w-16 h-16 rounded-full bg-zinc-800/50 text-zinc-300 mb-4">
+                <Search size={24} />
+              </div>
               <h3 className="text-2xl font-semibold text-white mb-4">
                 No posts found
               </h3>
-              <p className="text-gray-400">
-                {selectedCategory 
-                  ? `No posts found in the ${selectedCategory} category.` 
-                  : "No blog posts available at the moment."}
+              <p className="text-zinc-400 max-w-md mx-auto">
+                {searchQuery 
+                  ? `No results for "${searchQuery}". Try different keywords.` 
+                  : selectedCategory 
+                    ? `No posts found in the ${selectedCategory} category.` 
+                    : "No blog posts available at the moment."}
               </p>
-              {selectedCategory && (
-                <button 
-                  onClick={() => setSelectedCategory(null)}
-                  className="mt-6 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              {(selectedCategory || searchQuery) && (
+                <Button 
+                  onClick={() => {
+                    setSelectedCategory(null);
+                    setSearchQuery("");
+                  }}
+                  className="mt-6 bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  View All Posts
-                </button>
+                  Reset Filters
+                </Button>
               )}
             </div>
           )}
