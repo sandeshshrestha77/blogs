@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -10,6 +9,7 @@ import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ArrowRight, ChevronRight, Clock, User, BookOpen, ArrowUpRight } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+import { Helmet } from "react-helmet";
 
 type Post = Database['public']['Tables']['posts']['Row'];
 
@@ -71,8 +71,31 @@ const Index = () => {
     [showAllPosts, posts]
   );
 
+  const metaTitle = "Sandesh Shrestha | Articles & Insights on Technology and Design";
+  const metaDescription = "Explore expert guides and tutorials on technology, design, and development. Find resources to master digital skills, whether you're a beginner or looking to refine your expertise.";
+  const keywords = "web development, design, technology, tutorials, digital skills, programming";
+
   return (
     <div className="min-h-screen bg-zinc-950">
+      <Helmet>
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDescription} />
+        <meta name="keywords" content={keywords} />
+        
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        {featuredPost?.image && <meta property="og:image" content={featuredPost.image} />}
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={metaTitle} />
+        <meta name="twitter:description" content={metaDescription} />
+        {featuredPost?.image && <meta name="twitter:image" content={featuredPost.image} />}
+        
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
+      
       <Navbar />
       
       {initialLoading ? (

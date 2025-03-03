@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -10,6 +9,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { BookOpen, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Database } from "@/integrations/supabase/types";
+import { Helmet } from "react-helmet";
 
 type Post = Database['public']['Tables']['posts']['Row'];
 
@@ -33,7 +33,6 @@ const Blogs = () => {
       
       if (error) throw error;
       
-      // Apply search filter on client side
       let filteredData = data || [];
       if (searchQuery) {
         const lowercaseQuery = searchQuery.toLowerCase();
@@ -46,7 +45,6 @@ const Blogs = () => {
       
       setPosts(filteredData);
       
-      // Get unique categories for the filter
       if (!selectedCategory) {
         const uniqueCategories = Array.from(
           new Set(data?.map(post => post.category).filter(Boolean) as string[])
@@ -86,8 +84,37 @@ const Blogs = () => {
     fetchPosts();
   };
 
+  const metaTitle = selectedCategory 
+    ? `${selectedCategory} Articles | Sandesh Shrestha's Blog` 
+    : "All Articles | Sandesh Shrestha's Blog";
+  
+  const metaDescription = selectedCategory 
+    ? `Explore our collection of articles about ${selectedCategory}. Expert guides, tutorials, and insights to help you master ${selectedCategory}.` 
+    : "Discover in-depth articles, tutorials, and insights on technology, design, and development from Sandesh Shrestha.";
+  
+  const keywords = categories.join(", ") + ", blog, articles, tutorials";
+
   return (
     <div className="min-h-screen bg-zinc-950">
+      <Helmet>
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDescription} />
+        <meta name="keywords" content={keywords} />
+        
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        {posts[0]?.image && <meta property="og:image" content={posts[0].image} />}
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={metaTitle} />
+        <meta name="twitter:description" content={metaDescription} />
+        {posts[0]?.image && <meta name="twitter:image" content={posts[0].image} />}
+        
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
+      
       <Navbar />
       
       {/* Hero Section */}
