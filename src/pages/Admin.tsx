@@ -28,10 +28,14 @@ import type { Database } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
-type Post = Database['public']['Tables']['posts']['Row'];
+type Post = Database['public']['Tables']['posts']['Row'] & {
+  comments?: { count: number }; // Add comments count to post type
+};
+type Comment = Database['public']['Tables']['comments']['Row'];
 
 const Admin = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -48,7 +52,10 @@ const Admin = () => {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("posts")
-        .select()
+        .select(`
+          *,
+          comments(count)
+        `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -60,6 +67,21 @@ const Admin = () => {
       showToast("error", "Error fetching posts");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("comments")
+        .select()
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setComments(data || []);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      showToast("error", "Error fetching comments");
     }
   };
 
@@ -101,8 +123,9 @@ const Admin = () => {
 
   useEffect(() => {
     fetchPosts();
+    fetchComments();
 
-    const channel = supabase
+    const postsChannel = supabase
       .channel("posts-channel")
       .on(
         "postgres_changes",
@@ -111,8 +134,18 @@ const Admin = () => {
       )
       .subscribe();
 
+    const commentsChannel = supabase
+      .channel("comments-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "comments" },
+        () => fetchComments()
+      )
+      .subscribe();
+
     return () => {
-      channel.unsubscribe();
+      postsChannel.unsubscribe();
+      commentsChannel.unsubscribe();
     };
   }, []);
 
@@ -162,7 +195,7 @@ const Admin = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-4xl font-semibold text-blue-600">0</p>
+                  <p className="text-4xl font-semibold text-blue-600">{comments.length}</p>
                   <p className="text-gray-500 mt-1">Comments</p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
@@ -193,27 +226,18 @@ const Admin = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-gray-50 border-gray-200">
-                    <TableHead className="font-medium text-gray-600">
-                      Title
-                    </TableHead>
-                    <TableHead className="font-medium text-gray-600">
-                      Author
-                    </TableHead>
-                    <TableHead className="font-medium text-gray-600">
-                      Category
-                    </TableHead>
-                    <TableHead className="font-medium text-gray-600">
-                      Date
-                    </TableHead>
-                    <TableHead className="font-medium text-gray-600 text-right">
-                      Actions
-                    </TableHead>
+                    <TableHead className="font-medium text-gray-600">Title</TableHead>
+                    <TableHead className="font-medium text-gray-600">Author</TableHead>
+                    <TableHead className="font-medium text-gray-600">Category</TableHead>
+                    <TableHead className="font-medium text-gray-600">Date</TableHead>
+                    <TableHead className="font-medium text-gray-600">Comments</TableHead>
+                    <TableHead className="font-medium text-gray-600 text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8">
+                      <TableCell colSpan={6} className="text-center py-8">
                         <div className="flex justify-center">
                           <svg className="animate-spin h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -224,12 +248,12 @@ const Admin = () => {
                     </TableRow>
                   ) : posts.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                      <TableCell colSpan={6} className="text-center py-8 text-gray-500">
                         No posts found. Create your first post!
                       </TableCell>
                     </TableRow>
                   ) : (
-                    posts.map(({ id, title, author, category, date, featured }) => (
+                    posts.map(({ id, title, author, category, date, featured, comments }) => (
                       <TableRow key={id} className="hover:bg-gray-50 border-gray-200">
                         <TableCell className="font-medium text-[#2271b1] hover:text-[#135e96] transition-colors">
                           <a href={`/admin/edit/${id}`} className="hover:underline">
@@ -264,6 +288,12 @@ const Admin = () => {
                           <div className="flex items-center">
                             <Calendar className="h-3 w-3 mr-1 text-gray-400" />
                             {new Date(date).toLocaleDateString() || "N/A"}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-gray-600">
+                          <div className="flex items-center">
+                            <MessageSquare className="h-3 w-3 mr-1 text-gray-400" />
+                            {comments?.count || 0}
                           </div>
                         </TableCell>
                         <TableCell>
