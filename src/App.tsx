@@ -10,7 +10,7 @@ import Login from "./pages/Login";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import ScrollToTop from "./components/ScrollToTop"; // ✅ Added ScrollToTop
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   const [todos, setTodos] = useState<any[]>([]);
@@ -34,7 +34,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <ScrollToTop /> {/* ✅ Ensures every page starts from the top */}
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/blogs" element={<Blogs />} />
