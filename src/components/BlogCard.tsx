@@ -11,6 +11,9 @@ interface BlogCardProps {
   categories: string[];
   slug: string;
   read_time: string | null;
+  alt_text?: string | null;
+  meta_title?: string | null;
+  meta_description?: string | null;
 }
 
 const BlogCard = ({
@@ -21,8 +24,16 @@ const BlogCard = ({
   date,
   categories,
   slug,
-  read_time
+  read_time,
+  alt_text,
+  meta_title,
+  meta_description
 }: BlogCardProps) => {
+  // Use SEO fields if available, otherwise fall back to regular fields
+  const displayTitle = meta_title || title;
+  const displayExcerpt = meta_description || excerpt;
+  const imageAlt = alt_text || title;
+  
   return (
     <Link 
       to={`/blog/${slug}`} 
@@ -32,7 +43,7 @@ const BlogCard = ({
       <div className="aspect-[16/9] overflow-hidden bg-zinc-800 relative">
         <img 
           src={image || "https://source.unsplash.com/1200x800/?technology"} 
-          alt={title} 
+          alt={imageAlt} 
           className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110" 
           loading="lazy" 
         />
@@ -52,11 +63,11 @@ const BlogCard = ({
         </div>
 
         <h3 className="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-blue-400 transition-colors">
-          {title}
+          {displayTitle}
         </h3>
 
         <p className="text-gray-400 line-clamp-3 mb-4 flex-grow">
-          {excerpt}
+          {displayExcerpt}
         </p>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-500 mt-auto pt-4 border-t border-zinc-800/50 gap-3">

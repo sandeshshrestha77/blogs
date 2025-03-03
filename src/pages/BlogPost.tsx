@@ -9,6 +9,8 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ArrowLeft, MessageCircle, Calendar, Clock, Share2, ArrowRight } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import Footer from "@/components/Footer";
+import { Helmet } from "react-helmet";
+
 type Post = Database['public']['Tables']['posts']['Row'];
 interface Comment {
   id: string;
@@ -18,6 +20,7 @@ interface Comment {
   content: string;
   created_at: string;
 }
+
 const AuthorCard = ({
   author,
   date
@@ -38,6 +41,7 @@ const AuthorCard = ({
       <p className="text-gray-300 text-sm">Graphic Designer</p>
     </div>;
 };
+
 const CommentForm = ({
   postId,
   onCommentAdded
@@ -49,6 +53,7 @@ const CommentForm = ({
   const [email, setEmail] = useState("");
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !content) {
@@ -78,6 +83,7 @@ const CommentForm = ({
       setIsSubmitting(false);
     }
   };
+
   return <form onSubmit={handleSubmit} className="space-y-4 bg-zinc-900/50 p-6 rounded-lg border border-zinc-800">
       <h3 className="text-xl font-semibold text-white mb-4">Leave a Comment</h3>
       
@@ -109,6 +115,7 @@ const CommentForm = ({
       </Button>
     </form>;
 };
+
 const CommentsList = ({
   comments
 }: {
@@ -140,6 +147,7 @@ const CommentsList = ({
         </div>)}
     </div>;
 };
+
 const RelatedPostCard = ({
   post
 }: {
@@ -166,6 +174,7 @@ const RelatedPostCard = ({
       </div>
     </div>
   </Link>;
+
 const ShareButtons = () => {
   return (
     <div className="flex items-center gap-2">
@@ -181,13 +190,13 @@ const ShareButtons = () => {
     </div>
   );
 };
+
 const TableOfContents = ({
   content
 }: {
   content: string;
 }) => {
-  // Extract headings from the content (This is a simplified approach)
-  const headings = content.split('\n\n').filter(para => para.startsWith('#') || para.startsWith('##')).map(heading => heading.replace(/^#+\s/, '').trim()).slice(0, 5); // Limit to 5 headings
+  const headings = content.split('\n\n').filter(para => para.startsWith('#') || para.startsWith('##')).map(heading => heading.replace(/^#+\s/, '').trim()).slice(0, 5);
 
   if (headings.length === 0) return null;
   return <div className="mb-8 p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
@@ -202,6 +211,7 @@ const TableOfContents = ({
       </ul>
     </div>;
 };
+
 const BlogPost = () => {
   const {
     slug
@@ -213,6 +223,7 @@ const BlogPost = () => {
   const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
+
   const fetchPost = useCallback(async () => {
     if (!slug) return;
     try {
@@ -229,6 +240,7 @@ const BlogPost = () => {
       setLoading(false);
     }
   }, [slug]);
+
   const fetchComments = useCallback(async (postId: string) => {
     try {
       setCommentsLoading(true);
@@ -247,9 +259,9 @@ const BlogPost = () => {
       setCommentsLoading(false);
     }
   }, []);
+
   const fetchRelatedContent = useCallback(async () => {
     try {
-      // Fetch recent posts (excluding current post)
       const {
         data: recentData
       } = await supabase.from("posts").select().neq('slug', slug || '').order('created_at', {
@@ -257,29 +269,27 @@ const BlogPost = () => {
       }).limit(4);
       if (recentData) setRecentPosts(recentData);
 
-      // In a real app, trending posts might be based on view counts or other metrics
-      // For demo purposes, we'll just use the same recent posts
       setTrendingPosts(recentData || []);
     } catch (error) {
       console.error("Error fetching related content:", error);
     }
   }, [slug]);
+
   useEffect(() => {
     fetchPost();
     fetchRelatedContent();
   }, [fetchPost, fetchRelatedContent]);
+
   useEffect(() => {
     if (post?.id) {
       fetchComments(post.id);
 
-      // Set up real-time subscription for comments
       const channel = supabase.channel('comments-channel').on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'comments',
         filter: `post_id=eq.${post.id}`
       }, payload => {
-        // Add the new comment to the state
         const newComment = payload.new as Comment;
         setComments(prevComments => [newComment, ...prevComments]);
       }).subscribe();
@@ -288,30 +298,26 @@ const BlogPost = () => {
       };
     }
   }, [post?.id, fetchComments]);
+
   const handleCommentAdded = () => {
-    // No need to manually update comments as they will be updated via real-time subscription
-    // But we might want to refresh them anyway in case of network issues
     if (post?.id) {
       fetchComments(post.id);
     }
   };
+
   const formatContent = (content: string) => {
-    // Check if the content is HTML (from the rich text editor)
     if (content && (content.includes('<p>') || content.includes('<h'))) {
       return <div dangerouslySetInnerHTML={{
         __html: content
       }} className="prose prose-invert max-w-none" />;
     }
 
-    // Legacy content formatting (for old posts without HTML)
     let headingIndex = 0;
     return content.split('\n\n').map((paragraph, index) => {
-      // Check if paragraph is a heading
       if (paragraph.startsWith('#') || paragraph.startsWith('##')) {
         const id = `heading-${headingIndex}`;
         headingIndex++;
 
-        // Determine heading level (h2 or h3)
         if (paragraph.startsWith('##')) {
           return <h3 id={id} key={index} className="text-xl font-bold text-white mt-10 mb-4">
               {paragraph.replace(/^##\s/, '')}
@@ -323,12 +329,12 @@ const BlogPost = () => {
         }
       }
 
-      // Regular paragraph
       return <p key={index} className="mb-6 text-gray-300 leading-relaxed">
           {paragraph}
         </p>;
     });
   };
+
   if (loading) {
     return <div className="min-h-screen bg-zinc-950 flex flex-col">
         <Navbar />
@@ -337,6 +343,7 @@ const BlogPost = () => {
         </div>
       </div>;
   }
+
   if (!post) {
     return <div className="min-h-screen flex flex-col bg-zinc-950">
         <Navbar />
@@ -348,19 +355,51 @@ const BlogPost = () => {
         </div>
       </div>;
   }
+
+  const metaTitle = post.meta_title || post.title;
+  const metaDescription = post.meta_description || post.excerpt || `Read about ${post.title}`;
+  const imageAltText = post.alt_text || post.title;
+  const keywords = post.keywords || post.category || '';
+
   return <div className="min-h-screen bg-zinc-950 flex flex-col">
+      <Helmet>
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDescription} />
+        {keywords && <meta name="keywords" content={keywords} />}
+        
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:type" content="article" />
+        {post.image && <meta property="og:image" content={post.image} />}
+        <meta property="og:url" content={window.location.href} />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={metaTitle} />
+        <meta name="twitter:description" content={metaDescription} />
+        {post.image && <meta name="twitter:image" content={post.image} />}
+        
+        <meta property="article:author" content={post.author} />
+        <meta property="article:published_time" content={post.date} />
+        <meta property="article:section" content={post.category} />
+        
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
+      
       <Navbar />
       
       <article className="container mx-auto px-4 py-16 max-w-6xl">
         
         
-        {/* Featured Image */}
         <div className="aspect-video mb-8 rounded-xl overflow-hidden shadow-lg">
-          <img src={post.image || "https://images.unsplash.com/photo-1498050108023-c5249f4df085"} alt={post.title} className="object-cover w-full h-full" loading="lazy" />
+          <img 
+            src={post.image || "https://images.unsplash.com/photo-1498050108023-c5249f4df085"} 
+            alt={imageAltText} 
+            className="object-cover w-full h-full" 
+            loading="lazy" 
+          />
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-7 gap-8">
-          {/* Main Content (5 columns on large screens) */}
           <div className="lg:col-span-5">
             <header className="mb-8">
               {post.category && <span className="inline-block text-xs font-medium px-3 py-1 bg-blue-600/10 text-blue-400 rounded-full mb-4">
@@ -392,7 +431,6 @@ const BlogPost = () => {
               
               <ShareButtons />
               
-              {/* Table of Contents - only for longer articles */}
               {post.content && post.content.length > 1000 && <TableOfContents content={post.content} />}
             </header>
             
@@ -413,11 +451,9 @@ const BlogPost = () => {
             </div>
           </div>
           
-          {/* Sidebar (2 columns on large screens) */}
           <aside className="lg:col-span-2 space-y-8">
             <AuthorCard author={post.author || "Anonymous"} date={post.date || new Date().toLocaleDateString()} />
             
-            {/* Trending Posts Section */}
             <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Trending Posts</h3>
               <div className="space-y-6">
@@ -425,7 +461,6 @@ const BlogPost = () => {
               </div>
             </div>
             
-            {/* Recent Posts Section */}
             <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Recent Articles</h3>
               <div className="space-y-6">
@@ -443,4 +478,5 @@ const BlogPost = () => {
       <Footer />
     </div>;
 };
+
 export default BlogPost;
