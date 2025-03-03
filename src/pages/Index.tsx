@@ -220,7 +220,7 @@ const Index = () => {
                   </p>
                   
                   <Link to="/blogs">
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white group">
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white group mx-0 my-[20px]">
                       Explore My Articles
                       <ArrowUpRight className="ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" size={16} />
                     </Button>
