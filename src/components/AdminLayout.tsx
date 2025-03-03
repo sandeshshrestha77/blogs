@@ -20,15 +20,15 @@ const AdminLayout = ({
   return <div className="min-h-screen bg-[#f0f0f1]">
       <Navbar />
       
-      <div className="flex h-screen pt-16">
+      <div className="flex h-screen pt-16 px-0 py-0">
         {/* WordPress-style sidebar */}
-        <div className="w-64 bg-[#1d2327] text-white h-full fixed left-0 top-0 pt-24 overflow-y-auto">
+        <div className="w-64 bg-[#1d2327] text-white h-full fixed left-0 top-0 pt-24 overflow-y-auto py-[20px]">
           <div className="px-4 py-3">
             <div className="flex items-center space-x-2 mb-6">
               <User className="h-6 w-6 text-gray-300" />
               <div>
                 <p className="text-sm font-medium text-gray-200">Welcome,</p>
-                <p className="text-sm text-gray-400">Sandesh</p>
+                <p className="text-zinc-50 text-xl font-semibold">Sandesh shrestha</p>
               </div>
             </div>
             
