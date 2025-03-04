@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { supabase } from "./utils/supabase"; 
@@ -10,31 +11,32 @@ import Login from "./pages/Login";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import ScrollToTop from "./components/ScrollToTop"; // ✅ Added ScrollToTop
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
-  const [todos, setTodos] = useState<any[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
   
   useEffect(() => {
-    const getTodos = async () => {
+    const getPosts = async () => {
       try {
-        const { data, error } = await supabase.from("todos").select();
+        // Fixed: Changed from "todos" to "posts" which exists in our schema
+        const { data, error } = await supabase.from("posts").select();
         if (error) {
-          console.error("Error fetching todos:", error);
+          console.error("Error fetching posts:", error);
         } else if (data.length > 0) {
-          setTodos(data);
+          setPosts(data);
         }
       } catch (error) {
-        console.error("Unexpected error fetching todos:", error);
+        console.error("Unexpected error fetching posts:", error);
       }
     };
-    getTodos();
+    getPosts();
   }, []);
   
   return (
     <AuthProvider>
       <Router>
-        <ScrollToTop /> {/* ✅ Ensures every page starts from the top */}
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/blogs" element={<Blogs />} />

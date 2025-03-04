@@ -303,12 +303,12 @@ const BlogPost = () => {
       if (recentError) throw recentError;
       if (recentData) setRecentPosts(recentData);
 
-      // Fetch trending posts based on views (limited to 3)
+      // Fixed: Changed nullsLast to nullsFirst which is a valid property
       const { data: trendingData, error: trendingError } = await supabase
         .from("posts")
         .select()
         .neq('slug', slug || '')
-        .order('views', { ascending: false, nullsLast: true })
+        .order('views', { ascending: false, nullsFirst: false })
         .limit(3);
       if (trendingError) throw trendingError;
       if (trendingData) setTrendingPosts(trendingData);

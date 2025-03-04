@@ -29,10 +29,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
-  comments?: { count: number };
+  comments: { count: number }[];
 };
+
 type Comment = Database['public']['Tables']['comments']['Row'] & {
-  posts?: { title: string }; // Join with posts to get title
+  posts?: { title: string };
 };
 
 const Admin = () => {
@@ -61,8 +62,17 @@ const Admin = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      if (data && JSON.stringify(data) !== JSON.stringify(posts)) {
-        setPosts(data);
+      
+      if (data) {
+        const formattedPosts = data.map(post => {
+          const commentsData = post.comments || [];
+          return {
+            ...post,
+            comments: commentsData
+          };
+        });
+        
+        setPosts(formattedPosts as Post[]);
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -351,7 +361,6 @@ const Admin = () => {
           </CardContent>
         </Card>
 
-        {/* New Comments Section */}
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardHeader className="border-b border-gray-100 bg-white px-6 py-4">
             <CardTitle className="text-xl font-medium text-gray-800">Latest Comments</CardTitle>
