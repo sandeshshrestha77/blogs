@@ -1,26 +1,24 @@
-
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { LayoutDashboard, FileText, LogOut, Home, User, Settings } from "lucide-react";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import Navbar from "./Navbar";
-
 const AdminLayout = ({
   children
 }: {
   children: React.ReactNode;
 }) => {
   const navigate = useNavigate();
-  const { signOut, user } = useAuth();
-  
+  const {
+    signOut,
+    user
+  } = useAuth();
   const handleSignOut = async () => {
     await signOut();
     navigate("/login");
   };
-  
-  return (
-    <div className="min-h-screen bg-[#f0f0f1]">
+  return <div className="min-h-screen bg-[#f0f0f1]">
       <Navbar />
       
       <div className="flex h-screen pt-16 px-0 py-0">
@@ -33,7 +31,7 @@ const AdminLayout = ({
                 <User className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-300">Admin</p>
+                <p className="text-sm font-medium text-gray-300">Welcome</p>
                 <p className="text-zinc-50 font-semibold">{user?.email?.split('@')[0] || 'User'}</p>
               </div>
             </div>
@@ -44,20 +42,12 @@ const AdminLayout = ({
             <div className="space-y-1 mt-4">
               <p className="text-xs uppercase text-gray-400 font-medium mb-2 px-2">Main</p>
               
-              <Button 
-                onClick={() => navigate("/admin")} 
-                variant="ghost" 
-                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200"
-              >
+              <Button onClick={() => navigate("/admin")} variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200">
                 <LayoutDashboard className="h-5 w-5 mr-3" />
                 Dashboard
               </Button>
               
-              <Button 
-                onClick={() => navigate("/admin/create")} 
-                variant="ghost" 
-                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200"
-              >
+              <Button onClick={() => navigate("/admin/create")} variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200">
                 <FileText className="h-5 w-5 mr-3" />
                 Content
               </Button>
@@ -66,20 +56,12 @@ const AdminLayout = ({
             <div className="space-y-1 mt-6">
               <p className="text-xs uppercase text-gray-400 font-medium mb-2 px-2">System</p>
               
-              <Button 
-                onClick={() => navigate("/admin/settings")}
-                variant="ghost" 
-                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200"
-              >
+              <Button onClick={() => navigate("/admin/settings")} variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200">
                 <Settings className="h-5 w-5 mr-3" />
                 Settings
               </Button>
               
-              <Button 
-                onClick={() => navigate("/")} 
-                variant="ghost" 
-                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200"
-              >
+              <Button onClick={() => navigate("/")} variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200">
                 <Home className="h-5 w-5 mr-3" />
                 View Site
               </Button>
@@ -88,11 +70,7 @@ const AdminLayout = ({
             <Separator className="bg-[#2a3347] my-4" />
             
             {/* Sign out button */}
-            <Button 
-              onClick={handleSignOut} 
-              variant="ghost" 
-              className="w-full justify-start text-gray-300 hover:text-red-400 hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200 mt-2"
-            >
+            <Button onClick={handleSignOut} variant="ghost" className="w-full justify-start text-gray-300 hover:text-red-400 hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200 mt-2">
               <LogOut className="h-5 w-5 mr-3" />
               Sign Out
             </Button>
@@ -104,8 +82,6 @@ const AdminLayout = ({
           {children}
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AdminLayout;
