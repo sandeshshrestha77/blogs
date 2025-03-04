@@ -8,6 +8,31 @@ module.exports = {
         border: "hsl(var(--border))", // Make sure this matches your variable
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "#2271b1",
+          foreground: "#ffffff",
+          hover: "#135e96",
+        },
+        secondary: {
+          DEFAULT: "#6B7280",
+          foreground: "#ffffff",
+        },
+        destructive: {
+          DEFAULT: "#EF4444",
+          foreground: "#ffffff",
+        },
+        success: {
+          DEFAULT: "#10B981",
+          foreground: "#ffffff",
+        },
+        warning: {
+          DEFAULT: "#F59E0B",
+          foreground: "#ffffff",
+        },
+        info: {
+          DEFAULT: "#3B82F6",
+          foreground: "#ffffff",
+        }
       },
       spacing: {
         'section': '5rem',

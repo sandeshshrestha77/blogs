@@ -12,7 +12,7 @@ const AdminLayout = ({
   children: React.ReactNode;
 }) => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   
   const handleSignOut = async () => {
     await signOut();
@@ -31,7 +31,7 @@ const AdminLayout = ({
               <User className="h-6 w-6 text-gray-300" />
               <div>
                 <p className="text-sm font-medium text-gray-200">Welcome,</p>
-                <p className="text-zinc-50 text-xl font-semibold">Sandesh shrestha</p>
+                <p className="text-zinc-50 text-xl font-semibold">{user?.email?.split('@')[0] || 'Admin'}</p>
               </div>
             </div>
             
@@ -57,6 +57,7 @@ const AdminLayout = ({
               </Button>
               
               <Button 
+                onClick={() => navigate("/admin/settings")}
                 variant="ghost" 
                 className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#2c3338] pl-2"
               >
