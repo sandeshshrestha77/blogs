@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/utils/supabase";
@@ -308,7 +309,8 @@ const Admin = () => {
                         <TableCell className="text-gray-600">
                           <div className="flex items-center">
                             <MessageSquare className="h-3 w-3 mr-1 text-gray-400" />
-                            {comments?.count || 0}
+                            {/* Fixed: Access count from the first item in the comments array */}
+                            {comments && comments[0] ? comments[0].count : 0}
                           </div>
                         </TableCell>
                         <TableCell>
