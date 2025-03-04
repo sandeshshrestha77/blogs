@@ -32,6 +32,13 @@ module.exports = {
         info: {
           DEFAULT: "#3B82F6",
           foreground: "#ffffff",
+        },
+        sidebar: {
+          DEFAULT: "#121826",
+          hover: "#1e2538",
+          active: "#2a3347",
+          text: "#f8fafc",
+          muted: "#94a3b8",
         }
       },
       spacing: {

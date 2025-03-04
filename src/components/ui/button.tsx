@@ -23,6 +23,8 @@ const buttonVariants = cva(
         info: "bg-blue-500 text-white hover:bg-blue-600",
         warning: "bg-amber-500 text-white hover:bg-amber-600",
         danger: "bg-red-500 text-white hover:bg-red-600",
+        "sidebar-active": "bg-[#1e2538] text-white",
+        "sidebar-item": "text-gray-300 hover:text-white hover:bg-[#1e2538]",
       },
       size: {
         default: "h-10 px-4 py-2",
