@@ -522,7 +522,7 @@ const BlogPost = () => {
               <h3 className="text-lg font-semibold text-white mb-4">Recent Articles</h3>
               <div className="space-y-6">
                 {recentPosts.slice(0, 3).map(post => <RelatedPostCard key={post.id} post={post} />)}
-                <Link to="/blog" className="inline-flex items-center text-blue-400 hover:text-blue-300 mt-4">
+                <Link to="/blogs" className="inline-flex items-center text-blue-400 hover:text-blue-300 mt-4">
                   View all articles
                   <ArrowRight size={16} className="ml-1" />
                 </Link>
