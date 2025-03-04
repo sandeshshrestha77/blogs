@@ -199,7 +199,7 @@ const Admin = () => {
             Dashboard
           </h1>
           <p className="text-base-content text-gray-600">
-            Welcome to your blog management dashboard
+            Blog management dashboard
           </p>
         </div>
 
