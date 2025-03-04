@@ -1,9 +1,11 @@
+
 import { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Session } from "@supabase/supabase-js";
+import { Session, User } from "@supabase/supabase-js";
 
 interface AuthContextType {
   session: Session | null;
+  user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -13,12 +15,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getSession = async () => {
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
+      setUser(data.session?.user || null);
       setLoading(false);
     };
 
@@ -26,6 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setUser(session?.user || null);
     });
 
     return () => {
@@ -46,7 +51,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, []);
 
-  const value = useMemo(() => ({ session, loading, signIn, signOut }), [session, loading, signIn, signOut]);
+  const value = useMemo(() => ({ 
+    session, 
+    user: session?.user || null, 
+    loading, 
+    signIn, 
+    signOut 
+  }), [session, loading, signIn, signOut]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
