@@ -3,20 +3,23 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import BlogCard from "@/components/BlogCard";
 import Footer from "@/components/Footer";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/utils/supabase";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { BookOpen, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Database } from "@/integrations/supabase/types";
 import { Helmet } from "react-helmet";
+
 type Post = Database['public']['Tables']['posts']['Row'];
+
 const Blogs = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
@@ -48,6 +51,7 @@ const Blogs = () => {
       setLoading(false);
     }
   }, [selectedCategory, searchQuery]);
+
   useEffect(() => {
     fetchPosts();
     const channel = supabase.channel("blogs-page").on("postgres_changes", {
@@ -59,16 +63,20 @@ const Blogs = () => {
       supabase.removeChannel(channel);
     };
   }, [fetchPosts]);
+
   const handleCategorySelect = (category: string | null) => {
     setSelectedCategory(category);
   };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     fetchPosts();
   };
+
   const metaTitle = selectedCategory ? `${selectedCategory} Articles | Sandesh Shrestha's Blog` : "All Articles | Sandesh Shrestha's Blog";
   const metaDescription = selectedCategory ? `Explore our collection of articles about ${selectedCategory}. Expert guides, tutorials, and insights to help you master ${selectedCategory}.` : "Discover in-depth articles, tutorials, and insights on technology, design, and development from Sandesh Shrestha.";
   const keywords = categories.join(", ") + ", blog, articles, tutorials";
+
   return <div className="min-h-screen bg-zinc-950">
       <Helmet>
         <title>{metaTitle}</title>
@@ -174,4 +182,5 @@ const Blogs = () => {
       <Footer />
     </div>;
 };
+
 export default Blogs;
