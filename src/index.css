@@ -92,6 +92,90 @@
   background: rgba(65, 105, 225, 0.7);
 }
 
+/* Rich Text Editor Content Styling */
+.article-content {
+  @apply text-gray-300;
+}
+
+.article-content h1 {
+  @apply text-3xl font-bold text-white mt-10 mb-6;
+}
+
+.article-content h2 {
+  @apply text-2xl font-bold text-white mt-10 mb-5;
+}
+
+.article-content h3 {
+  @apply text-xl font-bold text-white mt-8 mb-4;
+}
+
+.article-content h4 {
+  @apply text-lg font-bold text-white mt-6 mb-3;
+}
+
+.article-content p {
+  @apply mb-6 leading-relaxed;
+}
+
+.article-content strong, 
+.article-content b {
+  @apply text-white font-bold;
+}
+
+.article-content em, 
+.article-content i {
+  @apply italic;
+}
+
+.article-content ul {
+  @apply list-disc pl-6 mb-6 space-y-2;
+}
+
+.article-content ol {
+  @apply list-decimal pl-6 mb-6 space-y-2;
+}
+
+.article-content li {
+  @apply mb-1;
+}
+
+.article-content a {
+  @apply text-blue-400 hover:underline;
+}
+
+.article-content blockquote {
+  @apply border-l-4 border-blue-500 pl-4 italic my-6;
+}
+
+.article-content img {
+  @apply rounded-lg my-8 max-w-full h-auto mx-auto;
+}
+
+.article-content pre {
+  @apply bg-zinc-800 p-4 rounded-lg overflow-x-auto my-6;
+}
+
+.article-content code {
+  @apply bg-zinc-800 px-1 py-0.5 rounded text-sm;
+}
+
+.article-content hr {
+  @apply border-zinc-700 my-8;
+}
+
+.article-content table {
+  @apply w-full border-collapse my-6;
+}
+
+.article-content th,
+.article-content td {
+  @apply border border-zinc-700 p-2 text-left;
+}
+
+.article-content th {
+  @apply bg-zinc-800 font-bold;
+}
+
 /* Add some additional styles for the Quill editor */
 .ql-toolbar.ql-snow {
   border-color: #374151 !important;
@@ -103,4 +187,52 @@
   border-color: #374151 !important;
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .article-content h1 {
+    @apply text-2xl;
+  }
+  
+  .article-content h2 {
+    @apply text-xl;
+  }
+  
+  .article-content h3 {
+    @apply text-lg;
+  }
+  
+  .article-content img {
+    @apply my-4;
+  }
+  
+  .ql-editor {
+    font-size: 14px;
+    min-height: 150px;
+  }
+  
+  .ql-toolbar.ql-snow button {
+    padding: 2px 4px;
+  }
+}
+
+@media (max-width: 640px) {
+  .blog-card-container {
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .article-content blockquote {
+    @apply pl-3 my-4;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
 }

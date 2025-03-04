@@ -63,6 +63,7 @@ export type Database = {
           slug: string
           title: string
           updated_at: string | null
+          views: number | null
         }
         Insert: {
           alt_text?: string | null
@@ -82,6 +83,7 @@ export type Database = {
           slug: string
           title: string
           updated_at?: string | null
+          views?: number | null
         }
         Update: {
           alt_text?: string | null
@@ -101,6 +103,7 @@ export type Database = {
           slug?: string
           title?: string
           updated_at?: string | null
+          views?: number | null
         }
         Relationships: []
       }
@@ -109,19 +112,38 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_post: {
-        Args: {
-          title: string
-          slug: string
-          excerpt: string
-          content: string
-          image: string
-          category: string
-          read_time: string
-          featured?: boolean
-        }
-        Returns: undefined
-      }
+      add_post:
+        | {
+            Args: {
+              title: string
+              content: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              title: string
+              slug: string
+              excerpt: string
+              content: string
+              image: string
+              category: string
+              read_time: string
+              featured?: boolean
+            }
+            Returns: undefined
+          }
+      increment_views:
+        | {
+            Args: Record<PropertyKey, never>
+            Returns: undefined
+          }
+        | {
+            Args: {
+              post_slug: string
+            }
+            Returns: undefined
+          }
     }
     Enums: {
       [_ in never]: never

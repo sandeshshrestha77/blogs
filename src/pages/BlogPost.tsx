@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -350,10 +351,17 @@ const BlogPost = () => {
   };
 
   const formatContent = (content: string) => {
+    // If the content contains HTML (from rich text editor like TinyMCE), render it directly
     if (content && (content.includes('<p>') || content.includes('<h'))) {
-      return <div dangerouslySetInnerHTML={{ __html: content }} className="prose prose-invert max-w-none" />;
+      return (
+        <div 
+          dangerouslySetInnerHTML={{ __html: content }} 
+          className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-img:my-8 prose-hr:border-zinc-700"
+        />
+      );
     }
 
+    // Legacy format: handle Markdown-style content for backward compatibility
     let headingIndex = 0;
     return content.split('\n\n').map((paragraph, index) => {
       if (paragraph.startsWith('#') || paragraph.startsWith('##')) {
@@ -482,7 +490,7 @@ const BlogPost = () => {
               {post.content && post.content.length > 1000 && <TableOfContents content={post.content} />}
             </header>
 
-            <div ref={contentRef} className="prose prose-lg max-w-none prose-dark">
+            <div ref={contentRef} className="article-content">
               {post.content ? formatContent(post.content) : <p className="text-gray-300">No content available.</p>}
             </div>
 
