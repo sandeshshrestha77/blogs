@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/utils/supabase";
@@ -34,7 +33,7 @@ type Post = Database['public']['Tables']['posts']['Row'] & {
 };
 
 type Comment = Database['public']['Tables']['comments']['Row'] & {
-  posts?: { title: string };
+  posts?: { title: string; slug: string };
 };
 
 const Admin = () => {
@@ -89,7 +88,7 @@ const Admin = () => {
         .from("comments")
         .select(`
           *,
-          posts(title)
+          posts(title, slug)
         `)
         .order("created_at", { ascending: false });
 
@@ -269,7 +268,7 @@ const Admin = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    posts.map(({ id, title, author, category, date, featured, comments }) => (
+                    posts.map(({ id, title, author, category, date, featured, comments, slug }) => (
                       <TableRow key={id} className="hover:bg-gray-50 border-gray-200">
                         <TableCell className="font-medium text-[#2271b1] hover:text-[#135e96] transition-colors">
                           <a href={`/admin/edit/${id}`} className="hover:underline">
@@ -277,7 +276,7 @@ const Admin = () => {
                           </a>
                           <div className="flex items-center gap-2 mt-1">
                             <button 
-                              onClick={() => navigate(`/blog/${id}`)} 
+                              onClick={() => navigate(`/blog/${slug}`)} 
                               className="text-xs text-gray-500 hover:text-gray-700 inline-flex items-center"
                             >
                               <Eye className="h-3 w-3 mr-1" />
@@ -309,7 +308,6 @@ const Admin = () => {
                         <TableCell className="text-gray-600">
                           <div className="flex items-center">
                             <MessageSquare className="h-3 w-3 mr-1 text-gray-400" />
-                            {/* Fixed: Access count from the first item in the comments array */}
                             {comments && comments[0] ? comments[0].count : 0}
                           </div>
                         </TableCell>
@@ -402,12 +400,16 @@ const Admin = () => {
                           {content || "No content"}
                         </TableCell>
                         <TableCell className="text-gray-600">
-                          <a 
-                            href={`/admin/edit/${id}`} 
-                            className="text-[#2271b1] hover:text-[#135e96] hover:underline"
-                          >
-                            {posts?.title || "Unknown Post"}
-                          </a>
+                          {posts?.slug ? (
+                            <a 
+                              href={`/blog/${posts.slug}`}
+                              className="text-[#2271b1] hover:text-[#135e96] hover:underline"
+                            >
+                              {posts.title || "Unknown Post"}
+                            </a>
+                          ) : (
+                            <span>{posts?.title || "Unknown Post"}</span>
+                          )}
                         </TableCell>
                         <TableCell className="text-gray-600">
                           <div className="flex items-center">
