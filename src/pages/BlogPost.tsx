@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -254,7 +253,7 @@ const BlogPost = () => {
   const [loading, setLoading] = useState(true);
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
-  const [mostViewedPost, setMostViewedPost] = useState<Post | null>(null);
+  const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -308,16 +307,14 @@ const BlogPost = () => {
       if (recentError) throw recentError;
       if (recentData) setRecentPosts(recentData);
 
-      // Fetch only the single most viewed post
-      const { data: mostViewedData, error: mostViewedError } = await supabase
+      const { data: trendingData, error: trendingError } = await supabase
         .from("posts")
         .select()
         .neq('slug', slug || '')
         .order('views', { ascending: false, nullsFirst: false })
-        .limit(1)
-        .maybeSingle();
-      if (mostViewedError) throw mostViewedError;
-      if (mostViewedData) setMostViewedPost(mostViewedData);
+        .limit(3);
+      if (trendingError) throw trendingError;
+      if (trendingData) setTrendingPosts(trendingData);
     } catch (error) {
       console.error("Error fetching related content:", error);
     }
@@ -521,12 +518,12 @@ const BlogPost = () => {
           <aside className="lg:col-span-2 space-y-8">
             <AuthorCard author={post.author || "Anonymous"} date={post.date || new Date().toLocaleDateString()} />
 
-            {mostViewedPost && (
-              <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Most Popular Post</h3>
-                <RelatedPostCard post={mostViewedPost} />
+            <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Trending Posts</h3>
+              <div className="space-y-6">
+                {trendingPosts.slice(0, 3).map(post => <RelatedPostCard key={post.id} post={post} />)}
               </div>
-            )}
+            </div>
 
             <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Recent Articles</h3>
