@@ -1,29 +1,74 @@
+
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { LayoutDashboard, FileText, LogOut, Home, User, Settings } from "lucide-react";
+import { LayoutDashboard, FileText, LogOut, Home, User, Settings, Menu, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
+import { useState, useEffect } from "react";
 import Navbar from "./Navbar";
+
 const AdminLayout = ({
   children
 }: {
   children: React.ReactNode;
 }) => {
   const navigate = useNavigate();
-  const {
-    signOut,
-    user
-  } = useAuth();
+  const { signOut, user } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Handle screen size changes
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, []);
+  
+  // Close sidebar when navigating on mobile
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    if (isMobile) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+  
   const handleSignOut = async () => {
     await signOut();
     navigate("/login");
   };
-  return <div className="min-h-screen bg-[#f0f0f1]">
+  
+  return (
+    <div className="min-h-screen bg-[#f0f0f1]">
       <Navbar />
       
-      <div className="flex h-screen pt-16 px-0 py-0">
-        {/* Redesigned sidebar */}
-        <div className="w-64 bg-[#121826] text-white h-full fixed left-0 top-0 pt-24 overflow-y-auto py-[20px]">
+      {/* Mobile menu toggle button */}
+      <div className="fixed z-30 bottom-4 right-4 lg:hidden">
+        <Button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="h-12 w-12 rounded-full shadow-lg bg-[#2271b1] hover:bg-[#135e96] p-0 flex items-center justify-center"
+        >
+          {isMobileMenuOpen ? (
+            <X className="h-5 w-5 text-white" />
+          ) : (
+            <Menu className="h-5 w-5 text-white" />
+          )}
+        </Button>
+      </div>
+      
+      <div className="flex min-h-screen pt-16 px-0 py-0">
+        {/* Responsive sidebar */}
+        <div 
+          className={`${
+            isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          } w-64 bg-[#121826] text-white fixed left-0 top-0 pt-24 h-full z-20 transition-transform duration-300 ease-in-out overflow-y-auto py-[20px] lg:shadow-none shadow-xl`}
+        >
           <div className="px-4 py-3">
             {/* User profile section */}
             <div className="flex items-center space-x-2 mb-6 bg-[#1a2032] p-3 rounded-lg">
@@ -42,12 +87,20 @@ const AdminLayout = ({
             <div className="space-y-1 mt-4">
               <p className="text-xs uppercase text-gray-400 font-medium mb-2 px-2">Main</p>
               
-              <Button onClick={() => navigate("/admin")} variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200">
+              <Button 
+                onClick={() => handleNavigation("/admin")} 
+                variant="ghost" 
+                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200"
+              >
                 <LayoutDashboard className="h-5 w-5 mr-3" />
                 Dashboard
               </Button>
               
-              <Button onClick={() => navigate("/admin/create")} variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200">
+              <Button 
+                onClick={() => handleNavigation("/admin/create")} 
+                variant="ghost" 
+                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200"
+              >
                 <FileText className="h-5 w-5 mr-3" />
                 Content
               </Button>
@@ -56,12 +109,20 @@ const AdminLayout = ({
             <div className="space-y-1 mt-6">
               <p className="text-xs uppercase text-gray-400 font-medium mb-2 px-2">System</p>
               
-              <Button onClick={() => navigate("/admin/settings")} variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200">
+              <Button 
+                onClick={() => handleNavigation("/admin/settings")} 
+                variant="ghost" 
+                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200"
+              >
                 <Settings className="h-5 w-5 mr-3" />
                 Settings
               </Button>
               
-              <Button onClick={() => navigate("/")} variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200">
+              <Button 
+                onClick={() => handleNavigation("/")} 
+                variant="ghost" 
+                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200"
+              >
                 <Home className="h-5 w-5 mr-3" />
                 View Site
               </Button>
@@ -70,18 +131,24 @@ const AdminLayout = ({
             <Separator className="bg-[#2a3347] my-4" />
             
             {/* Sign out button */}
-            <Button onClick={handleSignOut} variant="ghost" className="w-full justify-start text-gray-300 hover:text-red-400 hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200 mt-2">
+            <Button 
+              onClick={handleSignOut} 
+              variant="ghost" 
+              className="w-full justify-start text-gray-300 hover:text-red-400 hover:bg-[#1e2538] pl-2 rounded-lg transition-all duration-200 mt-2"
+            >
               <LogOut className="h-5 w-5 mr-3" />
               Sign Out
             </Button>
           </div>
         </div>
         
-        {/* Main content */}
-        <div className="ml-64 flex-1 p-6 md:p-8">
+        {/* Main content - adjusted for mobile */}
+        <div className="w-full lg:ml-64 p-4 md:p-6 lg:p-8 pt-20">
           {children}
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default AdminLayout;

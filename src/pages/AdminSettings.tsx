@@ -58,98 +58,103 @@ const AdminSettings = () => {
     <AdminLayout>
       <div>
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-2">
-            <SettingsIcon className="mr-2 h-6 w-6 text-[#2271b1]" />
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
+            <SettingsIcon className="mr-2 h-5 md:h-6 w-5 md:w-6 text-[#2271b1]" />
             Settings
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm md:text-base text-gray-600">
             Configure your blog settings
           </p>
         </div>
         
         <form onSubmit={handleSaveSettings}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
             {/* General Settings Card */}
-            <div className="md:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4 md:space-y-6">
               <Card className="bg-white shadow-sm border border-gray-200">
-                <CardHeader className="pb-3">
-                  <CardTitle>General Settings</CardTitle>
-                  <CardDescription>Configure the general settings for your blog</CardDescription>
+                <CardHeader className="pb-2 md:pb-3">
+                  <CardTitle className="text-gray-800 text-lg md:text-xl">General Settings</CardTitle>
+                  <CardDescription className="text-gray-600">Configure the general settings for your blog</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="siteName">Site Name</Label>
+                    <Label htmlFor="siteName" className="text-gray-700">Site Name</Label>
                     <Input 
                       id="siteName" 
                       value={siteName} 
                       onChange={(e) => setSiteName(e.target.value)} 
                       placeholder="My Blog" 
+                      className="text-gray-800 placeholder:text-gray-400"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="siteDescription">Site Description</Label>
+                    <Label htmlFor="siteDescription" className="text-gray-700">Site Description</Label>
                     <Textarea 
                       id="siteDescription" 
                       value={siteDescription} 
                       onChange={(e) => setSiteDescription(e.target.value)} 
                       placeholder="A brief description of your blog"
                       rows={3}
+                      className="text-gray-800 placeholder:text-gray-400"
                     />
                   </div>
                 </CardContent>
               </Card>
               
               <Card className="bg-white shadow-sm border border-gray-200">
-                <CardHeader className="pb-3">
-                  <CardTitle>Default Post Settings</CardTitle>
-                  <CardDescription>Configure defaults for new blog posts</CardDescription>
+                <CardHeader className="pb-2 md:pb-3">
+                  <CardTitle className="text-gray-800 text-lg md:text-xl">Default Post Settings</CardTitle>
+                  <CardDescription className="text-gray-600">Configure defaults for new blog posts</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="defaultCategory">Default Category</Label>
+                    <Label htmlFor="defaultCategory" className="text-gray-700">Default Category</Label>
                     <Input 
                       id="defaultCategory" 
                       value={defaultCategory} 
                       onChange={(e) => setDefaultCategory(e.target.value)} 
                       placeholder="Technology"
+                      className="text-gray-800 placeholder:text-gray-400"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="seoDescription">Default SEO Description</Label>
+                    <Label htmlFor="seoDescription" className="text-gray-700">Default SEO Description</Label>
                     <Textarea 
                       id="seoDescription" 
                       value={seoDescription} 
                       onChange={(e) => setSeoDescription(e.target.value)} 
                       placeholder="Default SEO description for new posts"
                       rows={3}
+                      className="text-gray-800 placeholder:text-gray-400"
                     />
                   </div>
                 </CardContent>
               </Card>
             </div>
             
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {/* Profile Settings Card */}
               <Card className="bg-white shadow-sm border border-gray-200">
-                <CardHeader className="pb-3">
-                  <CardTitle>Profile Settings</CardTitle>
-                  <CardDescription>Update your profile information</CardDescription>
+                <CardHeader className="pb-2 md:pb-3">
+                  <CardTitle className="text-gray-800 text-lg md:text-xl">Profile Settings</CardTitle>
+                  <CardDescription className="text-gray-600">Update your profile information</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="displayName">Display Name</Label>
+                    <Label htmlFor="displayName" className="text-gray-700">Display Name</Label>
                     <Input 
                       id="displayName" 
                       value={displayName} 
                       onChange={(e) => setDisplayName(e.target.value)} 
                       placeholder="Your Name"
+                      className="text-gray-800 placeholder:text-gray-400"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email" className="text-gray-700">Email Address</Label>
                     <Input 
                       id="email" 
                       type="email"
@@ -157,6 +162,7 @@ const AdminSettings = () => {
                       onChange={(e) => setEmail(e.target.value)} 
                       placeholder="your.email@example.com"
                       disabled
+                      className="text-gray-800 placeholder:text-gray-400"
                     />
                     <p className="text-xs text-gray-500">Email address cannot be changed</p>
                   </div>
@@ -165,14 +171,14 @@ const AdminSettings = () => {
               
               {/* Notification Settings Card */}
               <Card className="bg-white shadow-sm border border-gray-200">
-                <CardHeader className="pb-3">
-                  <CardTitle>Notification Settings</CardTitle>
-                  <CardDescription>Configure your notification preferences</CardDescription>
+                <CardHeader className="pb-2 md:pb-3">
+                  <CardTitle className="text-gray-800 text-lg md:text-xl">Notification Settings</CardTitle>
+                  <CardDescription className="text-gray-600">Configure your notification preferences</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <Label htmlFor="emailNotif">Email Notifications</Label>
+                      <Label htmlFor="emailNotif" className="text-gray-700">Email Notifications</Label>
                       <p className="text-xs text-gray-500">Receive email notifications</p>
                     </div>
                     <Switch 
@@ -186,7 +192,7 @@ const AdminSettings = () => {
                   
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <Label htmlFor="commentNotif">Comment Notifications</Label>
+                      <Label htmlFor="commentNotif" className="text-gray-700">Comment Notifications</Label>
                       <p className="text-xs text-gray-500">Get notified on new comments</p>
                     </div>
                     <Switch 
@@ -203,7 +209,7 @@ const AdminSettings = () => {
           <div className="mt-6 flex justify-end">
             <Button 
               type="submit" 
-              className="bg-[#2271b1] hover:bg-[#135e96]"
+              className="bg-[#2271b1] hover:bg-[#135e96] text-white"
               disabled={isLoading}
             >
               {isLoading ? (
