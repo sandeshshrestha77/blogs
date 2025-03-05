@@ -431,7 +431,7 @@ const BlogPost = () => {
               <AuthorCard author={post.author || "Anonymous"} date={post.date || new Date().toLocaleDateString()} />
 
               {trendingPosts.length > 0 && <div className="bg-zinc-900/50 rounded-xl border border-zinc-800 p-6 shadow-lg mb-10">
-                  <h3 className="text-xl font-semibold text-white mb-6">Most Popular Post</h3>
+                  <h3 className="text-xl font-semibold text-white mb-6">Trending Articles</h3>
                   <div>
                     {trendingPosts.map(post => <RelatedPostCard key={post.id} post={post} />)}
                   </div>
