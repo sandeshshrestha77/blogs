@@ -37,21 +37,23 @@ const AdminSettings = () => {
     const loadSettings = async () => {
       try {
         // Load site settings
-        const { data: siteData } = await supabase
+        const { data: siteData, error: siteError } = await supabase
           .from('site_settings')
           .select('*')
           .single();
+        if (siteError && siteError.code !== 'PGRST116') throw siteError; // PGRST116 means no rows
         if (siteData) {
           setSiteName(siteData.site_name);
           setSiteDescription(siteData.site_description);
         }
 
         // Load user settings
-        const { data: userData } = await supabase
+        const { data: userData, error: userError } = await supabase
           .from('user_settings')
           .select('*')
           .eq('user_id', user.id)
           .single();
+        if (userError && userError.code !== 'PGRST116') throw userError;
         if (userData) {
           setDisplayName(userData.display_name);
           setEmailNotifications(userData.email_notifications);
@@ -59,11 +61,12 @@ const AdminSettings = () => {
         }
 
         // Load post defaults
-        const { data: postData } = await supabase
+        const { data: postData, error: postError } = await supabase
           .from('post_defaults')
           .select('*')
           .eq('user_id', user.id)
           .single();
+        if (postError && postError.code !== 'PGRST116') throw postError;
         if (postData) {
           setDefaultCategory(postData.default_category);
           setSeoDescription(postData.seo_description);
@@ -88,9 +91,13 @@ const AdminSettings = () => {
       const { error: siteError } = await supabase
         .from('site_settings')
         .upsert({
+          id: (await supabase.from('site_settings').select('id').single())?.data?.id || undefined,
           site_name: siteName,
           site_description: siteDescription
-        }, { onConflict: 'id' });
+        }, { 
+          onConflict: 'id',
+          ignoreDuplicates: false
+        });
       
       if (siteError) throw siteError;
 
@@ -102,7 +109,10 @@ const AdminSettings = () => {
           display_name: displayName,
           email_notifications: emailNotifications,
           comment_notifications: commentNotifications
-        }, { onConflict: 'user_id' });
+        }, { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        });
       
       if (userError) throw userError;
 
@@ -113,19 +123,23 @@ const AdminSettings = () => {
           user_id: user.id,
           default_category: defaultCategory,
           seo_description: seoDescription
-        }, { onConflict: 'user_id' });
+        }, { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        });
       
       if (postError) throw postError;
 
       toast.success("Settings saved successfully");
     } catch (error) {
       console.error("Error saving settings:", error);
-      toast.error("Failed to save settings");
+      toast.error("Failed to save settings: " + error.message);
     } finally {
       setIsLoading(false);
     }
   };
   
+  // Rest of the component (UI) remains the same
   return (
     <AdminLayout>
       <div>
