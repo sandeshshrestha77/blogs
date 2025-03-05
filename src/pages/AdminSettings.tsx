@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import AdminLayout from "@/components/AdminLayout";
 import { Settings as SettingsIcon, Save } from "lucide-react";
@@ -32,19 +31,92 @@ const AdminSettings = () => {
   // Default post settings
   const [defaultCategory, setDefaultCategory] = useState("Technology");
   const [seoDescription, setSeoDescription] = useState("This is a default SEO description for new posts.");
-  
+
+  // Load settings on mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        // Load site settings
+        const { data: siteData } = await supabase
+          .from('site_settings')
+          .select('*')
+          .single();
+        if (siteData) {
+          setSiteName(siteData.site_name);
+          setSiteDescription(siteData.site_description);
+        }
+
+        // Load user settings
+        const { data: userData } = await supabase
+          .from('user_settings')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        if (userData) {
+          setDisplayName(userData.display_name);
+          setEmailNotifications(userData.email_notifications);
+          setCommentNotifications(userData.comment_notifications);
+        }
+
+        // Load post defaults
+        const { data: postData } = await supabase
+          .from('post_defaults')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        if (postData) {
+          setDefaultCategory(postData.default_category);
+          setSeoDescription(postData.seo_description);
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
+    };
+
+    if (user?.id) {
+      loadSettings();
+    }
+  }, [user?.id]);
+
   const handleSaveSettings = async (event: React.FormEvent) => {
     event.preventDefault();
     
     try {
       setIsLoading(true);
       
-      // Simulate API call with a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Save site settings
+      const { error: siteError } = await supabase
+        .from('site_settings')
+        .upsert({
+          site_name: siteName,
+          site_description: siteDescription
+        }, { onConflict: 'id' });
       
-      // Here you would normally save these settings to Supabase or another backend
-      // For now we'll just show a success toast
+      if (siteError) throw siteError;
+
+      // Save user settings
+      const { error: userError } = await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          display_name: displayName,
+          email_notifications: emailNotifications,
+          comment_notifications: commentNotifications
+        }, { onConflict: 'user_id' });
       
+      if (userError) throw userError;
+
+      // Save post defaults
+      const { error: postError } = await supabase
+        .from('post_defaults')
+        .upsert({
+          user_id: user.id,
+          default_category: defaultCategory,
+          seo_description: seoDescription
+        }, { onConflict: 'user_id' });
+      
+      if (postError) throw postError;
+
       toast.success("Settings saved successfully");
     } catch (error) {
       console.error("Error saving settings:", error);
