@@ -1,5 +1,7 @@
+
 import { Link } from "react-router-dom";
-import { Calendar, Clock, User, ArrowRightIcon } from "lucide-react";
+import { Calendar, Clock, User, ArrowRightIcon, Eye } from "lucide-react";
+
 interface BlogCardProps {
   title: string;
   excerpt: string | null;
@@ -12,7 +14,9 @@ interface BlogCardProps {
   alt_text?: string | null;
   meta_title?: string | null;
   meta_description?: string | null;
+  views?: number | null;
 }
+
 const BlogCard = ({
   title,
   excerpt,
@@ -24,12 +28,14 @@ const BlogCard = ({
   read_time,
   alt_text,
   meta_title,
-  meta_description
+  meta_description,
+  views
 }: BlogCardProps) => {
   // Use SEO fields if available, otherwise fall back to regular fields
   const displayTitle = meta_title || title;
   const displayExcerpt = meta_description || excerpt;
   const imageAlt = alt_text || title;
+  
   return <Link to={`/blog/${slug}`} className="group flex flex-col bg-zinc-900/50 rounded-xl overflow-hidden shadow-lg transition-all duration-300 
         hover:-translate-y-2 hover:shadow-2xl border border-zinc-800/50 h-full hover:border-blue-500/30">
       <div className="relative aspect-[16/9] overflow-hidden bg-zinc-800">
@@ -67,6 +73,12 @@ const BlogCard = ({
                 <Clock size={12} className="text-blue-400" />
                 <span>{read_time} min</span>
               </div>}
+            {views !== undefined && views !== null && (
+              <div className="flex items-center gap-1">
+                <Eye size={12} className="text-blue-400" />
+                <span>{views} views</span>
+              </div>
+            )}
           </div>
         </div>
         
@@ -77,4 +89,5 @@ const BlogCard = ({
       </div>
     </Link>;
 };
+
 export default BlogCard;

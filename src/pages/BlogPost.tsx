@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/utils/supabase";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { ArrowLeft, MessageCircle, Calendar, Clock, Share2, ArrowRight } from "lucide-react";
+import { ArrowLeft, MessageCircle, Calendar, Clock, Share2, ArrowRight, Eye } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet";
@@ -195,6 +195,12 @@ const RelatedPostCard = ({ post }: { post: Post }) => (
               {post.read_time} min
             </span>
           )}
+          {post.views !== undefined && post.views !== null && (
+            <span className="flex items-center gap-1">
+              <Eye size={12} />
+              {post.views} views
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -262,7 +268,6 @@ const BlogPost = () => {
       if (error) throw error;
       if (data) {
         setPost(data);
-        // Increment views using the SQL function
         await supabase.rpc('increment_views', { post_slug: slug });
       }
     } catch (error) {
@@ -293,7 +298,6 @@ const BlogPost = () => {
 
   const fetchRelatedContent = useCallback(async () => {
     try {
-      // Fetch recent posts (limited to 3)
       const { data: recentData, error: recentError } = await supabase
         .from("posts")
         .select()
@@ -303,7 +307,6 @@ const BlogPost = () => {
       if (recentError) throw recentError;
       if (recentData) setRecentPosts(recentData);
 
-      // Fixed: Changed nullsLast to nullsFirst which is a valid property
       const { data: trendingData, error: trendingError } = await supabase
         .from("posts")
         .select()
@@ -350,7 +353,6 @@ const BlogPost = () => {
   };
 
   const formatContent = (content: string) => {
-    // If the content contains HTML (from rich text editor like TinyMCE), render it directly
     if (content && (content.includes('<p>') || content.includes('<h'))) {
       return (
         <div 
@@ -360,7 +362,6 @@ const BlogPost = () => {
       );
     }
 
-    // Legacy format: handle Markdown-style content for backward compatibility
     let headingIndex = 0;
     return content.split('\n\n').map((paragraph, index) => {
       if (paragraph.startsWith('#') || paragraph.startsWith('##')) {
@@ -476,6 +477,12 @@ const BlogPost = () => {
                   <div className="flex items-center gap-1">
                     <Clock size={16} />
                     <span>{post.read_time} min read</span>
+                  </div>
+                )}
+                {post.views !== undefined && post.views !== null && (
+                  <div className="flex items-center gap-1">
+                    <Eye size={16} />
+                    <span>{post.views} views</span>
                   </div>
                 )}
                 <div className="flex items-center gap-1">
