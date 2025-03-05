@@ -98,9 +98,7 @@ const Index = () => {
                   <h2 className="text-3xl font-bold text-white">
                     Hey there, I'm Sandesh Shrestha
                   </h2>
-                  <p className="text-zinc-300 leading-relaxed">
-                    I'm Sandesh Shrestha, a Graphic & Motion Designer passionate about design, creativity, and technology. This blog is where I share insights on design, motion graphics. Stay tuned for tips, tutorials, and creative inspiration! 🚀
-                  </p>
+                  <p className="text-zinc-300 leading-relaxed">I'm a Graphic & Motion Designer passionate about design, creativity, and technology. This blog is where I share insights on design and motion graphics.</p>
                   
                   <Link to="https://sandeshshrestha.xyz" target="_blank" rel="noopener noreferrer">
   <Button className="bg-blue-600 hover:bg-blue-700 text-white group mx-0 my-[20px]">
