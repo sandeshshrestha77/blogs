@@ -7,6 +7,7 @@ import Blogs from "./pages/Blogs";
 import BlogPost from "./pages/BlogPost";
 import Admin from "./pages/Admin";
 import AdminPostForm from "./pages/AdminPostForm";
+import AdminSettings from "./pages/AdminSettings";
 import Login from "./pages/Login";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -56,6 +57,11 @@ function App() {
           <Route path="/admin/edit/:id" element={
             <ProtectedRoute>
               <AdminPostForm />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/settings" element={
+            <ProtectedRoute>
+              <AdminSettings />
             </ProtectedRoute>
           } />
         </Routes>
