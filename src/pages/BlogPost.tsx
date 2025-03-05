@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -23,9 +24,9 @@ interface Comment {
 
 const AuthorCard = ({ author, date }: { author: string; date: string }) => {
   return (
-    <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6 mb-6">
+    <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6 mb-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div className="flex items-center mb-4">
-        <div className="w-14 h-14 rounded-full bg-zinc-800 overflow-hidden mr-4">
+        <div className="w-16 h-16 rounded-full bg-zinc-800 overflow-hidden mr-5 border-2 border-blue-500/20">
           <img
             src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${author}`}
             alt={`${author}'s avatar`}
@@ -33,7 +34,7 @@ const AuthorCard = ({ author, date }: { author: string; date: string }) => {
           />
         </div>
         <div>
-          <h3 className="font-semibold text-white text-lg">{author}</h3>
+          <h3 className="font-semibold text-white text-xl mb-1">{author}</h3>
           <p className="text-sm text-gray-400">Posted on {date}</p>
         </div>
       </div>
@@ -77,11 +78,11 @@ const CommentForm = ({ postId, onCommentAdded }: { postId: string; onCommentAdde
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-zinc-900/50 p-6 rounded-lg border border-zinc-800">
-      <h3 className="text-xl font-semibold text-white mb-4">Leave a Comment</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="space-y-5 bg-zinc-900/60 p-7 rounded-xl border border-zinc-800 shadow-lg">
+      <h3 className="text-2xl font-semibold text-white mb-5">Leave a Comment</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-1">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-2">
             Name *
           </label>
           <input
@@ -89,12 +90,12 @@ const CommentForm = ({ postId, onCommentAdded }: { postId: string; onCommentAdde
             type="text"
             value={name}
             onChange={e => setName(e.target.value)}
-            className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             required
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-1">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-2">
             Email (optional)
           </label>
           <input
@@ -102,12 +103,12 @@ const CommentForm = ({ postId, onCommentAdded }: { postId: string; onCommentAdde
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
           />
         </div>
       </div>
       <div>
-        <label htmlFor="comment" className="block text-sm font-medium text-gray-400 mb-1">
+        <label htmlFor="comment" className="block text-sm font-medium text-gray-400 mb-2">
           Comment *
         </label>
         <textarea
@@ -115,14 +116,14 @@ const CommentForm = ({ postId, onCommentAdded }: { postId: string; onCommentAdde
           value={content}
           onChange={e => setContent(e.target.value)}
           rows={4}
-          className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
           required
         />
       </div>
       <Button
         type="submit"
         disabled={isSubmitting}
-        className="bg-blue-600 hover:bg-blue-700 text-zinc-100 font-medium"
+        className="bg-blue-600 hover:bg-blue-700 text-zinc-100 font-medium px-6 py-2.5 rounded-md transition-colors"
       >
         {isSubmitting ? "Submitting..." : "Post Comment"}
       </Button>
@@ -133,17 +134,17 @@ const CommentForm = ({ postId, onCommentAdded }: { postId: string; onCommentAdde
 const CommentsList = ({ comments }: { comments: Comment[] }) => {
   if (comments.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-400">Be the first to comment on this article!</p>
+      <div className="text-center py-10 bg-zinc-900/30 rounded-lg border border-zinc-800/50">
+        <p className="text-gray-400 text-lg">Be the first to comment on this article!</p>
       </div>
     );
   }
   return (
     <div className="space-y-6">
       {comments.map(comment => (
-        <div key={comment.id} className="bg-zinc-900/50 p-6 rounded-lg border border-zinc-800">
-          <div className="flex items-center mb-3">
-            <div className="w-10 h-10 rounded-full bg-zinc-800 overflow-hidden mr-3">
+        <div key={comment.id} className="bg-zinc-900/50 p-6 rounded-lg border border-zinc-800 hover:border-zinc-700 transition-colors shadow-md">
+          <div className="flex items-center mb-4">
+            <div className="w-12 h-12 rounded-full bg-zinc-800 overflow-hidden mr-4 border border-zinc-700">
               <img
                 src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.name}`}
                 alt={`${comment.name}'s avatar`}
@@ -152,7 +153,7 @@ const CommentsList = ({ comments }: { comments: Comment[] }) => {
               />
             </div>
             <div>
-              <h4 className="font-medium text-white">{comment.name}</h4>
+              <h4 className="font-medium text-white text-lg">{comment.name}</h4>
               <p className="text-xs text-gray-500">
                 {new Date(comment.created_at).toLocaleDateString('en-US', {
                   year: 'numeric',
@@ -162,7 +163,7 @@ const CommentsList = ({ comments }: { comments: Comment[] }) => {
               </p>
             </div>
           </div>
-          <p className="text-gray-300">{comment.content}</p>
+          <p className="text-gray-300 leading-relaxed">{comment.content}</p>
         </div>
       ))}
     </div>
@@ -170,9 +171,9 @@ const CommentsList = ({ comments }: { comments: Comment[] }) => {
 };
 
 const RelatedPostCard = ({ post }: { post: Post }) => (
-  <Link to={`/blog/${post.slug}`} className="group">
-    <div className="flex gap-4 items-start">
-      <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
+  <Link to={`/blog/${post.slug}`} className="group block">
+    <div className="flex gap-5 items-start p-4 rounded-lg hover:bg-zinc-900/50 transition-colors">
+      <div className="w-24 h-24 rounded-md overflow-hidden flex-shrink-0 border border-zinc-800 shadow-md">
         <img
           src={post.image || "https://source.unsplash.com/100x100/?technology"}
           alt={post.title}
@@ -181,7 +182,7 @@ const RelatedPostCard = ({ post }: { post: Post }) => (
         />
       </div>
       <div>
-        <h4 className="font-medium text-white group-hover:text-blue-400 transition-colors line-clamp-2">
+        <h4 className="font-medium text-white group-hover:text-blue-400 transition-colors line-clamp-2 text-lg mb-2">
           {post.title}
         </h4>
         <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
@@ -213,7 +214,7 @@ const ShareButtons = () => {
       <Button
         variant="outline"
         size="sm"
-        className="bg-white text-black hover:bg-gray-100"
+        className="bg-white text-black hover:bg-gray-100 transition-colors"
         onClick={() => window.navigator.share?.({ url: window.location.href })}
       >
         <Share2 className="h-4 w-4 mr-2" />
@@ -231,13 +232,13 @@ const TableOfContents = ({ content }: { content: string }) => {
 
   if (headings.length === 0) return null;
   return (
-    <div className="mb-8 p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
-      <h3 className="text-lg font-semibold text-white mb-3">Table of Contents</h3>
-      <ul className="space-y-2">
+    <div className="mb-10 p-6 bg-zinc-900/60 rounded-xl border border-zinc-800 shadow-md sticky top-24">
+      <h3 className="text-xl font-semibold text-white mb-4">Table of Contents</h3>
+      <ul className="space-y-3">
         {headings.map((heading, index) => (
-          <li key={index} className="text-blue-400 hover:text-blue-300">
-            <a href={`#heading-${index}`} className="flex items-center">
-              <span className="mr-2">•</span>
+          <li key={index} className="text-blue-400 hover:text-blue-300 transition-colors">
+            <a href={`#heading-${index}`} className="flex items-center group">
+              <span className="mr-2 text-blue-500 group-hover:mr-3 transition-all">•</span>
               <span className="line-clamp-1">{heading}</span>
             </a>
           </li>
@@ -312,9 +313,10 @@ const BlogPost = () => {
         .select()
         .neq('slug', slug || '')
         .order('views', { ascending: false, nullsFirst: false })
-        .limit(3);
+        .limit(1)
+        .maybeSingle();
       if (trendingError) throw trendingError;
-      if (trendingData) setTrendingPosts(trendingData);
+      if (trendingData) setTrendingPosts(trendingData ? [trendingData] : []);
     } catch (error) {
       console.error("Error fetching related content:", error);
     }
@@ -357,7 +359,7 @@ const BlogPost = () => {
       return (
         <div 
           dangerouslySetInnerHTML={{ __html: content }} 
-          className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-img:my-8 prose-hr:border-zinc-700"
+          className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-headings:font-bold prose-headings:mt-10 prose-headings:mb-6 prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-6 prose-strong:text-white prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:my-10 prose-img:shadow-lg prose-hr:border-zinc-700 prose-blockquote:border-l-blue-500 prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-gray-400"
         />
       );
     }
@@ -369,19 +371,19 @@ const BlogPost = () => {
         headingIndex++;
         if (paragraph.startsWith('##')) {
           return (
-            <h3 id={id} key={index} className="text-xl font-bold text-white mt-10 mb-4">
+            <h3 id={id} key={index} className="text-2xl font-bold text-white mt-12 mb-5 scroll-mt-24">
               {paragraph.replace(/^##\s/, '')}
             </h3>
           );
         } else {
           return (
-            <h2 id={id} key={index} className="text-2xl font-bold text-white mt-12 mb-6">
+            <h2 id={id} key={index} className="text-3xl font-bold text-white mt-16 mb-6 scroll-mt-24">
               {paragraph.replace(/^#\s/, '')}
             </h2>
           );
         }
       }
-      return <p key={index} className="mb-6 text-gray-300 leading-relaxed">{paragraph}</p>;
+      return <p key={index} className="mb-7 text-gray-300 leading-relaxed text-lg">{paragraph}</p>;
     });
   };
 
@@ -400,10 +402,10 @@ const BlogPost = () => {
     return (
       <div className="min-h-screen flex flex-col bg-zinc-950">
         <Navbar />
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-3xl font-bold mb-4 text-white">Post not found</h1>
+        <div className="container mx-auto px-4 py-20 text-center">
+          <h1 className="text-4xl font-bold mb-6 text-white">Post not found</h1>
           <Link to="/">
-            <Button>Return Home</Button>
+            <Button size="lg" className="mt-4">Return Home</Button>
           </Link>
         </div>
       </div>
@@ -438,8 +440,17 @@ const BlogPost = () => {
 
       <Navbar />
 
-      <article className="container mx-auto px-4 py-16 max-w-6xl">
-        <div className="aspect-video mb-8 rounded-xl overflow-hidden shadow-lg">
+      <div className="w-full h-2 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600"></div>
+
+      <article className="container mx-auto px-4 py-20 max-w-6xl">
+        <div className="mb-10">
+          <Link to="/blogs" className="inline-flex items-center text-blue-400 hover:text-blue-300 mb-8 group transition-colors text-sm font-medium">
+            <ArrowLeft size={16} className="mr-2 group-hover:mr-3 transition-all" />
+            Back to all articles
+          </Link>
+        </div>
+
+        <div className="aspect-video mb-12 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800/50">
           <img
             src={post.image || "https://images.unsplash.com/photo-1498050108023-c5249f4df085"}
             alt={imageAltText}
@@ -448,44 +459,44 @@ const BlogPost = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-7 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-7 gap-10">
           <div className="lg:col-span-5">
-            <header className="mb-8">
+            <header className="mb-12">
               {post.category && (
-                <span className="inline-block text-xs font-medium px-3 py-1 bg-blue-600/10 text-blue-400 rounded-full mb-4">
+                <span className="inline-block text-sm font-medium px-4 py-1.5 bg-blue-600/20 text-blue-400 rounded-full mb-5">
                   {post.category}
                 </span>
               )}
-              <h1 className="text-3xl md:text-4xl font-bold mb-6 text-white">{post.title}</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-8 text-white leading-tight">{post.title}</h1>
 
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-6">
+              <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400 mb-8">
                 <div className="flex items-center gap-2">
                   <img
                     src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author}`}
                     alt={`${post.author}'s avatar`}
-                    className="w-6 h-6 rounded-full"
+                    className="w-8 h-8 rounded-full border border-zinc-700"
                   />
-                  <span>{post.author || "Anonymous"}</span>
+                  <span className="font-medium">{post.author || "Anonymous"}</span>
                 </div>
                 {post.date && (
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
                     <Calendar size={16} />
                     <span>{post.date}</span>
                   </div>
                 )}
                 {post.read_time && (
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
                     <Clock size={16} />
                     <span>{post.read_time} min read</span>
                   </div>
                 )}
                 {post.views !== undefined && post.views !== null && (
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
                     <Eye size={16} />
                     <span>{post.views} views</span>
                   </div>
                 )}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <MessageCircle size={16} />
                   <span>{comments.length} comments</span>
                 </div>
@@ -496,43 +507,47 @@ const BlogPost = () => {
               {post.content && post.content.length > 1000 && <TableOfContents content={post.content} />}
             </header>
 
-            <div ref={contentRef} className="article-content">
+            <div ref={contentRef} className="article-content mb-16">
               {post.content ? formatContent(post.content) : <p className="text-gray-300">No content available.</p>}
             </div>
 
-            <div className="mt-12 pt-8 border-t border-zinc-800">
-              <h2 className="text-2xl font-bold text-white mb-6">Comments ({comments.length})</h2>
+            <div className="mt-16 pt-10 border-t border-zinc-800">
+              <h2 className="text-3xl font-bold text-white mb-8">Comments ({comments.length})</h2>
               {commentsLoading ? (
-                <div className="flex justify-center py-8">
+                <div className="flex justify-center py-10">
                   <LoadingSpinner />
                 </div>
               ) : (
                 <CommentsList comments={comments} />
               )}
-              <div className="mt-8">
+              <div className="mt-12">
                 <CommentForm postId={post.id} onCommentAdded={handleCommentAdded} />
               </div>
             </div>
           </div>
 
-          <aside className="lg:col-span-2 space-y-8">
-            <AuthorCard author={post.author || "Anonymous"} date={post.date || new Date().toLocaleDateString()} />
+          <aside className="lg:col-span-2 space-y-10">
+            <div className="sticky top-24">
+              <AuthorCard author={post.author || "Anonymous"} date={post.date || new Date().toLocaleDateString()} />
 
-            <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Trending Posts</h3>
-              <div className="space-y-6">
-                {trendingPosts.slice(0, 3).map(post => <RelatedPostCard key={post.id} post={post} />)}
-              </div>
-            </div>
+              {trendingPosts.length > 0 && (
+                <div className="bg-zinc-900/50 rounded-xl border border-zinc-800 p-6 shadow-lg mb-10">
+                  <h3 className="text-xl font-semibold text-white mb-6">Most Popular Post</h3>
+                  <div>
+                    {trendingPosts.map(post => <RelatedPostCard key={post.id} post={post} />)}
+                  </div>
+                </div>
+              )}
 
-            <div className="bg-zinc-900/50 rounded-lg border border-zinc-800 p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Recent Articles</h3>
-              <div className="space-y-6">
-                {recentPosts.slice(0, 3).map(post => <RelatedPostCard key={post.id} post={post} />)}
-                <Link to="/blogs" className="inline-flex items-center text-blue-400 hover:text-blue-300 mt-4">
-                  View all articles
-                  <ArrowRight size={16} className="ml-1" />
-                </Link>
+              <div className="bg-zinc-900/50 rounded-xl border border-zinc-800 p-6 shadow-lg">
+                <h3 className="text-xl font-semibold text-white mb-6">Recent Articles</h3>
+                <div className="space-y-6">
+                  {recentPosts.slice(0, 3).map(post => <RelatedPostCard key={post.id} post={post} />)}
+                  <Link to="/blogs" className="inline-flex items-center text-blue-400 hover:text-blue-300 mt-6 group transition-colors">
+                    View all articles
+                    <ArrowRight size={16} className="ml-2 group-hover:ml-3 transition-all" />
+                  </Link>
+                </div>
               </div>
             </div>
           </aside>
