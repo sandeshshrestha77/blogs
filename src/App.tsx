@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
+import ThreeDBackground from "./components/ThreeDBackground";
 
 function App() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -46,21 +47,25 @@ function App() {
           <Route path="/auth/callback" element={<Login />} />
           <Route path="/admin" element={
             <ProtectedRoute>
+              <ThreeDBackground />
               <Admin />
             </ProtectedRoute>
           } />
           <Route path="/admin/create" element={
             <ProtectedRoute>
+              <ThreeDBackground />
               <AdminPostForm />
             </ProtectedRoute>
           } />
           <Route path="/admin/edit/:id" element={
             <ProtectedRoute>
+              <ThreeDBackground />
               <AdminPostForm />
             </ProtectedRoute>
           } />
           <Route path="/admin/settings" element={
             <ProtectedRoute>
+              <ThreeDBackground />
               <AdminSettings />
             </ProtectedRoute>
           } />
