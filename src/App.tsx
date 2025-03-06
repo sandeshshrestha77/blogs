@@ -18,30 +18,8 @@ function App() {
   const [posts, setPosts] = useState<any[]>([]);
   
   useEffect(() => {
-    const setupDatabase = async () => {
-      // Check if newsletter_subscribers table exists
-      const { error: checkError } = await supabase
-        .from('newsletter_subscribers')
-        .select('id')
-        .limit(1)
-        .single();
-        
-      // If table doesn't exist, create it
-      if (checkError && checkError.code === 'PGRST204') {
-        const { error: createError } = await supabase.rpc('create_newsletter_table');
-        if (createError) {
-          console.error('Error creating newsletter table:', createError);
-        }
-      }
-    };
-    
-    setupDatabase();
-  }, []);
-  
-  useEffect(() => {
     const getPosts = async () => {
       try {
-        // Fixed: Changed from "todos" to "posts" which exists in our schema
         const { data, error } = await supabase.from("posts").select();
         if (error) {
           console.error("Error fetching posts:", error);

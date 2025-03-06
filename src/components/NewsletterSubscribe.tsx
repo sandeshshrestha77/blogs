@@ -19,21 +19,19 @@ const NewsletterSubscribe = () => {
     setLoading(true);
     
     try {
-      // Store the subscriber in Supabase
-      const { error } = await supabase
-        .from('newsletter_subscribers')
-        .insert([{ email }])
-        .select();
+      // Use the RPC function to subscribe to the newsletter
+      const { data, error } = await supabase
+        .rpc('subscribe_to_newsletter', { subscriber_email: email });
         
       if (error) {
-        if (error.code === '23505') { // Unique violation
-          toast.info('You\'re already subscribed!');
-        } else {
-          throw error;
-        }
-      } else {
+        throw error;
+      } 
+      
+      if (data && data.success) {
         toast.success('Thanks for subscribing!');
         setEmail('');
+      } else if (data && !data.success) {
+        toast.info(data.error || 'You\'re already subscribed!');
       }
     } catch (error) {
       console.error('Error subscribing to newsletter:', error);
