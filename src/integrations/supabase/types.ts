@@ -44,24 +44,6 @@ export type Database = {
           },
         ]
       }
-      newsletter_subscribers: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-        }
-        Relationships: []
-      }
       post_defaults: {
         Row: {
           created_at: string | null
@@ -243,12 +225,6 @@ export type Database = {
             }
             Returns: undefined
           }
-      subscribe_to_newsletter: {
-        Args: {
-          subscriber_email: string
-        }
-        Returns: Json
-      }
     }
     Enums: {
       [_ in never]: never

@@ -20,6 +20,7 @@ function App() {
   useEffect(() => {
     const getPosts = async () => {
       try {
+        // Fixed: Changed from "todos" to "posts" which exists in our schema
         const { data, error } = await supabase.from("posts").select();
         if (error) {
           console.error("Error fetching posts:", error);

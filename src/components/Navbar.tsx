@@ -1,9 +1,6 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import SearchBox from "./SearchBox";
-import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,27 +19,19 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-6">
+        <div className="hidden md:flex space-x-6">
           <Link to="/" className="text-white hover:text-blue-400 transition">
             Home
           </Link>
           <Link to="/blogs" className="text-white hover:text-blue-400 transition">
             Blogs
           </Link>
-          <div className="flex items-center ml-2 space-x-2">
-            <ThemeToggle />
-            <SearchBox />
-          </div>
         </div>
 
-        {/* Mobile Menu Button and Search */}
-        <div className="flex items-center md:hidden">
-          <ThemeToggle />
-          <SearchBox />
-          <button onClick={toggleMenu} className="text-white text-2xl ml-2">
-            {isMenuOpen ? <X /> : <Menu />}
-          </button>
-        </div>
+        {/* Mobile Menu Button */}
+        <button onClick={toggleMenu} className="text-white text-2xl md:hidden">
+          {isMenuOpen ? <X /> : <Menu />}
+        </button>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
