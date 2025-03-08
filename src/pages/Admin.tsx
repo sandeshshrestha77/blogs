@@ -1,7 +1,6 @@
-
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -145,7 +144,6 @@ const Admin = () => {
     }
   };
 
-  // Function to delete a comment
   const handleDeleteComment = async (commentId: string) => {
     try {
       const { error } = await supabase

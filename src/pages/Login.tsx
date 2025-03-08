@@ -1,155 +1,195 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { Navigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { supabase } from "@/integrations/supabase/client";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { Mail, Lock, ArrowRight, LogIn } from "lucide-react";
 
 const Login = () => {
-  const { signIn, session } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const { signIn, session, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const from = location.state?.from?.pathname || "/admin";
+  
+  useEffect(() => {
+    // Check if we're handling an OAuth redirect
+    const handleOAuthRedirect = async () => {
+      const { error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Error during OAuth redirect:', error);
+        toast.error('Authentication failed. Please try again.');
+      }
+    };
+    
+    // If already authenticated, redirect to admin
+    if (session) {
+      navigate(from, { replace: true });
+    } else if (location.pathname === '/auth/callback') {
+      handleOAuthRedirect();
+    }
+  }, [session, navigate, from, location.pathname]);
+  
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-
+    setIsLoading(true);
+    
     try {
-      await signIn(email, password);
+      if (isSignUp) {
+        if (password !== confirmPassword) {
+          toast.error("Passwords don't match");
+          setIsLoading(false);
+          return;
+        }
+        
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        
+        if (error) throw error;
+        toast.success("Sign up successful! Please check your email for verification.");
+      } else {
+        await signIn(email, password);
+        toast.success("Login successful!");
+        navigate(from, { replace: true });
+      }
     } catch (error: any) {
-      setError(error.message || "Invalid credentials");
-      toast.error(error.message || "Invalid credentials");
+      console.error('Authentication error:', error);
+      toast.error(error.message || "Authentication failed. Please try again.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-
-  if (session) {
-    return <Navigate to="/admin" replace />;
-  }
-
-  return (
-    <div className="min-h-screen flex bg-zinc-950">
-      {/* Left Side - Image (60%) */}
-      <div className="hidden lg:block w-[60%] relative overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1617802690992-15d93263d3a9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Login Background"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent" />
-        
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="max-w-md p-8">
-            <div className="mb-6">
-              <img src="/logo.png" alt="Logo" className="h-14 w-auto mb-6" />
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Welcome to the Admin Dashboard
-            </h1>
-            <p className="text-zinc-300 text-lg">
-              Manage your content, create new blog posts, and monitor your site's analytics from one central location.
-            </p>
-          </div>
-        </div>
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+        <LoadingSpinner />
       </div>
-
-      {/* Right Side - Form (40%) */}
-      <div className="w-full lg:w-[40%] flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
-          <div>
-            <div className="lg:hidden flex items-center mb-6">
-              <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-3" />
-              <h2 className="text-xl font-bold text-white">Sandesh Shrestha</h2>
-            </div>
-            <h2 className="text-3xl font-bold text-white">Sign in</h2>
-            <p className="mt-2 text-sm text-zinc-400">
-              Enter your credentials to access the admin dashboard
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-zinc-300">
-                  Email
-                </label>
-                <div className="relative mt-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail size={18} className="text-zinc-500" />
-                  </div>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    autoFocus
-                    disabled={loading}
-                    className="mt-1 pl-10 bg-zinc-900/50 border-zinc-800 text-white placeholder-zinc-500"
-                    placeholder="Enter your email"
-                  />
+    );
+  }
+  
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 bg-zinc-950">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl"></div>
+      </div>
+      
+      <Card className="w-full max-w-md bg-zinc-900/80 border border-zinc-800 shadow-2xl backdrop-blur-md">
+        <CardHeader className="space-y-2 text-center">
+          <CardTitle className="text-2xl font-bold text-white">
+            {isSignUp ? "Create an Account" : "Welcome Back"}
+          </CardTitle>
+          <CardDescription className="text-zinc-400">
+            {isSignUp 
+              ? "Sign up to start creating and managing your blog content" 
+              : "Sign in to access your blog dashboard"}
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-zinc-300">Email</Label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
+                  <Mail size={18} />
                 </div>
-              </div>
-
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-zinc-300">
-                  Password
-                </label>
-                <div className="relative mt-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock size={18} className="text-zinc-500" />
-                  </div>
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    disabled={loading}
-                    className="pl-10 bg-zinc-900/50 border-zinc-800 text-white placeholder-zinc-500"
-                    placeholder="Enter your password"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-3 flex items-center text-zinc-400 hover:text-white"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                  className="pl-10 bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500"
+                />
               </div>
             </div>
-
-            {error && (
-              <div className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-md p-3 text-center">
-                {error}
+            
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-zinc-300">Password</Label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
+                  <Lock size={18} />
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="pl-10 bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500"
+                />
+              </div>
+            </div>
+            
+            {isSignUp && (
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-zinc-300">Confirm Password</Label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
+                    <Lock size={18} />
+                  </div>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    className="pl-10 bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500"
+                  />
+                </div>
               </div>
             )}
-
-            <Button 
-              type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6" 
-              disabled={loading}
-            >
-              {loading ? "Signing in..." : "Sign in"}
-            </Button>
             
-            <div className="text-center mt-4">
-              <Link to="/" className="text-sm text-zinc-400 hover:text-white transition-colors">
-                ← Back to website
-              </Link>
-            </div>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 mt-2"
+            >
+              {isLoading ? (
+                <LoadingSpinner size="sm" />
+              ) : isSignUp ? (
+                <>Create Account <ArrowRight className="ml-2 h-4 w-4" /></>
+              ) : (
+                <>Sign In <LogIn className="ml-2 h-4 w-4" /></>
+              )}
+            </Button>
           </form>
-        </div>
-      </div>
+          
+          <div className="mt-6 text-center">
+            <Separator className="my-4" />
+            <p className="text-sm text-zinc-400">
+              {isSignUp ? "Already have an account?" : "Don't have an account?"}
+              <Button
+                type="button"
+                variant="link"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-blue-400 hover:text-blue-300 px-2 py-0 h-auto"
+              >
+                {isSignUp ? "Sign In" : "Sign Up"}
+              </Button>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

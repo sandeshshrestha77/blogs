@@ -1,10 +1,9 @@
-
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import BlogCard from "@/components/BlogCard";
 import Footer from "@/components/Footer";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { BookOpen, Search, Filter, TrendingUp } from "lucide-react";

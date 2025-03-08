@@ -44,6 +44,33 @@ export type Database = {
           },
         ]
       }
+      post_defaults: {
+        Row: {
+          created_at: string | null
+          default_category: string
+          id: string
+          seo_description: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          default_category: string
+          id?: string
+          seo_description?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          default_category?: string
+          id?: string
+          seo_description?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           alt_text: string | null
@@ -104,6 +131,60 @@ export type Database = {
           title?: string
           updated_at?: string | null
           views?: number | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          site_description: string | null
+          site_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          site_description?: string | null
+          site_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          site_description?: string | null
+          site_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          comment_notifications: boolean | null
+          created_at: string | null
+          display_name: string
+          email_notifications: boolean | null
+          id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          comment_notifications?: boolean | null
+          created_at?: string | null
+          display_name: string
+          email_notifications?: boolean | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          comment_notifications?: boolean | null
+          created_at?: string | null
+          display_name?: string
+          email_notifications?: boolean | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

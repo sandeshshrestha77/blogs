@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import AdminLayout from "@/components/AdminLayout";
 import { Settings as SettingsIcon, Save } from "lucide-react";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/integrations/supabase/client"; // Corrected import path
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -21,8 +22,8 @@ const AdminSettings = () => {
   const [siteDescription, setSiteDescription] = useState("A blog about technology, design, and more.");
   
   // User settings
-  const [displayName, setDisplayName] = useState(user?.email?.split('@')[0] || "");
-  const [email, setEmail] = useState(user?.email || "");
+  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
   
   // Notification settings
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -36,62 +37,93 @@ const AdminSettings = () => {
   useEffect(() => {
     const loadSettings = async () => {
       try {
+        // Set user email and display name from auth context
+        if (user?.email) {
+          setEmail(user.email);
+          setDisplayName(user.email.split('@')[0] || "");
+        }
+        
         // Load site settings
         const { data: siteData, error: siteError } = await supabase
           .from('site_settings')
           .select('*')
           .single();
-        if (siteError && siteError.code !== 'PGRST116') throw siteError; // PGRST116 means no rows
-        if (siteData) {
-          setSiteName(siteData.site_name);
-          setSiteDescription(siteData.site_description);
+        
+        if (siteError) {
+          if (siteError.code !== 'PGRST116') { // PGRST116 means no rows
+            console.error('Error loading site settings:', siteError);
+          }
+        } else if (siteData) {
+          setSiteName(siteData.site_name || "My Blog");
+          setSiteDescription(siteData.site_description || "A blog about technology, design, and more.");
         }
 
         // Load user settings
-        const { data: userData, error: userError } = await supabase
-          .from('user_settings')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-        if (userError && userError.code !== 'PGRST116') throw userError;
-        if (userData) {
-          setDisplayName(userData.display_name);
-          setEmailNotifications(userData.email_notifications);
-          setCommentNotifications(userData.comment_notifications);
+        if (user?.id) {
+          const { data: userData, error: userError } = await supabase
+            .from('user_settings')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (userError) {
+            if (userError.code !== 'PGRST116') { // PGRST116 means no rows
+              console.error('Error loading user settings:', userError);
+            }
+          } else if (userData) {
+            setDisplayName(userData.display_name || user.email?.split('@')[0] || "");
+            setEmailNotifications(userData.email_notifications !== undefined ? userData.email_notifications : true);
+            setCommentNotifications(userData.comment_notifications !== undefined ? userData.comment_notifications : true);
+          }
         }
 
         // Load post defaults
-        const { data: postData, error: postError } = await supabase
-          .from('post_defaults')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-        if (postError && postError.code !== 'PGRST116') throw postError;
-        if (postData) {
-          setDefaultCategory(postData.default_category);
-          setSeoDescription(postData.seo_description);
+        if (user?.id) {
+          const { data: postData, error: postError } = await supabase
+            .from('post_defaults')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (postError) {
+            if (postError.code !== 'PGRST116') { // PGRST116 means no rows
+              console.error('Error loading post defaults:', postError);
+            }
+          } else if (postData) {
+            setDefaultCategory(postData.default_category || "Technology");
+            setSeoDescription(postData.seo_description || "This is a default SEO description for new posts.");
+          }
         }
       } catch (error) {
         console.error('Error loading settings:', error);
+        toast.error("Failed to load settings");
       }
     };
 
-    if (user?.id) {
-      loadSettings();
-    }
-  }, [user?.id]);
+    loadSettings();
+  }, [user]);
 
   const handleSaveSettings = async (event: React.FormEvent) => {
     event.preventDefault();
+    
+    if (!user?.id) {
+      toast.error("You must be logged in to save settings");
+      return;
+    }
     
     try {
       setIsLoading(true);
       
       // Save site settings
+      const { data: existingSiteSettings } = await supabase
+        .from('site_settings')
+        .select('id')
+        .single();
+      
       const { error: siteError } = await supabase
         .from('site_settings')
         .upsert({
-          id: (await supabase.from('site_settings').select('id').single())?.data?.id || undefined,
+          id: existingSiteSettings?.id || undefined,
           site_name: siteName,
           site_description: siteDescription
         }, { 
@@ -133,13 +165,12 @@ const AdminSettings = () => {
       toast.success("Settings saved successfully");
     } catch (error) {
       console.error("Error saving settings:", error);
-      toast.error("Failed to save settings: " + error.message);
+      toast.error("Failed to save settings: " + (error as any).message);
     } finally {
       setIsLoading(false);
     }
   };
   
-  // Rest of the component (UI) remains the same
   return (
     <AdminLayout>
       <div>
@@ -248,7 +279,7 @@ const AdminSettings = () => {
                       onChange={(e) => setEmail(e.target.value)} 
                       placeholder="your.email@example.com"
                       disabled
-                      className="text-gray-800 placeholder:text-gray-400"
+                      className="text-gray-800 placeholder:text-gray-400 bg-gray-100"
                     />
                     <p className="text-xs text-gray-500">Email address cannot be changed</p>
                   </div>
