@@ -74,7 +74,6 @@
   }
 }
 
-/* Custom Animation Classes */
 @layer utilities {
   .hover-scale {
     @apply transition-transform duration-200 hover:scale-105;
@@ -120,7 +119,6 @@
   }
 }
 
-/* Add some scrollbar styling for a more polished look */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -139,7 +137,6 @@
   background: rgba(65, 105, 225, 0.7);
 }
 
-/* Rich Text Editor Content Styling */
 .article-content {
   @apply text-gray-300;
 }
@@ -223,7 +220,6 @@
   @apply bg-zinc-800 font-bold;
 }
 
-/* Add some additional styles for the Quill editor */
 .ql-toolbar.ql-snow {
   border-color: #374151 !important;
   border-top-left-radius: 0.5rem;
@@ -236,7 +232,6 @@
   border-bottom-right-radius: 0.5rem;
 }
 
-/* Mobile Responsiveness */
 @media (max-width: 768px) {
   .container {
     padding-left: 1rem;

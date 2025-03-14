@@ -30,7 +30,6 @@ const Blogs = () => {
         query = query.eq('category', selectedCategory);
       }
       
-      // Sort by created_at when showing regular posts, or by views when showing trending
       if (showTrending) {
         query = query.order("views", { ascending: false, nullsFirst: false });
       } else {
@@ -56,8 +55,7 @@ const Blogs = () => {
         const uniqueCategories = Array.from(new Set(data?.map(post => post.category).filter(Boolean) as string[]));
         setCategories(uniqueCategories);
       }
-      
-      // Fetch trending posts if we're not already showing trending
+
       if (!showTrending) {
         const { data: trendingData, error: trendingError } = await supabase
           .from("posts")
@@ -91,18 +89,18 @@ const Blogs = () => {
 
   const handleCategorySelect = (category: string | null) => {
     setSelectedCategory(category);
-    setShowTrending(false); // Reset to regular view when selecting a category
+    setShowTrending(false);
   };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setShowTrending(false); // Reset to regular view when searching
+    setShowTrending(false);
     fetchPosts();
   };
 
   const toggleTrendingView = () => {
     setShowTrending(!showTrending);
-    setSelectedCategory(null); // Clear category filter when toggling trending
+    setSelectedCategory(null);
   };
 
   const metaTitle = selectedCategory ? `${selectedCategory} Articles | Sandesh Shrestha's Blog` : "All Articles | Sandesh Shrestha's Blog";
@@ -131,7 +129,6 @@ const Blogs = () => {
       
       <Navbar />
       
-      {/* Hero Section */}
       <section className="pt-36 pb-16 relative overflow-hidden py-[80px]">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
@@ -164,7 +161,6 @@ const Blogs = () => {
         </div>
       </section>
       
-      {/* Category Filter */}
       <section className="border-y border-zinc-800/50 bg-zinc-900/30 py-[16px]">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap items-center gap-3 justify-center">
@@ -200,8 +196,7 @@ const Blogs = () => {
           </div>
         </div>
       </section>
-      
-      {/* Blog Posts Grid */}
+  
       <section className="py-20">
         <div className="container mx-auto px-4">
           {loading ? (
@@ -225,7 +220,6 @@ const Blogs = () => {
                 ))}
               </div>
               
-              {/* Show trending section at the bottom when on regular view */}
               {!showTrending && trendingPosts.length > 0 && (
                 <div className="mt-20">
                   <div className="mb-8 flex items-center">

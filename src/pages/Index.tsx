@@ -56,7 +56,6 @@ const Index = () => {
         <title>{metaTitle}</title>
         <meta name="description" content={metaDescription} />
         <meta name="keywords" content={keywords} />
-        {/* Other meta tags remain the same */}
       </Helmet>
       
       <Navbar />
@@ -64,7 +63,6 @@ const Index = () => {
       {initialLoading ? <div className="flex items-center justify-center min-h-[70vh]">
           <LoadingSpinner />
         </div> : <>
-          {/* About Section - Moved to Top */}
           <section className="relative overflow-hidden py-[80px]">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
@@ -112,7 +110,6 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Featured Post Section - Moved to Second */}
           {featuredPost && <section className="relative pt-32 pb-20 overflow-hidden px-0 py-[80px]">
               <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
@@ -163,7 +160,6 @@ const Index = () => {
               </div>
             </section>}
 
-          {/* Latest Posts Section - Moved to Third */}
           {posts.length > 0 && <section className="bg-zinc-950 py-[80px]">
               <div className="container mx-auto px-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">

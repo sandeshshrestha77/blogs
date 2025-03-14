@@ -16,41 +16,34 @@ import { useAuth } from "@/contexts/AuthContext";
 const AdminSettings = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  
-  // General site settings
+
   const [siteName, setSiteName] = useState("My Blog");
   const [siteDescription, setSiteDescription] = useState("A blog about technology, design, and more.");
-  
-  // User settings
+ 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
-  
-  // Notification settings
+
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [commentNotifications, setCommentNotifications] = useState(true);
-  
-  // Default post settings
+
   const [defaultCategory, setDefaultCategory] = useState("Technology");
   const [seoDescription, setSeoDescription] = useState("This is a default SEO description for new posts.");
 
-  // Load settings on mount
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        // Set user email and display name from auth context
         if (user?.email) {
           setEmail(user.email);
           setDisplayName(user.email.split('@')[0] || "");
         }
         
-        // Load site settings
         const { data: siteData, error: siteError } = await supabase
           .from('site_settings')
           .select('*')
           .single();
         
         if (siteError) {
-          if (siteError.code !== 'PGRST116') { // PGRST116 means no rows
+          if (siteError.code !== 'PGRST116') { 
             console.error('Error loading site settings:', siteError);
           }
         } else if (siteData) {
@@ -58,7 +51,6 @@ const AdminSettings = () => {
           setSiteDescription(siteData.site_description || "A blog about technology, design, and more.");
         }
 
-        // Load user settings
         if (user?.id) {
           const { data: userData, error: userError } = await supabase
             .from('user_settings')
@@ -67,7 +59,7 @@ const AdminSettings = () => {
             .single();
           
           if (userError) {
-            if (userError.code !== 'PGRST116') { // PGRST116 means no rows
+            if (userError.code !== 'PGRST116') {
               console.error('Error loading user settings:', userError);
             }
           } else if (userData) {
@@ -77,7 +69,6 @@ const AdminSettings = () => {
           }
         }
 
-        // Load post defaults
         if (user?.id) {
           const { data: postData, error: postError } = await supabase
             .from('post_defaults')
@@ -86,7 +77,7 @@ const AdminSettings = () => {
             .single();
           
           if (postError) {
-            if (postError.code !== 'PGRST116') { // PGRST116 means no rows
+            if (postError.code !== 'PGRST116') {
               console.error('Error loading post defaults:', postError);
             }
           } else if (postData) {
@@ -113,8 +104,7 @@ const AdminSettings = () => {
     
     try {
       setIsLoading(true);
-      
-      // Save site settings
+
       const { data: existingSiteSettings } = await supabase
         .from('site_settings')
         .select('id')
@@ -133,7 +123,6 @@ const AdminSettings = () => {
       
       if (siteError) throw siteError;
 
-      // Save user settings
       const { error: userError } = await supabase
         .from('user_settings')
         .upsert({
@@ -148,7 +137,7 @@ const AdminSettings = () => {
       
       if (userError) throw userError;
 
-      // Save post defaults
+
       const { error: postError } = await supabase
         .from('post_defaults')
         .upsert({
@@ -186,7 +175,6 @@ const AdminSettings = () => {
         
         <form onSubmit={handleSaveSettings}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-            {/* General Settings Card */}
             <div className="lg:col-span-2 space-y-4 md:space-y-6">
               <Card className="bg-white shadow-sm border border-gray-200">
                 <CardHeader className="pb-2 md:pb-3">
@@ -252,7 +240,6 @@ const AdminSettings = () => {
             </div>
             
             <div className="space-y-4 md:space-y-6">
-              {/* Profile Settings Card */}
               <Card className="bg-white shadow-sm border border-gray-200">
                 <CardHeader className="pb-2 md:pb-3">
                   <CardTitle className="text-gray-800 text-lg md:text-xl">Profile Settings</CardTitle>
@@ -286,7 +273,6 @@ const AdminSettings = () => {
                 </CardContent>
               </Card>
               
-              {/* Notification Settings Card */}
               <Card className="bg-white shadow-sm border border-gray-200">
                 <CardHeader className="pb-2 md:pb-3">
                   <CardTitle className="text-gray-800 text-lg md:text-xl">Notification Settings</CardTitle>

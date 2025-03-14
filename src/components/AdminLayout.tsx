@@ -17,7 +17,6 @@ const AdminLayout = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   
-  // Handle screen size changes
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -31,7 +30,6 @@ const AdminLayout = ({
     };
   }, []);
   
-  // Close sidebar when navigating on mobile
   const handleNavigation = (path: string) => {
     navigate(path);
     if (isMobile) {
@@ -48,7 +46,6 @@ const AdminLayout = ({
     <div className="min-h-screen bg-[#f0f0f1]">
       <Navbar />
       
-      {/* Mobile menu toggle button */}
       <div className="fixed z-30 bottom-4 right-4 lg:hidden">
         <Button 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -63,14 +60,14 @@ const AdminLayout = ({
       </div>
       
       <div className="flex min-h-screen pt-16 px-0 py-0">
-        {/* Responsive sidebar */}
+        
         <div 
           className={`${
             isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
           } w-64 bg-[#121826] text-white fixed left-0 top-0 pt-24 h-full z-20 transition-transform duration-300 ease-in-out overflow-y-auto py-[20px] lg:shadow-none shadow-xl`}
         >
           <div className="px-4 py-3">
-            {/* User profile section */}
+            
             <div className="flex items-center space-x-2 mb-6 bg-[#1a2032] p-3 rounded-lg">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white">
                 <User className="h-5 w-5" />
@@ -83,7 +80,7 @@ const AdminLayout = ({
             
             <Separator className="bg-[#2a3347] my-3" />
             
-            {/* Main navigation */}
+            
             <div className="space-y-1 mt-4">
               <p className="text-xs uppercase text-gray-400 font-medium mb-2 px-2">Main</p>
               
@@ -130,7 +127,6 @@ const AdminLayout = ({
             
             <Separator className="bg-[#2a3347] my-4" />
             
-            {/* Sign out button */}
             <Button 
               onClick={handleSignOut} 
               variant="ghost" 
@@ -142,7 +138,6 @@ const AdminLayout = ({
           </div>
         </div>
         
-        {/* Main content - adjusted for mobile */}
         <div className="w-full lg:ml-64 p-4 md:p-6 lg:p-8 pt-20">
           {children}
         </div>

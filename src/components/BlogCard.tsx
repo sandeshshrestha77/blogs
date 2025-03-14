@@ -31,7 +31,6 @@ const BlogCard = ({
   meta_description,
   views
 }: BlogCardProps) => {
-  // Use SEO fields if available, otherwise fall back to regular fields
   const displayTitle = meta_title || title;
   const displayExcerpt = meta_description || excerpt;
   const imageAlt = alt_text || title;

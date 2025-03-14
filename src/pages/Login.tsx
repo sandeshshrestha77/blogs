@@ -25,7 +25,6 @@ const Login = () => {
   const from = location.state?.from?.pathname || "/admin";
   
   useEffect(() => {
-    // Check if we're handling an OAuth redirect
     const handleOAuthRedirect = async () => {
       const { error } = await supabase.auth.getSession();
       if (error) {
@@ -34,7 +33,6 @@ const Login = () => {
       }
     };
     
-    // If already authenticated, redirect to admin
     if (session) {
       navigate(from, { replace: true });
     } else if (location.pathname === '/auth/callback') {
