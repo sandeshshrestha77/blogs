@@ -15,7 +15,15 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
-  const [posts, setPosts] = useState<any[]>([]);
+  interface Post {
+    id: number;
+    title: string;
+    content: string;
+    slug: string;
+    // Add other fields as per your database schema
+  }
+
+  const [posts, setPosts] = useState<Post[]>([]);
   
   useEffect(() => {
     const getPosts = async () => {
@@ -24,7 +32,7 @@ function App() {
         if (error) {
           console.error("Error fetching posts:", error);
         } else if (data.length > 0) {
-          setPosts(data);
+          setPosts(data.map(post => ({ ...post, id: Number(post.id) })));
         }
       } catch (error) {
         console.error("Unexpected error fetching posts:", error);

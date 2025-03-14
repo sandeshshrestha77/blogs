@@ -64,9 +64,16 @@ const Login = () => {
         toast.success("Login successful!");
         navigate(from, { replace: true });
       }
-    } catch (error: any) {
-      console.error('Authentication error:', error);
-      toast.error(error.message || "Authentication failed. Please try again.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        if (error instanceof Error) {
+          toast.error(error.message || "Authentication failed. Please try again.");
+        } else {
+          toast.error("An unknown error occurred. Please try again.");
+        }
+      } else {
+        toast.error("An unknown error occurred. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

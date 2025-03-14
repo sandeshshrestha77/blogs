@@ -154,7 +154,7 @@ const AdminSettings = () => {
       toast.success("Settings saved successfully");
     } catch (error) {
       console.error("Error saving settings:", error);
-      toast.error("Failed to save settings: " + (error as any).message);
+      toast.error("Failed to save settings: " + (error instanceof Error ? error.message : "Unknown error"));
     } finally {
       setIsLoading(false);
     }
