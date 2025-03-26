@@ -10,9 +10,7 @@ import { BookOpen, Search, Filter, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Database } from "@/integrations/supabase/types";
 import { Helmet } from "react-helmet";
-
 type Post = Database['public']['Tables']['posts']['Row'];
-
 const Blogs = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +19,6 @@ const Blogs = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
   const [showTrending, setShowTrending] = useState(false);
-
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
@@ -29,40 +26,39 @@ const Blogs = () => {
       if (selectedCategory) {
         query = query.eq('category', selectedCategory);
       }
-      
       if (showTrending) {
-        query = query.order("views", { ascending: false, nullsFirst: false });
+        query = query.order("views", {
+          ascending: false,
+          nullsFirst: false
+        });
       } else {
-        query = query.order("created_at", { ascending: false });
+        query = query.order("created_at", {
+          ascending: false
+        });
       }
-      
       const {
         data,
         error
       } = await query;
-      
       if (error) throw error;
       let filteredData = data || [];
-      
       if (searchQuery) {
         const lowercaseQuery = searchQuery.toLowerCase();
         filteredData = filteredData.filter(post => post.title.toLowerCase().includes(lowercaseQuery) || post.excerpt && post.excerpt.toLowerCase().includes(lowercaseQuery) || post.category && post.category.toLowerCase().includes(lowercaseQuery));
       }
-      
       setPosts(filteredData);
-      
       if (!selectedCategory) {
         const uniqueCategories = Array.from(new Set(data?.map(post => post.category).filter(Boolean) as string[]));
         setCategories(uniqueCategories);
       }
-
       if (!showTrending) {
-        const { data: trendingData, error: trendingError } = await supabase
-          .from("posts")
-          .select()
-          .order("views", { ascending: false, nullsFirst: false })
-          .limit(4);
-          
+        const {
+          data: trendingData,
+          error: trendingError
+        } = await supabase.from("posts").select().order("views", {
+          ascending: false,
+          nullsFirst: false
+        }).limit(4);
         if (!trendingError && trendingData) {
           setTrendingPosts(trendingData);
         }
@@ -74,7 +70,6 @@ const Blogs = () => {
       setLoading(false);
     }
   }, [selectedCategory, searchQuery, showTrending]);
-
   useEffect(() => {
     fetchPosts();
     const channel = supabase.channel("blogs-page").on("postgres_changes", {
@@ -86,27 +81,22 @@ const Blogs = () => {
       supabase.removeChannel(channel);
     };
   }, [fetchPosts]);
-
   const handleCategorySelect = (category: string | null) => {
     setSelectedCategory(category);
     setShowTrending(false);
   };
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setShowTrending(false);
     fetchPosts();
   };
-
   const toggleTrendingView = () => {
     setShowTrending(!showTrending);
     setSelectedCategory(null);
   };
-
   const metaTitle = selectedCategory ? `${selectedCategory} Articles | Sandesh Shrestha's Blog` : "All Articles | Sandesh Shrestha's Blog";
   const metaDescription = selectedCategory ? `Explore our collection of articles about ${selectedCategory}. Expert guides, tutorials, and insights to help you master ${selectedCategory}.` : "Discover in-depth articles, tutorials, and insights on technology, design, and development from Sandesh Shrestha.";
   const keywords = categories.join(", ") + ", blog, articles, tutorials";
-
   return <div className="min-h-screen bg-zinc-950">
       <Helmet>
         <title>{metaTitle}</title>
@@ -169,82 +159,37 @@ const Blogs = () => {
               <span>Filter by:</span>
             </div>
             
-            <button 
-              onClick={() => handleCategorySelect(null)} 
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === null && !showTrending ? 'bg-blue-600 text-white' : 'bg-zinc-800/70 text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}
-            >
+            <button onClick={() => handleCategorySelect(null)} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === null && !showTrending ? 'bg-blue-600 text-white' : 'bg-zinc-800/70 text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}>
               All Categories
             </button>
             
-            <button 
-              onClick={toggleTrendingView} 
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1 ${showTrending ? 'bg-blue-600 text-white' : 'bg-zinc-800/70 text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}
-            >
-              <TrendingUp size={14} />
-              Trending
-            </button>
             
-            {categories.map(category => (
-              <button 
-                key={category} 
-                onClick={() => handleCategorySelect(category)} 
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-zinc-800/70 text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}
-              >
+            
+            {categories.map(category => <button key={category} onClick={() => handleCategorySelect(category)} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-zinc-800/70 text-zinc-300 hover:bg-zinc-700/50 hover:text-white'}`}>
                 {category}
-              </button>
-            ))}
+              </button>)}
           </div>
         </div>
       </section>
   
       <section className="py-20">
         <div className="container mx-auto px-4">
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
+          {loading ? <div className="flex items-center justify-center py-20">
               <LoadingSpinner />
-            </div>
-          ) : posts.length > 0 ? (
-            <>
-              {showTrending && (
-                <div className="mb-8 flex items-center">
+            </div> : posts.length > 0 ? <>
+              {showTrending && <div className="mb-8 flex items-center">
                   <TrendingUp size={20} className="mr-2 text-blue-400" />
                   <h2 className="text-2xl font-bold text-white">
                     Trending Articles
                   </h2>
-                </div>
-              )}
+                </div>}
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {posts.map(post => (
-                  <BlogCard key={post.id} {...post} categories={post.category ? [post.category] : []} views={post.views} />
-                ))}
+                {posts.map(post => <BlogCard key={post.id} {...post} categories={post.category ? [post.category] : []} views={post.views} />)}
               </div>
               
-              {!showTrending && trendingPosts.length > 0 && (
-                <div className="mt-20">
-                  <div className="mb-8 flex items-center">
-                    <TrendingUp size={20} className="mr-2 text-blue-400" />
-                    <h2 className="text-2xl font-bold text-white">
-                      Trending Articles
-                    </h2>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {trendingPosts.slice(0, 4).map(post => (
-                      <BlogCard key={post.id} {...post} categories={post.category ? [post.category] : []} views={post.views} />
-                    ))}
-                  </div>
-                  
-                  <div className="mt-6 text-center">
-                    <Button onClick={toggleTrendingView} variant="outline" className="border-blue-500/30 text-blue-400 hover:bg-blue-950/30">
-                      See All Trending Articles
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-20 bg-zinc-900/20 rounded-2xl border border-zinc-800/50">
+              {!showTrending && trendingPosts.length > 0}
+            </> : <div className="text-center py-20 bg-zinc-900/20 rounded-2xl border border-zinc-800/50">
               <div className="inline-flex justify-center items-center w-16 h-16 rounded-full bg-zinc-800/50 text-zinc-300 mb-4">
                 <Search size={24} />
               </div>
@@ -254,22 +199,18 @@ const Blogs = () => {
               <p className="text-zinc-400 max-w-md mx-auto">
                 {searchQuery ? `No results for "${searchQuery}". Try different keywords.` : selectedCategory ? `No posts found in the ${selectedCategory} category.` : "No blog posts available at the moment."}
               </p>
-              {(selectedCategory || searchQuery || showTrending) && (
-                <Button onClick={() => {
-                  setSelectedCategory(null);
-                  setSearchQuery("");
-                  setShowTrending(false);
-                }} className="mt-6 bg-blue-600 hover:bg-blue-700 text-white">
+              {(selectedCategory || searchQuery || showTrending) && <Button onClick={() => {
+            setSelectedCategory(null);
+            setSearchQuery("");
+            setShowTrending(false);
+          }} className="mt-6 bg-blue-600 hover:bg-blue-700 text-white">
                   Reset Filters
-                </Button>
-              )}
-            </div>
-          )}
+                </Button>}
+            </div>}
         </div>
       </section>
       
       <Footer />
     </div>;
 };
-
 export default Blogs;
