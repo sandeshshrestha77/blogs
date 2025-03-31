@@ -75,17 +75,7 @@ const Index = () => {
                   <div className="rounded-2xl overflow-hidden border border-zinc-800/50 shadow-xl">
                     <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" alt="About" className="w-full h-auto" />
                   </div>
-                  <div className="absolute -bottom-6 -right-6 border border-zinc-800 rounded-xl p-4 shadow-xl bg-inherit">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-blue-600/20 p-3 rounded-full">
-                        <BookOpen size={24} className="text-blue-400" />
-                      </div>
-                      <div>
-                        <div className="text-zinc-400 text-sm">Total Articles</div>
-                        <div className="text-white font-bold text-xl">{posts.length + (featuredPost ? 1 : 0)}</div>
-                      </div>
-                    </div>
-                  </div>
+                  
                 </div>
                 
                 <div className="space-y-6 py-[16px] mx-0 my-0">
