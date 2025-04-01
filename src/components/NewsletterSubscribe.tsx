@@ -22,23 +22,30 @@ export default function NewsletterSubscribe() {
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.rpc('subscribe_to_newsletter', {
-        subscriber_email: email
-      });
+      // Instead of using rpc which is causing type issues, 
+      // let's directly insert into the newsletter_subscribers table
+      const { data, error } = await supabase
+        .from('newsletter_subscribers')
+        .select('email')
+        .eq('email', email)
+        .maybeSingle();
       
-      if (error) {
-        throw error;
+      if (data) {
+        toast.error("Email already subscribed");
+        setIsLoading(false);
+        return;
       }
       
-      // Type assertion to handle the response from our RPC function
-      const response = data as { success: boolean; error?: string };
+      const { error: insertError } = await supabase
+        .from('newsletter_subscribers')
+        .insert([{ email }]);
       
-      if (response.success) {
-        toast.success("Successfully subscribed to newsletter!");
-        setEmail("");
-      } else {
-        toast.error(response.error || "Failed to subscribe. Please try again.");
+      if (insertError) {
+        throw insertError;
       }
+      
+      toast.success("Successfully subscribed to newsletter!");
+      setEmail("");
     } catch (error) {
       console.error("Error subscribing to newsletter:", error);
       toast.error("An error occurred. Please try again later.");
