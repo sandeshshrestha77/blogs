@@ -9,7 +9,6 @@ import Admin from "./pages/Admin";
 import AdminPostForm from "./pages/AdminPostForm";
 import AdminSettings from "./pages/AdminSettings";
 import AdminAnalytics from "./pages/AdminAnalytics";
-import AdminNotifications from "./pages/AdminNotifications";
 import Login from "./pages/Login";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -76,11 +75,6 @@ function App() {
           <Route path="/admin/analytics" element={
             <ProtectedRoute>
               <AdminAnalytics />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/notifications" element={
-            <ProtectedRoute>
-              <AdminNotifications />
             </ProtectedRoute>
           } />
         </Routes>
