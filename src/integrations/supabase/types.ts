@@ -44,6 +44,24 @@ export type Database = {
           },
         ]
       }
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
       post_defaults: {
         Row: {
           created_at: string | null
@@ -195,6 +213,10 @@ export type Database = {
     Functions: {
       add_post:
         | {
+            Args: Record<PropertyKey, never>
+            Returns: undefined
+          }
+        | {
             Args: {
               title: string
               content: string
@@ -224,6 +246,17 @@ export type Database = {
               post_slug: string
             }
             Returns: undefined
+          }
+      subscribe_to_newsletter:
+        | {
+            Args: Record<PropertyKey, never>
+            Returns: undefined
+          }
+        | {
+            Args: {
+              subscriber_email: string
+            }
+            Returns: Json
           }
     }
     Enums: {
