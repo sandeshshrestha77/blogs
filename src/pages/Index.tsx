@@ -1,6 +1,5 @@
-
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import BlogCard from "@/components/BlogCard";
 import Footer from "@/components/Footer";
@@ -15,14 +14,13 @@ import { Helmet } from "react-helmet";
 type Post = Database['public']['Tables']['posts']['Row'];
 
 const Index = () => {
-  const navigate = useNavigate();
   const [featuredPost, setFeaturedPost] = useState<Post | null>(null);
   const [showAllPosts, setShowAllPosts] = useState(false);
   
   const { 
     data: posts = [],
     loading: updating,
-  } = useRealtimeData<Post[]>({
+  } = useRealtimeData<Post>({
     tableName: 'posts',
     initialQuery: async () => {
       const { data, error } = await supabase
@@ -185,7 +183,7 @@ const Index = () => {
         </section>
       )}
 
-      {posts?.length > 0 && (
+      {Array.isArray(posts) && posts.length > 0 && (
         <section className="bg-zinc-950 py-[80px]">
           <div className="container mx-auto px-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
@@ -213,7 +211,7 @@ const Index = () => {
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {displayedPosts.map((post) => (
+              {Array.isArray(displayedPosts) && displayedPosts.map((post) => (
                 <BlogCard 
                   key={post.id} 
                   title={post.title}

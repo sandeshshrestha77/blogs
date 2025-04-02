@@ -29,7 +29,7 @@ export function useRealtimeData<T = any>({
         } else {
           // Default query if no initialQuery is provided
           const { data: initialData, error } = await supabase
-            .from(tableName)
+            .from(tableName as any)
             .select('*');
           
           if (error) throw error;
