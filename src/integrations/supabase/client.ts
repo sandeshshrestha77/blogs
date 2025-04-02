@@ -37,7 +37,8 @@ export const subscribeToTable = (
 ) => {
   const channel = supabase
     .channel(`table-changes:${tableName}`)
-    .on('postgres_changes', 
+    .on(
+      'postgres_changes', 
       { 
         event: event, 
         schema: 'public', 
