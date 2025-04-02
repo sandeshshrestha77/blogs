@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -24,14 +25,20 @@ const Index = () => {
   } = useRealtimeData<Post[]>({
     tableName: 'posts',
     initialQuery: async () => {
-      return await supabase
+      const { data, error } = await supabase
         .from("posts")
         .select()
         .eq('featured', false)
         .order("created_at", { ascending: false })
         .limit(showAllPosts ? 100 : 6);
+      
+      if (error) {
+        console.error("Error fetching posts:", error);
+        return [];
+      }
+      return data || [];
     },
-    events: ['INSERT', 'UPDATE', 'DELETE']
+    event: '*'
   });
 
   useEffect(() => {
@@ -206,8 +213,22 @@ const Index = () => {
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {displayedPosts.map(post => (
-                <BlogCard key={post.id} {...post} categories={post.category ? [post.category] : []} />
+              {displayedPosts.map((post) => (
+                <BlogCard 
+                  key={post.id} 
+                  title={post.title}
+                  excerpt={post.excerpt}
+                  image={post.image}
+                  author={post.author}
+                  date={post.date}
+                  categories={post.category ? [post.category] : []}
+                  slug={post.slug}
+                  read_time={post.read_time}
+                  alt_text={post.alt_text}
+                  meta_title={post.meta_title}
+                  meta_description={post.meta_description}
+                  views={post.views}
+                />
               ))}
             </div>
           </div>

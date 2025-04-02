@@ -1,23 +1,50 @@
 
 import { useState, useEffect } from 'react';
-import { subscribeToTable } from '@/integrations/supabase/client';
+import { subscribeToTable, supabase } from '@/integrations/supabase/client';
 
 interface UseRealtimeDataOptions {
   tableName: string;
   event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
   filter?: (data: any) => boolean;
+  initialQuery?: () => Promise<any[]>;
 }
 
 export function useRealtimeData<T = any>({ 
   tableName, 
   event = '*',
-  filter 
+  filter,
+  initialQuery
 }: UseRealtimeDataOptions) {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    async function fetchInitialData() {
+      try {
+        if (initialQuery) {
+          // Use the initialQuery function if provided
+          const initialData = await initialQuery();
+          setData(initialData as T[]);
+        } else {
+          // Default query if no initialQuery is provided
+          const { data: initialData, error } = await supabase
+            .from(tableName)
+            .select('*');
+          
+          if (error) throw error;
+          setData(initialData as T[]);
+        }
+      } catch (err) {
+        console.error(`Error fetching initial data from ${tableName}:`, err);
+        setError(err instanceof Error ? err : new Error(String(err)));
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchInitialData();
+
     try {
       // Create subscription to the Supabase table
       const unsubscribe = subscribeToTable(
@@ -58,8 +85,6 @@ export function useRealtimeData<T = any>({
         event
       );
 
-      setLoading(false);
-      
       // Clean up the subscription when the component unmounts
       return () => {
         unsubscribe();
@@ -69,7 +94,7 @@ export function useRealtimeData<T = any>({
       setError(err instanceof Error ? err : new Error(String(err)));
       setLoading(false);
     }
-  }, [tableName, event, filter]);
+  }, [tableName, event, filter, initialQuery]);
 
   return { data, loading, error, setData };
 }
