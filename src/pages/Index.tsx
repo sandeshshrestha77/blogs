@@ -6,6 +6,7 @@ import BlogCard from "@/components/BlogCard";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useRealtimeData } from "@/hooks/useRealtimeData";
 import { toast } from "sonner";
 import { ArrowRight, ChevronRight, Clock, User, BookOpen, ArrowUpRight } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
@@ -16,47 +17,67 @@ type Post = Database['public']['Tables']['posts']['Row'];
 const Index = () => {
   const navigate = useNavigate();
   const [featuredPost, setFeaturedPost] = useState<Post | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [updating, setUpdating] = useState(false);
   const [showAllPosts, setShowAllPosts] = useState(false);
+  
+  // Replace the old posts state with the new realtime hook
+  const { 
+    data: posts,
+    loading: updating,
+  } = useRealtimeData<Post[]>({
+    tableName: 'posts',
+    initialQuery: async () => {
+      return await supabase
+        .from("posts")
+        .select()
+        .eq('featured', false)
+        .order("created_at", { ascending: false })
+        .limit(showAllPosts ? 100 : 6);
+    },
+    events: ['INSERT', 'UPDATE', 'DELETE']
+  });
 
-  const fetchPosts = useCallback(async () => {
-    try {
-      setUpdating(true);
-      const [featuredResponse, postsResponse] = await Promise.all([
-        supabase.from("posts").select().eq('featured', true).maybeSingle(),
-        supabase.from("posts").select().eq('featured', false).order("created_at", {
-          ascending: false
-        }).limit(6)
-      ]);
-
-      if (featuredResponse.error && featuredResponse.error.code !== 'PGRST116') throw featuredResponse.error;
-      if (postsResponse.error) throw postsResponse.error;
-
-      if (featuredResponse.data) setFeaturedPost(featuredResponse.data);
-      if (postsResponse.data) setPosts(postsResponse.data);
-    } catch (error) {
-      toast.error("Error loading posts");
-    } finally {
-      setUpdating(false);
-    }
-  }, []);
-
+  // Fetch the featured post separately
   useEffect(() => {
-    fetchPosts();
-    const channel = supabase.channel("posts-channel").on("postgres_changes", {
-      event: "*",
-      schema: "public",
-      table: "posts"
-    }, fetchPosts).subscribe();
+    const fetchFeaturedPost = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("posts")
+          .select()
+          .eq('featured', true)
+          .maybeSingle();
+
+        if (error && error.code !== 'PGRST116') throw error;
+        if (data) setFeaturedPost(data);
+      } catch (error) {
+        console.error("Error loading featured post:", error);
+        toast.error("Error loading featured post");
+      }
+    };
+
+    fetchFeaturedPost();
+
+    // Subscribe to changes on the featured post
+    const channel = supabase
+      .channel('featured-post-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'posts',
+          filter: 'featured=eq.true'
+        },
+        () => fetchFeaturedPost()
+      )
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchPosts]);
+  }, []);
 
   const handleViewAll = () => setShowAllPosts(true);
-  const displayedPosts = useMemo(() => showAllPosts ? posts : posts.slice(0, 6), [showAllPosts, posts]);
+  const displayedPosts = useMemo(() => posts || [], [posts]);
 
   const metaTitle = "Sandesh Shrestha | Articles & Insights on Technology and Design";
   const metaDescription = "Explore expert guides and tutorials on technology, design, and development...";

@@ -20,6 +20,38 @@ export const supabase = createClient<Database>(
       detectSessionInUrl: true,
       flowType: 'pkce',
       storage: typeof window !== 'undefined' ? window.localStorage : undefined
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 10
+      }
     }
   }
 );
+
+// Helper for subscribing to table changes
+export const subscribeToTable = (
+  tableName: string,
+  callback: (payload: any) => void,
+  event: 'INSERT' | 'UPDATE' | 'DELETE' | '*' = '*'
+) => {
+  const channel = supabase
+    .channel(`public:${tableName}`)
+    .on(
+      'postgres_changes',
+      {
+        event: event,
+        schema: 'public',
+        table: tableName
+      },
+      payload => callback(payload)
+    )
+    .subscribe();
+
+  return channel;
+};
+
+// Helper for removing a channel
+export const removeChannel = (channel: any) => {
+  supabase.removeChannel(channel);
+};
