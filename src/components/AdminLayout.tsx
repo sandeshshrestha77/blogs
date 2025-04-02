@@ -60,22 +60,22 @@ const AdminLayout = ({
   const userInitial = userName.charAt(0).toUpperCase();
   
   return (
-    <div className="min-h-screen bg-zinc-950 flex">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar - Desktop */}
       <aside className={`
         fixed lg:relative inset-y-0 left-0 z-50
-        w-64 bg-zinc-900 border-r border-zinc-800/50 shadow-sm
+        w-64 bg-white border-r border-gray-100 shadow-sm
         transform transition-transform duration-300 ease-in-out
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Sidebar Header with Logo */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-zinc-800">
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-100">
           <div className="flex items-center space-x-2">
             <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
-            <span className="font-semibold text-zinc-100">Admin Panel</span>
+            <span className="font-semibold text-gray-800">Admin Panel</span>
           </div>
           {isMobile && (
-            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden text-zinc-300 hover:text-white">
+            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden">
               <X className="h-5 w-5" />
             </Button>
           )}
@@ -85,49 +85,49 @@ const AdminLayout = ({
         <div className="flex flex-col h-[calc(100vh-4rem)] overflow-y-auto py-4">
           {/* User Info */}
           <div className="px-4 mb-6">
-            <div className="flex items-center space-x-3 p-3 rounded-lg bg-zinc-800/50">
-              <Avatar className="h-10 w-10 border border-zinc-700">
-                <AvatarFallback className="bg-blue-600 text-white">
+            <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50">
+              <Avatar className="h-10 w-10 border border-gray-200">
+                <AvatarFallback className="bg-primary text-white">
                   {userInitial}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-sm font-medium text-zinc-100">{userName}</p>
-                <p className="text-xs text-zinc-400 truncate max-w-[140px]">{user?.email}</p>
+                <p className="text-sm font-medium text-gray-800">{userName}</p>
+                <p className="text-xs text-gray-500 truncate max-w-[140px]">{user?.email}</p>
               </div>
             </div>
           </div>
           
           {/* Main Navigation */}
           <div className="px-3 py-2">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mx-3 mb-2">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mx-3 mb-2">
               Main
             </h3>
             <nav className="space-y-1">
               <Button 
                 onClick={() => handleNavigation("/admin")} 
                 variant="ghost" 
-                className="w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800"
+                className="w-full justify-start text-gray-600 hover:text-primary hover:bg-gray-50"
               >
-                <LayoutDashboard className="h-5 w-5 mr-3 text-zinc-500" />
+                <LayoutDashboard className="h-5 w-5 mr-3 text-gray-400" />
                 Dashboard
               </Button>
               
               <Button 
                 onClick={() => handleNavigation("/admin/create")} 
                 variant="ghost" 
-                className="w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800"
+                className="w-full justify-start text-gray-600 hover:text-primary hover:bg-gray-50"
               >
-                <PenSquare className="h-5 w-5 mr-3 text-zinc-500" />
+                <PenSquare className="h-5 w-5 mr-3 text-gray-400" />
                 Create Post
               </Button>
 
               <Button 
                 onClick={() => handleNavigation("/admin/analytics")} 
                 variant="ghost" 
-                className="w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800"
+                className="w-full justify-start text-gray-600 hover:text-primary hover:bg-gray-50"
               >
-                <BarChart3 className="h-5 w-5 mr-3 text-zinc-500" />
+                <BarChart3 className="h-5 w-5 mr-3 text-gray-400" />
                 Analytics
               </Button>
             </nav>
@@ -135,25 +135,25 @@ const AdminLayout = ({
           
           {/* System Navigation */}
           <div className="px-3 py-2 mt-2">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mx-3 mb-2">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mx-3 mb-2">
               System
             </h3>
             <nav className="space-y-1">
               <Button 
                 onClick={() => handleNavigation("/admin/settings")} 
                 variant="ghost" 
-                className="w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800"
+                className="w-full justify-start text-gray-600 hover:text-primary hover:bg-gray-50"
               >
-                <Settings className="h-5 w-5 mr-3 text-zinc-500" />
+                <Settings className="h-5 w-5 mr-3 text-gray-400" />
                 Settings
               </Button>
               
               <Button 
                 onClick={() => handleNavigation("/")} 
                 variant="ghost" 
-                className="w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800"
+                className="w-full justify-start text-gray-600 hover:text-primary hover:bg-gray-50"
               >
-                <BookOpen className="h-5 w-5 mr-3 text-zinc-500" />
+                <BookOpen className="h-5 w-5 mr-3 text-gray-400" />
                 View Blog
               </Button>
             </nav>
@@ -164,7 +164,7 @@ const AdminLayout = ({
             <Button 
               onClick={handleSignOut} 
               variant="outline" 
-              className="w-full justify-start text-red-400 border-red-900/20 bg-red-950/10 hover:bg-red-900/20 hover:text-red-300"
+              className="w-full justify-start text-red-500 border-red-100 hover:bg-red-50 hover:text-red-600 hover:border-red-200"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
@@ -176,14 +176,14 @@ const AdminLayout = ({
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Top Navigation Bar */}
-        <header className="bg-zinc-900 border-b border-zinc-800 h-16 sticky top-0 z-40 flex items-center px-4 lg:px-6">
+        <header className="bg-white border-b border-gray-100 h-16 sticky top-0 z-40 flex items-center px-4 lg:px-6">
           <div className="flex-1 flex items-center">
             {isMobile && (
               <Button 
                 variant="ghost" 
                 size="icon" 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-                className="mr-2 lg:hidden text-zinc-300 hover:text-white"
+                className="mr-2 lg:hidden"
               >
                 <Menu className="h-5 w-5" />
               </Button>
@@ -191,10 +191,10 @@ const AdminLayout = ({
             
             {/* Search Bar */}
             <div className="relative max-w-md hidden md:flex items-center flex-1 ml-4">
-              <Search className="absolute left-3 h-4 w-4 text-zinc-500" />
+              <Search className="absolute left-3 h-4 w-4 text-gray-400" />
               <Input 
                 placeholder="Search..." 
-                className="pl-10 bg-zinc-800/50 border-zinc-700 w-full max-w-[320px] text-zinc-200 focus:border-blue-600" 
+                className="pl-10 bg-gray-50 border-gray-100 w-full max-w-[320px] focus:border-primary" 
               />
             </div>
           </div>
@@ -204,8 +204,8 @@ const AdminLayout = ({
             <NotificationsPopover />
             
             <Button variant="ghost" className="relative rounded-full" onClick={() => navigate("/admin/settings")}>
-              <Avatar className="h-8 w-8 border border-zinc-700">
-                <AvatarFallback className="bg-blue-600 text-white text-sm">
+              <Avatar className="h-8 w-8 border border-gray-200">
+                <AvatarFallback className="bg-primary text-white text-sm">
                   {userInitial}
                 </AvatarFallback>
               </Avatar>
@@ -219,7 +219,7 @@ const AdminLayout = ({
             <Button 
               onClick={() => setIsMobileMenuOpen(true)} 
               size="icon" 
-              className="h-12 w-12 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700"
+              className="h-12 w-12 rounded-full shadow-lg bg-primary hover:bg-primary/90"
             >
               <Menu className="h-6 w-6 text-white" />
             </Button>
@@ -229,13 +229,13 @@ const AdminLayout = ({
         {/* Mobile menu overlay */}
         {isMobile && isMobileMenuOpen && (
           <div 
-            className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm" 
+            className="fixed inset-0 bg-black/30 z-40 backdrop-blur-sm" 
             onClick={() => setIsMobileMenuOpen(false)} 
           />
         )}
         
         {/* Page Content */}
-        <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-zinc-900">
+        <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-gray-50">
           {children}
         </main>
       </div>
