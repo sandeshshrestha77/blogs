@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -19,7 +18,6 @@ const Index = () => {
   const [featuredPost, setFeaturedPost] = useState<Post | null>(null);
   const [showAllPosts, setShowAllPosts] = useState(false);
   
-  // Replace the old posts state with the new realtime hook
   const { 
     data: posts = [],
     loading: updating,
@@ -36,7 +34,6 @@ const Index = () => {
     events: ['INSERT', 'UPDATE', 'DELETE']
   });
 
-  // Fetch the featured post separately
   useEffect(() => {
     const fetchFeaturedPost = async () => {
       try {
@@ -56,7 +53,6 @@ const Index = () => {
 
     fetchFeaturedPost();
 
-    // Subscribe to changes on the featured post
     const channel = supabase
       .channel('featured-post-changes')
       .on(
@@ -182,7 +178,7 @@ const Index = () => {
         </section>
       )}
 
-      {posts.length > 0 && (
+      {posts?.length > 0 && (
         <section className="bg-zinc-950 py-[80px]">
           <div className="container mx-auto px-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
@@ -218,7 +214,7 @@ const Index = () => {
         </section>
       )}
 
-      {!updating && !featuredPost && posts.length === 0 && (
+      {!updating && !featuredPost && (!posts || posts.length === 0) && (
         <div className="text-center py-40">
           <div className="max-w-md mx-auto">
             <h3 className="text-2xl font-semibold text-white mb-4">
