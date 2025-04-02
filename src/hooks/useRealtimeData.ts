@@ -14,7 +14,7 @@ export const useRealtimeData = <T extends any[]>({
   initialQuery,
   events = ['INSERT', 'UPDATE', 'DELETE']
 }: UseRealtimeDataOptions) => {
-  const [data, setData] = useState<T | null>(null);
+  const [data, setData] = useState<T | []>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -29,7 +29,7 @@ export const useRealtimeData = <T extends any[]>({
         throw result.error;
       }
       
-      setData(result.data);
+      setData(result.data || []);
     } catch (err: any) {
       console.error(`Error fetching ${tableName} data:`, err);
       setError(err);

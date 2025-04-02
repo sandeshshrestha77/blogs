@@ -21,7 +21,7 @@ const Index = () => {
   
   // Replace the old posts state with the new realtime hook
   const { 
-    data: posts,
+    data: posts = [],
     loading: updating,
   } = useRealtimeData<Post[]>({
     tableName: 'posts',
