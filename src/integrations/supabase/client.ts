@@ -1,6 +1,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
+import type { RealtimeChannel, RealtimeChannelOptions } from '@supabase/supabase-js';
 
 // Get the Supabase URL and key from environment variables with fallbacks
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://afnrcckplletaqljyjyi.supabase.co";
@@ -34,7 +35,7 @@ export const subscribeToTable = (
   tableName: string,
   callback: (payload: any) => void,
   event: 'INSERT' | 'UPDATE' | 'DELETE' | '*' = '*'
-) => {
+): RealtimeChannel => {
   const channel = supabase
     .channel(`table-changes:${tableName}`)
     .on(
@@ -43,7 +44,7 @@ export const subscribeToTable = (
         event: event, 
         schema: 'public', 
         table: tableName 
-      }, 
+      } as RealtimeChannelOptions['postgres_changes'], 
       callback
     )
     .subscribe();
@@ -52,6 +53,6 @@ export const subscribeToTable = (
 };
 
 // Helper for removing a channel
-export const removeChannel = (channel: any) => {
+export const removeChannel = (channel: RealtimeChannel) => {
   supabase.removeChannel(channel);
 };

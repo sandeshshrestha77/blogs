@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase, subscribeToTable, removeChannel } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 type UseRealtimeDataOptions = {
   tableName: string;
@@ -42,7 +43,7 @@ export const useRealtimeData = <T extends any[]>({
   useEffect(() => {
     fetchData();
 
-    const channels = events.map(event => {
+    const channels: RealtimeChannel[] = events.map(event => {
       return subscribeToTable(tableName, payload => {
         console.log(`Received ${event} event for ${tableName}:`, payload);
         
