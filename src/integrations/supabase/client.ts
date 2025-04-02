@@ -35,17 +35,15 @@ export const subscribeToTable = (
   callback: (payload: any) => void,
   event: 'INSERT' | 'UPDATE' | 'DELETE' | '*' = '*'
 ) => {
-  // Fix: Correctly configure the channel with proper typing
   const channel = supabase
-    .channel(`public:${tableName}`)
-    .on(
-      'postgres_changes', // This is a valid event type for Supabase channels
-      {
-        event: event,
-        schema: 'public',
-        table: tableName
-      },
-      (payload) => callback(payload)
+    .channel(`table-changes:${tableName}`)
+    .on('postgres_changes', 
+      { 
+        event: event, 
+        schema: 'public', 
+        table: tableName 
+      }, 
+      callback
     )
     .subscribe();
 

@@ -44,18 +44,20 @@ export const useRealtimeData = <T extends any[]>({
 
     const channels = events.map(event => {
       return subscribeToTable(tableName, payload => {
+        console.log(`Received ${event} event for ${tableName}:`, payload);
+        
         // Update data based on the event type
-        if (event === 'INSERT') {
+        if (event === 'INSERT' && payload.new) {
           setData(prevData => [...(prevData || []), payload.new] as T);
           toast.success('New item added');
-        } else if (event === 'UPDATE') {
+        } else if (event === 'UPDATE' && payload.new) {
           setData(prevData => 
             prevData?.map(item => 
               item.id === payload.new.id ? payload.new : item
             ) as T || []
           );
           toast.info('Item updated');
-        } else if (event === 'DELETE') {
+        } else if (event === 'DELETE' && payload.old) {
           setData(prevData => 
             prevData?.filter(item => item.id !== payload.old.id) as T || []
           );

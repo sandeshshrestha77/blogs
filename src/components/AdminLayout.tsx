@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
@@ -11,10 +12,9 @@ import {
   X,
   PenSquare,
   BarChart3,
-  Bell,
   Search,
   BookOpen,
-  MessageSquare // Added MessageSquare icon
+  MessageSquare
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useState, useEffect } from "react";
 import { Badge } from "./ui/badge";
 import { Input } from "./ui/input";
+import { NotificationsPopover } from "./NotificationsPopover";
 
 const AdminLayout = ({
   children
@@ -91,12 +92,7 @@ const AdminLayout = ({
             />
           </div>
           
-          <Button variant="outline" size="icon" className="relative">
-            <Bell className="h-5 w-5 text-gray-600" />
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500">
-              2
-            </Badge>
-          </Button>
+          <NotificationsPopover />
           
           <Button 
             variant="ghost" 

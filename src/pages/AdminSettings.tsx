@@ -111,47 +111,94 @@ const AdminSettings = () => {
       setIsLoading(true);
 
       // Save site settings
-      const { data: existingSiteSettings } = await supabase
+      const { data: siteSettingsExists } = await supabase
         .from('site_settings')
-        .select('id')
-        .single();
+        .select('id');
       
-      const { error: siteError } = await supabase
-        .from('site_settings')
-        .upsert({
-          id: existingSiteSettings?.id || undefined,
-          site_name: siteName,
-          site_description: siteDescription
-        });
-      
-      if (siteError) throw siteError;
+      if (siteSettingsExists && siteSettingsExists.length > 0) {
+        // Update existing record
+        const { error: siteError } = await supabase
+          .from('site_settings')
+          .update({
+            site_name: siteName,
+            site_description: siteDescription
+          })
+          .eq('id', siteSettingsExists[0].id);
+        
+        if (siteError) throw siteError;
+      } else {
+        // Insert new record
+        const { error: siteError } = await supabase
+          .from('site_settings')
+          .insert({
+            site_name: siteName,
+            site_description: siteDescription
+          });
+        
+        if (siteError) throw siteError;
+      }
 
       // Save user settings
-      const { error: userError } = await supabase
+      const { data: userSettingsExists } = await supabase
         .from('user_settings')
-        .upsert({
-          user_id: user.id,
-          display_name: displayName,
-          email_notifications: emailNotifications,
-          comment_notifications: commentNotifications
-        }, { 
-          onConflict: 'user_id' 
-        });
+        .select('id')
+        .eq('user_id', user.id);
       
-      if (userError) throw userError;
+      if (userSettingsExists && userSettingsExists.length > 0) {
+        // Update existing record
+        const { error: userError } = await supabase
+          .from('user_settings')
+          .update({
+            display_name: displayName,
+            email_notifications: emailNotifications,
+            comment_notifications: commentNotifications
+          })
+          .eq('user_id', user.id);
+        
+        if (userError) throw userError;
+      } else {
+        // Insert new record
+        const { error: userError } = await supabase
+          .from('user_settings')
+          .insert({
+            user_id: user.id,
+            display_name: displayName,
+            email_notifications: emailNotifications,
+            comment_notifications: commentNotifications
+          });
+        
+        if (userError) throw userError;
+      }
 
       // Save post defaults
-      const { error: postError } = await supabase
+      const { data: postDefaultsExists } = await supabase
         .from('post_defaults')
-        .upsert({
-          user_id: user.id,
-          default_category: defaultCategory,
-          seo_description: seoDescription
-        }, { 
-          onConflict: 'user_id'
-        });
+        .select('id')
+        .eq('user_id', user.id);
       
-      if (postError) throw postError;
+      if (postDefaultsExists && postDefaultsExists.length > 0) {
+        // Update existing record
+        const { error: postError } = await supabase
+          .from('post_defaults')
+          .update({
+            default_category: defaultCategory,
+            seo_description: seoDescription
+          })
+          .eq('user_id', user.id);
+        
+        if (postError) throw postError;
+      } else {
+        // Insert new record
+        const { error: postError } = await supabase
+          .from('post_defaults')
+          .insert({
+            user_id: user.id,
+            default_category: defaultCategory,
+            seo_description: seoDescription
+          });
+        
+        if (postError) throw postError;
+      }
 
       toast.success("Settings saved successfully");
     } catch (error) {
