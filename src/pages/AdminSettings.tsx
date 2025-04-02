@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import AdminLayout from "@/components/AdminLayout";
-import { Settings as SettingsIcon, Save } from "lucide-react";
+import { Settings as SettingsIcon, Save, User, Bell, FileText, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const AdminSettings = () => {
   const { user } = useAuth();
@@ -218,24 +219,43 @@ const AdminSettings = () => {
       ) : (
         <div>
           <div className="mb-6">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
-              <SettingsIcon className="mr-2 h-5 md:h-6 w-5 md:w-6 text-primary" />
+            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+              <SettingsIcon className="h-6 w-6 text-primary" />
               Settings
             </h1>
-            <p className="text-sm md:text-base text-gray-600">
-              Configure your blog settings
+            <p className="text-gray-500 mt-1">
+              Manage your account preferences and blog configuration
             </p>
           </div>
           
           <form onSubmit={handleSaveSettings}>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-              <div className="lg:col-span-2 space-y-4 md:space-y-6">
-                <Card className="bg-white shadow-sm border border-gray-200">
-                  <CardHeader className="pb-2 md:pb-3">
-                    <CardTitle className="text-gray-800 text-lg md:text-xl">General Settings</CardTitle>
-                    <CardDescription className="text-gray-600">Configure the general settings for your blog</CardDescription>
+            <Tabs defaultValue="site" className="mb-8">
+              <TabsList className="mb-6">
+                <TabsTrigger value="site" className="flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  <span>Site</span>
+                </TabsTrigger>
+                <TabsTrigger value="profile" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>Profile</span>
+                </TabsTrigger>
+                <TabsTrigger value="notifications" className="flex items-center gap-2">
+                  <Bell className="h-4 w-4" />
+                  <span>Notifications</span>
+                </TabsTrigger>
+                <TabsTrigger value="defaults" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Post Defaults</span>
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="site">
+                <Card className="bg-white border-gray-100 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gray-800">Site Settings</CardTitle>
+                    <CardDescription>Configure the general settings for your blog</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6">
                     <div className="space-y-2">
                       <Label htmlFor="siteName" className="text-gray-700">Site Name</Label>
                       <Input 
@@ -243,7 +263,7 @@ const AdminSettings = () => {
                         value={siteName} 
                         onChange={(e) => setSiteName(e.target.value)} 
                         placeholder="My Blog" 
-                        className="text-gray-800 placeholder:text-gray-400"
+                        className="border-gray-200 focus:border-primary"
                       />
                     </div>
                     
@@ -255,18 +275,99 @@ const AdminSettings = () => {
                         onChange={(e) => setSiteDescription(e.target.value)} 
                         placeholder="A brief description of your blog"
                         rows={3}
-                        className="text-gray-800 placeholder:text-gray-400"
+                        className="border-gray-200 focus:border-primary"
                       />
                     </div>
                   </CardContent>
                 </Card>
-                
-                <Card className="bg-white shadow-sm border border-gray-200">
-                  <CardHeader className="pb-2 md:pb-3">
-                    <CardTitle className="text-gray-800 text-lg md:text-xl">Default Post Settings</CardTitle>
-                    <CardDescription className="text-gray-600">Configure defaults for new blog posts</CardDescription>
+              </TabsContent>
+              
+              <TabsContent value="profile">
+                <Card className="bg-white border-gray-100 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gray-800">Profile Settings</CardTitle>
+                    <CardDescription>Update your profile information</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6">
+                    <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 p-4 bg-gray-50 rounded-lg">
+                      <Avatar className="h-16 w-16 border-2 border-white shadow-sm">
+                        <AvatarFallback className="bg-primary text-white text-xl">
+                          {user?.email?.charAt(0).toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="space-y-1">
+                        <p className="font-medium text-gray-800">{displayName || "User"}</p>
+                        <p className="text-sm text-gray-500">{email}</p>
+                      </div>
+                    </div>
+                  
+                    <div className="space-y-2">
+                      <Label htmlFor="displayName" className="text-gray-700">Display Name</Label>
+                      <Input 
+                        id="displayName" 
+                        value={displayName} 
+                        onChange={(e) => setDisplayName(e.target.value)} 
+                        placeholder="Your Name"
+                        className="border-gray-200 focus:border-primary"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-gray-700">Email Address</Label>
+                      <Input 
+                        id="email" 
+                        type="email"
+                        value={email} 
+                        disabled
+                        className="bg-gray-50 border-gray-200 text-gray-500"
+                      />
+                      <p className="text-xs text-gray-500">Email address cannot be changed</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="notifications">
+                <Card className="bg-white border-gray-100 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gray-800">Notification Settings</CardTitle>
+                    <CardDescription>Configure your notification preferences</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div className="space-y-1">
+                        <p className="font-medium text-gray-800">Email Notifications</p>
+                        <p className="text-sm text-gray-500">Receive blog updates via email</p>
+                      </div>
+                      <Switch 
+                        id="emailNotif"
+                        checked={emailNotifications}
+                        onCheckedChange={setEmailNotifications}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div className="space-y-1">
+                        <p className="font-medium text-gray-800">Comment Notifications</p>
+                        <p className="text-sm text-gray-500">Get notified when someone comments on your posts</p>
+                      </div>
+                      <Switch 
+                        id="commentNotif"
+                        checked={commentNotifications}
+                        onCheckedChange={setCommentNotifications}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="defaults">
+                <Card className="bg-white border-gray-100 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gray-800">Default Post Settings</CardTitle>
+                    <CardDescription>Configure defaults for new blog posts</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
                     <div className="space-y-2">
                       <Label htmlFor="defaultCategory" className="text-gray-700">Default Category</Label>
                       <Input 
@@ -274,7 +375,7 @@ const AdminSettings = () => {
                         value={defaultCategory} 
                         onChange={(e) => setDefaultCategory(e.target.value)} 
                         placeholder="Technology"
-                        className="text-gray-800 placeholder:text-gray-400"
+                        className="border-gray-200 focus:border-primary"
                       />
                     </div>
                     
@@ -286,98 +387,28 @@ const AdminSettings = () => {
                         onChange={(e) => setSeoDescription(e.target.value)} 
                         placeholder="Default SEO description for new posts"
                         rows={3}
-                        className="text-gray-800 placeholder:text-gray-400"
+                        className="border-gray-200 focus:border-primary"
                       />
                     </div>
                   </CardContent>
                 </Card>
-              </div>
-              
-              <div className="space-y-4 md:space-y-6">
-                <Card className="bg-white shadow-sm border border-gray-200">
-                  <CardHeader className="pb-2 md:pb-3">
-                    <CardTitle className="text-gray-800 text-lg md:text-xl">Profile Settings</CardTitle>
-                    <CardDescription className="text-gray-600">Update your profile information</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="displayName" className="text-gray-700">Display Name</Label>
-                      <Input 
-                        id="displayName" 
-                        value={displayName} 
-                        onChange={(e) => setDisplayName(e.target.value)} 
-                        placeholder="Your Name"
-                        className="text-gray-800 placeholder:text-gray-400"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-gray-700">Email Address</Label>
-                      <Input 
-                        id="email" 
-                        type="email"
-                        value={email} 
-                        disabled
-                        className="text-gray-800 placeholder:text-gray-400 bg-gray-100"
-                      />
-                      <p className="text-xs text-gray-500">Email address cannot be changed</p>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="bg-white shadow-sm border border-gray-200">
-                  <CardHeader className="pb-2 md:pb-3">
-                    <CardTitle className="text-gray-800 text-lg md:text-xl">Notification Settings</CardTitle>
-                    <CardDescription className="text-gray-600">Configure your notification preferences</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="emailNotif" className="text-gray-700">Email Notifications</Label>
-                        <p className="text-xs text-gray-500">Receive email notifications</p>
-                      </div>
-                      <Switch 
-                        id="emailNotif"
-                        checked={emailNotifications}
-                        onCheckedChange={setEmailNotifications}
-                      />
-                    </div>
-                    
-                    <Separator className="my-2" />
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="commentNotif" className="text-gray-700">Comment Notifications</Label>
-                        <p className="text-xs text-gray-500">Get notified on new comments</p>
-                      </div>
-                      <Switch 
-                        id="commentNotif"
-                        checked={commentNotifications}
-                        onCheckedChange={setCommentNotifications}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+              </TabsContent>
+            </Tabs>
             
             <div className="mt-6 flex justify-end">
               <Button 
                 type="submit" 
-                className="bg-primary hover:bg-primary/90 text-white"
+                className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2 px-6"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
                     Saving...
                   </>
                 ) : (
                   <>
-                    <Save className="mr-2 h-4 w-4" />
+                    <Save className="h-4 w-4" />
                     Save Settings
                   </>
                 )}

@@ -1,58 +1,78 @@
 
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from './types';
-import type { RealtimeChannel, RealtimeChannelOptions } from '@supabase/supabase-js';
+import type { Database } from './database.types';
 
-// Get the Supabase URL and key from environment variables with fallbacks
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://afnrcckplletaqljyjyi.supabase.co";
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmbnJjY2twbGxldGFxbGp5anlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAzMDg0MzgsImV4cCI6MjA1NTg4NDQzOH0.9Sqh5vtPe3ovmfqPAnJZZAoAzzGyPyqCpaVtePhtpWE";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-const siteUrl = import.meta.env.PROD 
-  ? 'https://sandeshshrestha77.com.np'
-  : 'http://localhost:8080';
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
 
-export const supabase = createClient<Database>(
-  SUPABASE_URL, 
-  SUPABASE_ANON_KEY,
-  {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-      flowType: 'pkce',
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined
-    },
-    realtime: {
-      params: {
-        eventsPerSecond: 10
-      }
-    }
-  }
-);
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
-// Helper for subscribing to table changes
+// Helper function to subscribe to real-time changes on a Supabase table
 export const subscribeToTable = (
   tableName: string,
   callback: (payload: any) => void,
-  event: 'INSERT' | 'UPDATE' | 'DELETE' | '*' = '*'
-): RealtimeChannel => {
-  const channel = supabase
-    .channel(`table-changes:${tableName}`)
-    .on(
-      'postgres_changes', 
-      { 
-        event: event, 
-        schema: 'public', 
-        table: tableName 
-      } as RealtimeChannelOptions['postgres_changes'], 
-      callback
-    )
-    .subscribe();
+  event = '*'
+) => {
+  // Fix the issue with the RealtimeChannelOptions type by using a type assertion
+  const channel = supabase.channel(`table-changes-${tableName}`, {
+    config: {
+      broadcast: { self: true },
+    },
+  });
 
-  return channel;
+  // Use the correct method signature with type assertion to fix TS error
+  channel
+    .on(
+      'postgres_changes',
+      {
+        event: event,
+        schema: 'public',
+        table: tableName,
+      } as any, // Type assertion to bypass TypeScript error
+      (payload) => {
+        callback(payload);
+      }
+    )
+    .subscribe((status) => {
+      if (status !== 'SUBSCRIBED') {
+        console.error(`Failed to subscribe to ${tableName}:`, status);
+      }
+    });
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
 };
 
-// Helper for removing a channel
-export const removeChannel = (channel: RealtimeChannel) => {
-  supabase.removeChannel(channel);
+export const getUser = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+};
+
+export const signInWithEmail = async (email: string, password: string) => {
+  return await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+};
+
+export const signUpWithEmail = async (email: string, password: string) => {
+  return await supabase.auth.signUp({
+    email,
+    password,
+  });
+};
+
+export const signOut = async () => {
+  return await supabase.auth.signOut();
+};
+
+export const resetPassword = async (email: string) => {
+  return await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
+  });
 };

@@ -1,79 +1,77 @@
 
 import { useState, useEffect } from 'react';
-import { supabase, subscribeToTable, removeChannel } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import type { RealtimeChannel } from '@supabase/supabase-js';
+import { subscribeToTable } from '@/integrations/supabase/client';
 
-type UseRealtimeDataOptions = {
+interface UseRealtimeDataOptions {
   tableName: string;
-  initialQuery?: () => Promise<any>;
-  events?: Array<'INSERT' | 'UPDATE' | 'DELETE'>;
-};
+  event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
+  filter?: (data: any) => boolean;
+}
 
-export const useRealtimeData = <T extends any[]>({
-  tableName,
-  initialQuery,
-  events = ['INSERT', 'UPDATE', 'DELETE']
-}: UseRealtimeDataOptions) => {
-  const [data, setData] = useState<T | []>([]);
+export function useRealtimeData<T = any>({ 
+  tableName, 
+  event = '*',
+  filter 
+}: UseRealtimeDataOptions) {
+  const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchData = async () => {
-    if (!initialQuery) return;
-    
+  useEffect(() => {
     try {
-      setLoading(true);
-      const result = await initialQuery();
+      // Create subscription to the Supabase table
+      const unsubscribe = subscribeToTable(
+        tableName,
+        (payload) => {
+          // Process the payload based on the event type
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            const newItem = payload.new as T;
+            
+            // Apply filter if provided
+            if (filter && !filter(newItem)) {
+              return;
+            }
+            
+            setData((currentData) => {
+              // Check if the item already exists
+              const exists = currentData.some((item: any) => item.id === (newItem as any).id);
+              
+              if (exists) {
+                // Update existing item
+                return currentData.map((item: any) => 
+                  item.id === (newItem as any).id ? newItem : item
+                );
+              } else {
+                // Add new item
+                return [...currentData, newItem];
+              }
+            });
+          } 
+          else if (payload.eventType === 'DELETE') {
+            const oldItem = payload.old as T;
+            
+            setData((currentData) => 
+              currentData.filter((item: any) => item.id !== (oldItem as any).id)
+            );
+          }
+        },
+        event
+      );
+
+      setLoading(false);
       
-      if (result.error) {
-        throw result.error;
-      }
-      
-      setData(result.data || []);
-    } catch (err: any) {
-      console.error(`Error fetching ${tableName} data:`, err);
-      setError(err);
-      toast.error(`Error loading data: ${err.message || 'Unknown error'}`);
-    } finally {
+      // Clean up the subscription when the component unmounts
+      return () => {
+        unsubscribe();
+      };
+    } catch (err) {
+      console.error("Error in useRealtimeData:", err);
+      setError(err instanceof Error ? err : new Error(String(err)));
       setLoading(false);
     }
-  };
+  }, [tableName, event, filter]);
 
-  useEffect(() => {
-    fetchData();
+  return { data, loading, error, setData };
+}
 
-    const channels: RealtimeChannel[] = events.map(event => {
-      return subscribeToTable(tableName, payload => {
-        console.log(`Received ${event} event for ${tableName}:`, payload);
-        
-        // Update data based on the event type
-        if (event === 'INSERT' && payload.new) {
-          setData(prevData => [...(prevData || []), payload.new] as T);
-          toast.success('New item added');
-        } else if (event === 'UPDATE' && payload.new) {
-          setData(prevData => 
-            prevData?.map(item => 
-              item.id === payload.new.id ? payload.new : item
-            ) as T || []
-          );
-          toast.info('Item updated');
-        } else if (event === 'DELETE' && payload.old) {
-          setData(prevData => 
-            prevData?.filter(item => item.id !== payload.old.id) as T || []
-          );
-          toast.info('Item removed');
-        } else {
-          // If we can't handle the update precisely, just refetch all data
-          fetchData();
-        }
-      }, event);
-    });
-
-    return () => {
-      channels.forEach(channel => removeChannel(channel));
-    };
-  }, [tableName]);
-
-  return { data, loading, error, refetch: fetchData };
-};
+export default useRealtimeData;
