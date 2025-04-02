@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
@@ -14,7 +13,8 @@ import {
   BarChart3,
   Bell,
   Search,
-  BookOpen
+  BookOpen,
+  MessageSquare // Added MessageSquare icon
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
