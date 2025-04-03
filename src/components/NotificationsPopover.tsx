@@ -31,17 +31,20 @@ export function NotificationsPopover() {
     
     try {
       setIsLoading(true);
-      // For now, we'll use comments as notifications since there's no dedicated notifications table
+      // Using mock notifications since we don't have a dedicated notifications table
       const { data, error } = await supabase
         .from('comments')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(5);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        return;
+      }
       
       // Transform comments into notifications
-      const notificationsData = data.map((comment) => ({
+      const notificationsData = (data || []).map((comment) => ({
         id: comment.id,
         title: 'New Comment',
         content: `${comment.name} commented: ${comment.content.substring(0, 50)}${comment.content.length > 50 ? '...' : ''}`,
@@ -83,24 +86,24 @@ export function NotificationsPopover() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" className="relative">
-          <Bell className="h-5 w-5 text-gray-600" />
+        <Button variant="ghost" size="icon" className="relative text-zinc-400 hover:text-white hover:bg-zinc-800">
+          <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500">
+            <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white">
               {unreadCount}
             </Badge>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="end">
-        <div className="flex justify-between items-center border-b pb-2">
+      <PopoverContent className="w-80 bg-zinc-900 border border-zinc-800 text-white" align="end">
+        <div className="flex justify-between items-center border-b border-zinc-800 pb-2">
           <h3 className="font-medium">Notifications</h3>
           {notifications.length > 0 && (
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={markAllAsRead}
-              className="text-xs h-7"
+              className="text-xs h-7 text-zinc-400 hover:text-white hover:bg-zinc-800"
             >
               Mark all as read
             </Button>
@@ -109,10 +112,10 @@ export function NotificationsPopover() {
         <div className="py-2 max-h-[300px] overflow-y-auto">
           {isLoading ? (
             <div className="flex justify-center py-4">
-              <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>
+              <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
             </div>
           ) : notifications.length === 0 ? (
-            <div className="text-center py-6 text-gray-500">
+            <div className="text-center py-6 text-zinc-500">
               <p>No notifications</p>
             </div>
           ) : (
@@ -120,16 +123,16 @@ export function NotificationsPopover() {
               {notifications.map((notification) => (
                 <div 
                   key={notification.id}
-                  className={`p-2 rounded-md ${notification.read ? 'bg-gray-50' : 'bg-blue-50'}`}
+                  className={`p-2 rounded-md cursor-pointer ${notification.read ? 'bg-zinc-800/50' : 'bg-zinc-800'}`}
                   onClick={() => markAsRead(notification.id)}
                 >
                   <div className="flex justify-between">
                     <h4 className="text-sm font-medium">{notification.title}</h4>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-zinc-500">
                       {new Date(notification.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600">{notification.content}</p>
+                  <p className="text-sm text-zinc-400">{notification.content}</p>
                 </div>
               ))}
             </div>

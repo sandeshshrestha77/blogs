@@ -14,6 +14,7 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
+import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
 
 function App() {
   interface Post {
@@ -79,6 +80,7 @@ function App() {
           } />
         </Routes>
         <Toaster position="top-right" />
+        <ShadcnToaster />
       </Router>
     </AuthProvider>
   );

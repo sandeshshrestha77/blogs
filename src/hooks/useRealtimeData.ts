@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { subscribeToTable, supabase } from '@/integrations/supabase/client';
+import { toast } from "sonner";
 
 interface UseRealtimeDataOptions {
   tableName: string;
@@ -28,13 +29,13 @@ export function useRealtimeData<T = any>({
           setData(initialData as T[]);
         } else {
           // Default query if no initialQuery is provided
-          // Use type assertion to handle table name type safely
+          // Use type assertion with 'as const' to handle table name type safely
           const { data: initialData, error } = await supabase
             .from(tableName as any)
-            .select('*') as { data: T[] | null, error: any };
+            .select('*');
           
           if (error) throw error;
-          setData(initialData || []);
+          setData((initialData || []) as T[]);
         }
       } catch (err) {
         console.error(`Error fetching initial data from ${tableName}:`, err);
@@ -46,9 +47,11 @@ export function useRealtimeData<T = any>({
 
     fetchInitialData();
 
+    let unsubscribe: (() => void) | null = null;
+
     try {
       // Create subscription to the Supabase table
-      const unsubscribe = subscribeToTable(
+      unsubscribe = subscribeToTable(
         tableName,
         (payload) => {
           // Process the payload based on the event type
@@ -85,16 +88,18 @@ export function useRealtimeData<T = any>({
         },
         event
       );
-
-      // Clean up the subscription when the component unmounts
-      return () => {
-        unsubscribe();
-      };
     } catch (err) {
       console.error("Error in useRealtimeData:", err);
       setError(err instanceof Error ? err : new Error(String(err)));
       setLoading(false);
     }
+
+    // Clean up the subscription when the component unmounts
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [tableName, event, filter, initialQuery]);
 
   return { data, loading, error, setData };
