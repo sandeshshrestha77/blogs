@@ -20,9 +20,9 @@ const Index = () => {
   const [showAllPosts, setShowAllPosts] = useState(false);
   
   const { 
-    data: posts = [],
+    data: posts,
     loading: updating,
-  } = useRealtimeData<Post[]>({
+  } = useRealtimeData<Post>({
     tableName: 'posts',
     initialQuery: async () => {
       const { data, error } = await supabase
@@ -185,7 +185,7 @@ const Index = () => {
         </section>
       )}
 
-      {posts?.length > 0 && (
+      {displayedPosts.length > 0 && (
         <section className="bg-zinc-950 py-[80px]">
           <div className="container mx-auto px-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
@@ -198,7 +198,7 @@ const Index = () => {
                 <p className="mt-2 text-zinc-400">Discover our most recent articles and insights</p>
               </div>
               <div className="flex gap-3">
-                {!showAllPosts && posts.length > 6 && (
+                {!showAllPosts && displayedPosts.length > 6 && (
                   <Button variant="outline" onClick={handleViewAll} className="border-blue-600/40 text-blue-400 hover:bg-blue-600/10 hover:text-blue-300 transition-all">
                     View More
                     <ChevronRight className="ml-1 h-4 w-4" />
@@ -235,7 +235,7 @@ const Index = () => {
         </section>
       )}
 
-      {!updating && !featuredPost && (!posts || posts.length === 0) && (
+      {!updating && !featuredPost && (!displayedPosts || displayedPosts.length === 0) && (
         <div className="text-center py-40">
           <div className="max-w-md mx-auto">
             <h3 className="text-2xl font-semibold text-white mb-4">

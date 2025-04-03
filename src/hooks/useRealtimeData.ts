@@ -30,10 +30,10 @@ export function useRealtimeData<T = any>({
           // Default query if no initialQuery is provided
           const { data: initialData, error } = await supabase
             .from(tableName)
-            .select('*');
+            .select('*') as { data: T[] | null, error: any };
           
           if (error) throw error;
-          setData(initialData as T[]);
+          setData(initialData as T[] || []);
         }
       } catch (err) {
         console.error(`Error fetching initial data from ${tableName}:`, err);
