@@ -1,35 +1,22 @@
-
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { 
-  LayoutDashboard, 
-  FileText, 
-  LogOut, 
-  Home, 
-  Settings, 
-  Menu, 
-  X, 
-  PenSquare, 
-  BarChart3, 
-  BookOpen,
-  ChevronRight,
-  User
-} from "lucide-react";
+import { LayoutDashboard, FileText, LogOut, Home, Settings, Menu, X, PenSquare, BarChart3, BookOpen, ChevronRight, User } from "lucide-react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useState, useEffect } from "react";
 import { NotificationsPopover } from "./NotificationsPopover";
-
 const AdminLayout = ({
   children
 }: {
   children: React.ReactNode;
 }) => {
   const navigate = useNavigate();
-  const { signOut, user } = useAuth();
+  const {
+    signOut,
+    user
+  } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -40,24 +27,19 @@ const AdminLayout = ({
       window.removeEventListener('resize', checkIfMobile);
     };
   }, []);
-  
   const handleNavigation = (path: string) => {
     navigate(path);
     if (isMobile) {
       setIsMobileMenuOpen(false);
     }
   };
-  
   const handleSignOut = async () => {
     await signOut();
     navigate("/login");
   };
-  
   const userName = user?.email?.split('@')[0] || 'User';
   const userInitial = userName.charAt(0).toUpperCase();
-  
-  return (
-    <div className="min-h-screen bg-zinc-950 flex">
+  return <div className="min-h-screen bg-zinc-950 flex">
       {/* Sidebar - Desktop */}
       <aside className={`
         fixed lg:relative inset-y-0 left-0 z-50
@@ -68,14 +50,12 @@ const AdminLayout = ({
         {/* Sidebar Header with Logo */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-zinc-800">
           <div className="flex items-center space-x-2">
-            <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
-            <span className="font-semibold text-white">Admin Panel</span>
+            <img src="/logo.png" alt="Logo" className="h-8 w-aut" />
+            
           </div>
-          {isMobile && (
-            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden text-zinc-400 hover:text-white hover:bg-zinc-800">
+          {isMobile && <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden text-zinc-400 hover:text-white hover:bg-zinc-800">
               <X className="h-5 w-5" />
-            </Button>
-          )}
+            </Button>}
         </div>
         
         {/* Sidebar Content */}
@@ -101,29 +81,17 @@ const AdminLayout = ({
               Main
             </h3>
             <nav className="space-y-1">
-              <Button 
-                onClick={() => handleNavigation("/admin")} 
-                variant="ghost" 
-                className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800"
-              >
+              <Button onClick={() => handleNavigation("/admin")} variant="ghost" className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800">
                 <LayoutDashboard className="h-5 w-5 mr-3 text-zinc-500" />
                 Dashboard
               </Button>
               
-              <Button 
-                onClick={() => handleNavigation("/admin/create")} 
-                variant="ghost" 
-                className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800"
-              >
+              <Button onClick={() => handleNavigation("/admin/create")} variant="ghost" className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800">
                 <PenSquare className="h-5 w-5 mr-3 text-zinc-500" />
                 Create Post
               </Button>
 
-              <Button 
-                onClick={() => handleNavigation("/admin/analytics")} 
-                variant="ghost" 
-                className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800"
-              >
+              <Button onClick={() => handleNavigation("/admin/analytics")} variant="ghost" className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800">
                 <BarChart3 className="h-5 w-5 mr-3 text-zinc-500" />
                 Analytics
               </Button>
@@ -136,20 +104,12 @@ const AdminLayout = ({
               System
             </h3>
             <nav className="space-y-1">
-              <Button 
-                onClick={() => handleNavigation("/admin/settings")} 
-                variant="ghost" 
-                className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800"
-              >
+              <Button onClick={() => handleNavigation("/admin/settings")} variant="ghost" className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800">
                 <Settings className="h-5 w-5 mr-3 text-zinc-500" />
                 Settings
               </Button>
               
-              <Button 
-                onClick={() => handleNavigation("/")} 
-                variant="ghost" 
-                className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800"
-              >
+              <Button onClick={() => handleNavigation("/")} variant="ghost" className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800">
                 <BookOpen className="h-5 w-5 mr-3 text-zinc-500" />
                 View Blog
               </Button>
@@ -158,11 +118,7 @@ const AdminLayout = ({
           
           {/* Log Out - Bottom */}
           <div className="mt-auto px-3 pt-6 pb-2">
-            <Button 
-              onClick={handleSignOut} 
-              variant="outline" 
-              className="w-full justify-start text-red-400 border-zinc-800 hover:bg-zinc-800 hover:text-red-300 hover:border-zinc-700"
-            >
+            <Button onClick={handleSignOut} variant="outline" className="w-full justify-start text-red-400 border-zinc-800 hover:bg-zinc-800 hover:text-red-300 hover:border-zinc-700">
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
             </Button>
@@ -175,22 +131,12 @@ const AdminLayout = ({
         {/* Top Navigation Bar */}
         <header className="bg-zinc-900 border-b border-zinc-800 h-16 sticky top-0 z-40 flex items-center px-4 lg:px-6">
           <div className="flex-1 flex items-center">
-            {isMobile && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-                className="mr-2 lg:hidden text-zinc-400 hover:text-white hover:bg-zinc-800"
-              >
+            {isMobile && <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="mr-2 lg:hidden text-zinc-400 hover:text-white hover:bg-zinc-800">
                 <Menu className="h-5 w-5" />
-              </Button>
-            )}
+              </Button>}
             
             <div className="text-white font-medium ml-4">
-              <span className="text-zinc-500">Admin /</span> {window.location.pathname.includes('/create') ? 'Create Post' : 
-                window.location.pathname.includes('/edit') ? 'Edit Post' : 
-                window.location.pathname.includes('/analytics') ? 'Analytics' : 
-                window.location.pathname.includes('/settings') ? 'Settings' : 'Dashboard'}
+              <span className="text-zinc-500">Admin /</span> {window.location.pathname.includes('/create') ? 'Create Post' : window.location.pathname.includes('/edit') ? 'Edit Post' : window.location.pathname.includes('/analytics') ? 'Analytics' : window.location.pathname.includes('/settings') ? 'Settings' : 'Dashboard'}
             </div>
           </div>
           
@@ -198,11 +144,7 @@ const AdminLayout = ({
           <div className="flex items-center space-x-3">
             <NotificationsPopover />
             
-            <Button 
-              variant="ghost" 
-              className="relative rounded-full hover:bg-zinc-800" 
-              onClick={() => navigate("/admin/settings")}
-            >
+            <Button variant="ghost" className="relative rounded-full hover:bg-zinc-800" onClick={() => navigate("/admin/settings")}>
               <Avatar className="h-8 w-8 border border-zinc-700">
                 <AvatarFallback className="bg-blue-600 text-white text-sm">
                   {userInitial}
@@ -213,33 +155,20 @@ const AdminLayout = ({
         </header>
         
         {/* Mobile menu toggle button when sidebar is closed */}
-        {isMobile && !isMobileMenuOpen && (
-          <div className="fixed bottom-4 left-4 z-30">
-            <Button 
-              onClick={() => setIsMobileMenuOpen(true)} 
-              size="icon" 
-              className="h-12 w-12 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700"
-            >
+        {isMobile && !isMobileMenuOpen && <div className="fixed bottom-4 left-4 z-30">
+            <Button onClick={() => setIsMobileMenuOpen(true)} size="icon" className="h-12 w-12 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700">
               <Menu className="h-6 w-6 text-white" />
             </Button>
-          </div>
-        )}
+          </div>}
         
         {/* Mobile menu overlay */}
-        {isMobile && isMobileMenuOpen && (
-          <div 
-            className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm" 
-            onClick={() => setIsMobileMenuOpen(false)} 
-          />
-        )}
+        {isMobile && isMobileMenuOpen && <div className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />}
         
         {/* Page Content */}
         <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-zinc-950">
           {children}
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AdminLayout;
