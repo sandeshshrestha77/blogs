@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import AdminLayout from "@/components/AdminLayout";
@@ -321,7 +322,7 @@ const AdminSettings = () => {
                         disabled
                         className="bg-gray-50 border-gray-200 text-gray-500"
                       />
-                      <p className="text-xs text-gray-500">Email address cannot be changed</p>
+                      <p className="text-xs text-gray-500 mt-1">Email address cannot be changed</p>
                     </div>
                   </CardContent>
                 </Card>
