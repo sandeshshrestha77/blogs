@@ -28,12 +28,13 @@ export function useRealtimeData<T = any>({
           setData(initialData as T[]);
         } else {
           // Default query if no initialQuery is provided
+          // Use type assertion to handle table name type safely
           const { data: initialData, error } = await supabase
-            .from(tableName)
+            .from(tableName as any)
             .select('*') as { data: T[] | null, error: any };
           
           if (error) throw error;
-          setData(initialData as T[] || []);
+          setData(initialData || []);
         }
       } catch (err) {
         console.error(`Error fetching initial data from ${tableName}:`, err);
