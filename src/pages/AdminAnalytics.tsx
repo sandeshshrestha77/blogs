@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart } from "recharts";
 import { BarChart3, TrendingUp, Eye, MessageSquare, FileText, Calendar, RefreshCw } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Post {
@@ -53,7 +53,11 @@ const AdminAnalytics = () => {
       }
     } catch (error) {
       console.error("Error fetching posts data:", error);
-      toast.error("Failed to load analytics data");
+      toast({
+        title: "Error",
+        description: "Failed to load analytics data",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -106,19 +110,19 @@ const AdminAnalytics = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              <BarChart3 className="h-6 w-6 text-primary" />
-              Analytics
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+              <BarChart3 className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+              Analytics Dashboard
             </h1>
-            <p className="text-gray-500 mt-1">
-              Track performance and engagement metrics
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
+              Track performance and engagement metrics for your blog
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <Select value={timeRange} onValueChange={(v) => setTimeRange(v as 'week' | 'month' | 'year')}>
-              <SelectTrigger className="w-[180px] bg-white border-gray-200">
+              <SelectTrigger className="w-[180px] bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700">
                 <SelectValue placeholder="Select time range" />
               </SelectTrigger>
               <SelectContent>
@@ -129,7 +133,7 @@ const AdminAnalytics = () => {
             </Select>
             
             <Select value={chartType} onValueChange={(v) => setChartType(v as 'bar' | 'line')}>
-              <SelectTrigger className="w-[180px] bg-white border-gray-200">
+              <SelectTrigger className="w-[180px] bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700">
                 <SelectValue placeholder="Select chart type" />
               </SelectTrigger>
               <SelectContent>
@@ -142,39 +146,39 @@ const AdminAnalytics = () => {
 
         {isLoading ? (
           <div className="h-64 w-full flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="bg-white border-gray-100 shadow-sm overflow-hidden">
+              <Card className="bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 shadow-sm overflow-hidden transition-all hover:shadow-md">
                 <div className="absolute top-0 right-0 h-24 w-24 opacity-10">
-                  <Eye className="h-full w-full text-blue-500" />
+                  <Eye className="h-full w-full text-indigo-500" />
                 </div>
                 <CardContent className="pt-6 pb-4">
                   <div className="flex flex-col">
-                    <p className="text-sm font-medium text-gray-500">Total Views</p>
-                    <h3 className="text-3xl font-bold text-gray-800 mt-1">{totalViews.toLocaleString()}</h3>
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Views</p>
+                    <h3 className="text-3xl font-bold text-gray-800 dark:text-white mt-1">{totalViews.toLocaleString()}</h3>
                     <div className="mt-4 flex items-center text-sm">
-                      <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                      <span className="font-medium text-green-500">+12.5%</span>
-                      <span className="text-gray-500 ml-1">vs last {timeRange}</span>
+                      <TrendingUp className="h-4 w-4 text-emerald-500 mr-1" />
+                      <span className="font-medium text-emerald-500">+12.5%</span>
+                      <span className="text-gray-500 dark:text-gray-400 ml-1">vs last {timeRange}</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card className="bg-white border-gray-100 shadow-sm overflow-hidden">
+              <Card className="bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 shadow-sm overflow-hidden transition-all hover:shadow-md">
                 <div className="absolute top-0 right-0 h-24 w-24 opacity-10">
-                  <FileText className="h-full w-full text-purple-500" />
+                  <FileText className="h-full w-full text-indigo-500" />
                 </div>
                 <CardContent className="pt-6 pb-4">
                   <div className="flex flex-col">
-                    <p className="text-sm font-medium text-gray-500">Total Posts</p>
-                    <h3 className="text-3xl font-bold text-gray-800 mt-1">{posts.length}</h3>
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Posts</p>
+                    <h3 className="text-3xl font-bold text-gray-800 dark:text-white mt-1">{posts.length}</h3>
                     <div className="mt-4 flex items-center text-sm">
-                      <Calendar className="h-4 w-4 text-gray-500 mr-1" />
-                      <span className="text-gray-700 font-medium">
+                      <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400 mr-1" />
+                      <span className="text-gray-700 dark:text-gray-300 font-medium">
                         {Math.max(1, Math.round(posts.length / 4))} posts/month
                       </span>
                     </div>
@@ -182,16 +186,16 @@ const AdminAnalytics = () => {
                 </CardContent>
               </Card>
               
-              <Card className="bg-white border-gray-100 shadow-sm overflow-hidden">
+              <Card className="bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 shadow-sm overflow-hidden transition-all hover:shadow-md">
                 <div className="absolute top-0 right-0 h-24 w-24 opacity-10">
-                  <MessageSquare className="h-full w-full text-green-500" />
+                  <MessageSquare className="h-full w-full text-indigo-500" />
                 </div>
                 <CardContent className="pt-6 pb-4">
                   <div className="flex flex-col">
-                    <p className="text-sm font-medium text-gray-500">Total Comments</p>
-                    <h3 className="text-3xl font-bold text-gray-800 mt-1">{totalComments.toLocaleString()}</h3>
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Comments</p>
+                    <h3 className="text-3xl font-bold text-gray-800 dark:text-white mt-1">{totalComments.toLocaleString()}</h3>
                     <div className="mt-4 flex items-center text-sm">
-                      <span className="text-gray-700 font-medium">
+                      <span className="text-gray-700 dark:text-gray-300 font-medium">
                         {posts.length ? (totalComments / posts.length).toFixed(1) : 0} comments/post
                       </span>
                     </div>
@@ -201,20 +205,20 @@ const AdminAnalytics = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-white border-gray-100 shadow-sm">
-                <CardHeader className="pb-2">
+              <Card className="bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 shadow-sm transition-all hover:shadow-md">
+                <CardHeader className="pb-2 border-b border-gray-100 dark:border-zinc-700">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-lg text-gray-800">Post Performance</CardTitle>
-                      <CardDescription>Views and comments per post</CardDescription>
+                      <CardTitle className="text-lg text-gray-800 dark:text-white">Post Performance</CardTitle>
+                      <CardDescription className="text-gray-500 dark:text-gray-400">Views and comments per post</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                   <div className="h-[300px] w-full">
                     {posts.length === 0 ? (
                       <div className="h-full w-full flex items-center justify-center">
-                        <p className="text-gray-500">No post data available</p>
+                        <p className="text-gray-500 dark:text-gray-400">No post data available</p>
                       </div>
                     ) : (
                       <ResponsiveContainer width="100%" height="100%">
@@ -223,7 +227,7 @@ const AdminAnalytics = () => {
                             data={viewData}
                             margin={{ top: 5, right: 30, left: 20, bottom: 70 }}
                           >
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                             <XAxis 
                               dataKey="name" 
                               angle={-45}
@@ -241,15 +245,15 @@ const AdminAnalytics = () => {
                               }} 
                             />
                             <Legend />
-                            <Bar dataKey="views" fill="#4169E1" name="Views" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="comments" fill="#8B5CF6" name="Comments" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="views" fill="#4f46e5" name="Views" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="comments" fill="#8b5cf6" name="Comments" radius={[4, 4, 0, 0]} />
                           </BarChart>
                         ) : (
                           <LineChart
                             data={viewData}
                             margin={{ top: 5, right: 30, left: 20, bottom: 70 }}
                           >
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                             <XAxis 
                               dataKey="name" 
                               angle={-45}
@@ -267,8 +271,8 @@ const AdminAnalytics = () => {
                               }} 
                             />
                             <Legend />
-                            <Line type="monotone" dataKey="views" stroke="#4169E1" name="Views" strokeWidth={2} dot={{ r: 4 }} />
-                            <Line type="monotone" dataKey="comments" stroke="#8B5CF6" name="Comments" strokeWidth={2} dot={{ r: 4 }} />
+                            <Line type="monotone" dataKey="views" stroke="#4f46e5" name="Views" strokeWidth={2} dot={{ r: 4 }} />
+                            <Line type="monotone" dataKey="comments" stroke="#8b5cf6" name="Comments" strokeWidth={2} dot={{ r: 4 }} />
                           </LineChart>
                         )}
                       </ResponsiveContainer>
@@ -277,20 +281,20 @@ const AdminAnalytics = () => {
                 </CardContent>
               </Card>
               
-              <Card className="bg-white border-gray-100 shadow-sm">
-                <CardHeader className="pb-2">
+              <Card className="bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 shadow-sm transition-all hover:shadow-md">
+                <CardHeader className="pb-2 border-b border-gray-100 dark:border-zinc-700">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-lg text-gray-800">Category Distribution</CardTitle>
-                      <CardDescription>Posts by category</CardDescription>
+                      <CardTitle className="text-lg text-gray-800 dark:text-white">Category Distribution</CardTitle>
+                      <CardDescription className="text-gray-500 dark:text-gray-400">Posts by category</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                   <div className="h-[300px] w-full">
                     {categoryData.length === 0 ? (
                       <div className="h-full w-full flex items-center justify-center">
-                        <p className="text-gray-500">No category data available</p>
+                        <p className="text-gray-500 dark:text-gray-400">No category data available</p>
                       </div>
                     ) : (
                       <ResponsiveContainer width="100%" height="100%">
@@ -299,7 +303,7 @@ const AdminAnalytics = () => {
                           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                           layout="vertical"
                         >
-                          <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f0f0f0" />
+                          <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e5e7eb" />
                           <XAxis type="number" tick={{ fontSize: 12, fill: '#6b7280' }} />
                           <YAxis 
                             type="category" 
@@ -316,7 +320,7 @@ const AdminAnalytics = () => {
                             }} 
                           />
                           <Legend />
-                          <Bar dataKey="posts" fill="#10B981" name="Posts" radius={[0, 4, 4, 0]} />
+                          <Bar dataKey="posts" fill="#10b981" name="Posts" radius={[0, 4, 4, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     )}
@@ -325,20 +329,20 @@ const AdminAnalytics = () => {
               </Card>
             </div>
 
-            <Card className="bg-white border-gray-100 shadow-sm">
-              <CardHeader className="pb-2">
+            <Card className="bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 shadow-sm transition-all hover:shadow-md">
+              <CardHeader className="pb-2 border-b border-gray-100 dark:border-zinc-700">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg text-gray-800">Growth Trend</CardTitle>
-                    <CardDescription>Post views over time</CardDescription>
+                    <CardTitle className="text-lg text-gray-800 dark:text-white">Growth Trend</CardTitle>
+                    <CardDescription className="text-gray-500 dark:text-gray-400">Post views over time</CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pb-6">
+              <CardContent className="p-6">
                 <div className="h-[300px] w-full">
                   {viewData.length === 0 ? (
                     <div className="h-full w-full flex items-center justify-center">
-                      <p className="text-gray-500">No trend data available</p>
+                      <p className="text-gray-500 dark:text-gray-400">No trend data available</p>
                     </div>
                   ) : (
                     <ResponsiveContainer width="100%" height="100%">
@@ -346,7 +350,7 @@ const AdminAnalytics = () => {
                         data={viewData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())}
                         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                       >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis 
                           dataKey="date" 
                           tick={{ fontSize: 12, fill: '#6b7280' }}
@@ -364,7 +368,7 @@ const AdminAnalytics = () => {
                         <Line 
                           type="monotone" 
                           dataKey="views" 
-                          stroke="#4169E1" 
+                          stroke="#4f46e5" 
                           activeDot={{ r: 8 }} 
                           name="Views"
                           strokeWidth={2}
@@ -372,7 +376,7 @@ const AdminAnalytics = () => {
                         <Line 
                           type="monotone" 
                           dataKey="comments" 
-                          stroke="#8B5CF6" 
+                          stroke="#8b5cf6" 
                           name="Comments"
                           strokeWidth={2}
                         />
@@ -383,11 +387,11 @@ const AdminAnalytics = () => {
               </CardContent>
             </Card>
 
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center mt-6">
               <Button 
                 onClick={fetchPosts} 
                 variant="outline" 
-                className="border-gray-200 text-primary hover:bg-primary/5 flex items-center gap-2"
+                className="border-gray-200 dark:border-zinc-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 flex items-center gap-2"
               >
                 <RefreshCw className="h-4 w-4" />
                 Refresh Data

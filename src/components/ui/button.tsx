@@ -10,21 +10,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        success: "bg-green-500 text-white hover:bg-green-600",
-        info: "bg-blue-500 text-white hover:bg-blue-600",
-        warning: "bg-amber-500 text-white hover:bg-amber-600",
-        danger: "bg-red-500 text-white hover:bg-red-600",
-        "sidebar-active": "bg-[#1e2538] text-white",
-        "sidebar-item": "text-gray-300 hover:text-white hover:bg-[#1e2538]",
+        default: "bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700",
+        destructive: "bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700",
+        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground dark:border-gray-600",
+        secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600",
+        ghost: "hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-50",
+        link: "text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400",
+        success: "bg-emerald-500 text-white hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700",
+        info: "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700",
+        warning: "bg-amber-500 text-white hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700",
+        danger: "bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700",
+        "sidebar-active": "bg-indigo-100 text-indigo-900 dark:bg-indigo-900 dark:text-indigo-100",
+        "sidebar-item": "text-gray-700 hover:text-indigo-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-zinc-800",
       },
       size: {
         default: "h-10 px-4 py-2",
