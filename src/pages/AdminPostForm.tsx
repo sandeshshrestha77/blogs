@@ -232,7 +232,6 @@ const AdminPostForm = () => {
       toast({
         title: "Success",
         description: `Post ${id ? "updated" : "created"} successfully`,
-        variant: "success"
       });
       
       navigate("/admin");
@@ -375,7 +374,8 @@ const AdminPostForm = () => {
                         Content
                       </Label>
                       <div className="mt-1 editor-wrapper">
-                        <style jsx global>{`
+                        <style>
+                          {`
                           .editor-wrapper .ql-toolbar.ql-snow {
                             border-color: #d1d5db;
                             border-top-left-radius: 0.375rem;
@@ -405,7 +405,8 @@ const AdminPostForm = () => {
                           .editor-wrapper .ql-editor {
                             min-height: 200px;
                           }
-                        `}</style>
+                          `}
+                        </style>
                         <ReactQuill 
                           theme="snow" 
                           value={formData.content} 
