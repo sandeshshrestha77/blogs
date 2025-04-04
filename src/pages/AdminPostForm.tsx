@@ -13,13 +13,48 @@ import { Separator } from "@/components/ui/separator";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "@/hooks/use-toast";
-import { PlusCircle, Save, Eye, X, ArrowLeft, Image, Star, Calendar, User, Tag, Clock, Search } from "lucide-react";
+import { PlusCircle, Save, Eye, X, ArrowLeft, Image, Star, Calendar, User, Tag, Clock, Search, AlertCircle } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 type Post = Database["public"]["Tables"]["posts"]["Row"] & {
   meta_title?: string;
   meta_description?: string;
   keywords?: string;
   alt_text?: string;
+};
+
+// SEO Helper Functions
+const generateSeoTitle = (title: string): string => {
+  return title.length <= 60 ? title : title.substring(0, 57) + "...";
+};
+
+const generateSeoDescription = (content: string): string => {
+  // Remove HTML tags and limit to 160 characters
+  const plainText = content.replace(/<[^>]+>/g, "");
+  return plainText.length <= 160 ? plainText : plainText.substring(0, 157) + "...";
+};
+
+const generateKeywords = (title: string, category: string): string => {
+  // Extract potential keywords from title
+  const words = title
+    .toLowerCase()
+    .replace(/[^\w\s]/g, "")
+    .split(" ")
+    .filter(word => word.length > 3)
+    .slice(0, 5);
+  
+  // Add category if it exists
+  if (category && !words.includes(category.toLowerCase())) {
+    words.push(category.toLowerCase());
+  }
+  
+  return words.join(", ");
+};
+
+const estimateReadTime = (content: string): string => {
+  const plainText = content.replace(/<[^>]+>/g, "");
+  const wordCount = plainText.split(/\s+/).length;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200)); // Assuming 200 words per minute
+  return readingTime.toString();
 };
 
 const AdminPostForm = () => {
@@ -45,6 +80,7 @@ const AdminPostForm = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
   const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
+  const [seoScore, setSeoScore] = useState(0);
   
   const modules = {
     toolbar: [
@@ -65,6 +101,41 @@ const AdminPostForm = () => {
   useEffect(() => {
     if (id) fetchPost();
   }, [id]);
+  
+  // Calculate SEO score when relevant fields change
+  useEffect(() => {
+    const calculateSeoScore = () => {
+      let score = 0;
+      
+      // Title factors
+      if (formData.meta_title) {
+        const titleLength = formData.meta_title.length;
+        if (titleLength >= 40 && titleLength <= 60) score += 20;
+        else if (titleLength > 0) score += 10;
+      }
+      
+      // Description factors
+      if (formData.meta_description) {
+        const descLength = formData.meta_description.length;
+        if (descLength >= 140 && descLength <= 160) score += 20;
+        else if (descLength > 0) score += 10;
+      }
+      
+      // Keywords factors
+      if (formData.keywords && formData.keywords.split(",").length >= 3) score += 20;
+      else if (formData.keywords) score += 10;
+      
+      // Image ALT text
+      if (imagePreview && formData.alt_text) score += 20;
+      
+      // Slug quality
+      if (formData.slug && formData.slug.includes(formData.title.toLowerCase().split(" ")[0])) score += 20;
+      
+      setSeoScore(score);
+    };
+    
+    calculateSeoScore();
+  }, [formData.meta_title, formData.meta_description, formData.keywords, formData.alt_text, formData.slug, imagePreview, formData.title]);
   
   const fetchPost = async () => {
     if (!id) return;
@@ -217,10 +288,15 @@ const AdminPostForm = () => {
     try {
       const imageUrl = await handleImageUpload();
       
+      // Auto-generate SEO fields if they're empty
       const postData = {
         ...formData,
         image: imageUrl,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        meta_title: formData.meta_title || generateSeoTitle(formData.title),
+        meta_description: formData.meta_description || generateSeoDescription(formData.content),
+        keywords: formData.keywords || generateKeywords(formData.title, formData.category),
+        read_time: formData.read_time || estimateReadTime(formData.content)
       };
       
       const { error } = id
@@ -231,7 +307,7 @@ const AdminPostForm = () => {
       
       toast({
         title: "Success",
-        description: `Post ${id ? "updated" : "created"} successfully`,
+        description: `Post ${id ? "updated" : "created"} successfully with optimized SEO`,
       });
       
       navigate("/admin");
@@ -255,7 +331,7 @@ const AdminPostForm = () => {
         ...prev,
         title: value,
         slug: !prev.slug ? generateSlug(value) : prev.slug,
-        meta_title: prev.meta_title || value.slice(0, 70)
+        meta_title: prev.meta_title || generateSeoTitle(value)
       }));
     } else {
       setFormData(prev => ({
@@ -278,14 +354,30 @@ const AdminPostForm = () => {
         excerpt: content.replace(/<[^>]+>/g, "").slice(0, 150) + "..."
       }),
       ...(prev.meta_description ? {} : {
-        meta_description: content.replace(/<[^>]+>/g, "").slice(0, 160)
-      })
+        meta_description: generateSeoDescription(content)
+      }),
+      read_time: prev.read_time || estimateReadTime(content)
     }));
     
     setErrors(prev => ({
       ...prev,
       content: undefined
     }));
+  };
+  
+  const generateSeoFields = () => {
+    setFormData(prev => ({
+      ...prev,
+      meta_title: generateSeoTitle(prev.title),
+      meta_description: generateSeoDescription(prev.content),
+      keywords: generateKeywords(prev.title, prev.category),
+      read_time: estimateReadTime(prev.content)
+    }));
+    
+    toast({
+      title: "SEO Fields Generated",
+      description: "SEO fields have been auto-generated based on your content",
+    });
   };
   
   return <AdminLayout>
@@ -300,6 +392,15 @@ const AdminPostForm = () => {
             </h1>
           </div>
           <div className="flex space-x-2">
+            <Button 
+              type="button" 
+              onClick={generateSeoFields}
+              variant="outline"
+              className="text-indigo-600 border-indigo-200 hover:bg-indigo-50 dark:text-indigo-400 dark:border-indigo-800 dark:hover:bg-indigo-900/20"
+            >
+              <Search className="h-4 w-4 mr-2" />
+              Generate SEO
+            </Button>
             <Button 
               type="button" 
               onClick={() => {
@@ -457,7 +558,8 @@ const AdminPostForm = () => {
                           setImageFile(null);
                           setFormData(prev => ({
                             ...prev,
-                            image: ""
+                            image: "",
+                            alt_text: ""
                           }));
                         }} 
                         className="absolute top-2 right-2 rounded-full h-8 w-8 p-0 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
@@ -466,14 +568,14 @@ const AdminPostForm = () => {
                       </Button>
                       <div className="mt-2">
                         <Label htmlFor="alt_text" className="text-gray-700 dark:text-gray-300 text-sm font-medium">
-                          Alt Text
+                          Alt Text (important for SEO)
                         </Label>
                         <Input 
                           id="alt_text" 
                           name="alt_text" 
                           value={formData.alt_text} 
                           onChange={handleChange} 
-                          placeholder="Describe the image" 
+                          placeholder="Describe the image for search engines and accessibility" 
                           className="mt-1 border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 dark:placeholder-gray-500" 
                         />
                       </div>
@@ -484,6 +586,9 @@ const AdminPostForm = () => {
                       <div className="mt-2">
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Drag and drop an image here, or click to select a file
+                        </p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                          Adding a featured image with alt text improves SEO and accessibility
                         </p>
                       </div>
                     </div>
@@ -506,7 +611,7 @@ const AdminPostForm = () => {
                   className="border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 dark:placeholder-gray-500 min-h-[100px]" 
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  Excerpts are optional hand-crafted summaries of your content.
+                  Excerpts are optional hand-crafted summaries of your content that may appear on search results.
                 </p>
               </CardContent>
             </Card>
@@ -514,6 +619,77 @@ const AdminPostForm = () => {
 
           {/* Sidebar Column */}
           <div className="space-y-6">
+            <Card className="bg-white dark:bg-zinc-800 shadow-sm border border-gray-200 dark:border-zinc-700">
+              <CardHeader className="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
+                <CardTitle className="text-lg font-medium text-gray-800 dark:text-white">SEO Score</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300">SEO Optimization</div>
+                  <div className="text-sm font-bold">
+                    {seoScore}%
+                  </div>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-zinc-700 rounded-full h-2.5">
+                  <div 
+                    className={`h-2.5 rounded-full ${
+                      seoScore >= 80 ? 'bg-green-500' : 
+                      seoScore >= 50 ? 'bg-yellow-400' : 'bg-red-500'
+                    }`} 
+                    style={{ width: `${seoScore}%` }}>
+                  </div>
+                </div>
+                
+                <div className="mt-4 space-y-3">
+                  {seoScore < 80 && (
+                    <div className="flex items-start space-x-2 text-sm">
+                      <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Click "Generate SEO" for optimized metadata
+                      </span>
+                    </div>
+                  )}
+                  
+                  {!formData.meta_title && (
+                    <div className="flex items-start space-x-2 text-sm">
+                      <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Add a meta title (40-60 characters)
+                      </span>
+                    </div>
+                  )}
+                  
+                  {!formData.meta_description && (
+                    <div className="flex items-start space-x-2 text-sm">
+                      <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Add a meta description (140-160 characters)
+                      </span>
+                    </div>
+                  )}
+                  
+                  {imagePreview && !formData.alt_text && (
+                    <div className="flex items-start space-x-2 text-sm">
+                      <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Add alt text to your featured image
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
+                <Button 
+                  type="button" 
+                  onClick={generateSeoFields}
+                  variant="outline"
+                  className="w-full mt-4 text-indigo-600 border-indigo-200 hover:bg-indigo-50 dark:text-indigo-400 dark:border-indigo-800 dark:hover:bg-indigo-900/20"
+                >
+                  <Search className="h-4 w-4 mr-2" />
+                  Generate SEO Fields
+                </Button>
+              </CardContent>
+            </Card>
+
             <Card className="bg-white dark:bg-zinc-800 shadow-sm border border-gray-200 dark:border-zinc-700">
               <CardHeader className="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
                 <CardTitle className="text-lg font-medium text-gray-800 dark:text-white">Publish</CardTitle>
@@ -666,8 +842,10 @@ const AdminPostForm = () => {
                       className="border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 dark:placeholder-gray-500" 
                     />
                     <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      <span>Recommended: 60-70 characters</span>
-                      <span>{formData.meta_title.length}/70</span>
+                      <span>Recommended: 40-60 characters</span>
+                      <span className={`${formData.meta_title.length > 60 ? 'text-red-500' : ''}`}>
+                        {formData.meta_title.length}/70
+                      </span>
                     </div>
                     {errors.meta_title && <p className="text-red-500 text-sm">{errors.meta_title}</p>}
                   </div>
@@ -686,8 +864,10 @@ const AdminPostForm = () => {
                       className="border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 dark:placeholder-gray-500 min-h-[80px]" 
                     />
                     <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      <span>Recommended: 150-160 characters</span>
-                      <span>{formData.meta_description.length}/160</span>
+                      <span>Recommended: 140-160 characters</span>
+                      <span className={`${formData.meta_description.length > 160 ? 'text-red-500' : ''}`}>
+                        {formData.meta_description.length}/160
+                      </span>
                     </div>
                     {errors.meta_description && <p className="text-red-500 text-sm">{errors.meta_description}</p>}
                   </div>

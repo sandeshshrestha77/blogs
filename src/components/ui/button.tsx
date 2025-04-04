@@ -22,6 +22,7 @@ const buttonVariants = cva(
         danger: "bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700",
         "sidebar-active": "bg-indigo-100 text-indigo-900 dark:bg-indigo-900/50 dark:text-indigo-100 font-medium",
         "sidebar-item": "text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 dark:text-gray-300 dark:hover:text-indigo-400 dark:hover:bg-indigo-900/20",
+        seo: "bg-teal-500 text-white hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700",
       },
       size: {
         default: "h-10 px-4 py-2",
