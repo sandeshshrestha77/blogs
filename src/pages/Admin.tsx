@@ -1,66 +1,33 @@
-
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Pencil,
-  Trash2,
-  Star,
-  StarOff,
-  Eye,
-  MessageSquare,
-  Calendar,
-  FileText,
-  PlusCircle,
-  BarChart3,
-  MoreHorizontal,
-  ChevronUp,
-  ArrowUpRight,
-  Clock,
-  LinkIcon,
-  Users,
-  TrendingUp,
-  Bookmark,
-  Layers
-} from "lucide-react";
+import { LayoutDashboard, Pencil, Trash2, Star, StarOff, Eye, MessageSquare, Calendar, FileText, PlusCircle, BarChart3, MoreHorizontal, ChevronUp, ArrowUpRight, Clock, LinkIcon, Users, TrendingUp, Bookmark, Layers } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useRealtimeData } from "@/hooks/useRealtimeData";
-
 type Post = Database['public']['Tables']['posts']['Row'] & {
-  comments: { count: number }[];
+  comments: {
+    count: number;
+  }[];
 };
-
 type Comment = Database['public']['Tables']['comments']['Row'] & {
-  posts?: { title: string; slug: string };
+  posts?: {
+    title: string;
+    slug: string;
+  };
 };
-
 const Admin = () => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isTogglingFeature, setIsTogglingFeature] = useState<string | null>(null);
   const navigate = useNavigate();
-
   const {
     data: posts = [],
     loading: postsLoading,
@@ -68,47 +35,46 @@ const Admin = () => {
   } = useRealtimeData<Post>({
     tableName: 'posts',
     initialQuery: async () => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select(`
+      const {
+        data,
+        error
+      } = await supabase.from("posts").select(`
           *,
           comments(count)
-        `)
-        .order("created_at", { ascending: false });
-
+        `).order("created_at", {
+        ascending: false
+      });
       if (error) throw error;
       return data || [];
     }
   });
-
   const {
     data: comments = [],
-    loading: commentsLoading,
+    loading: commentsLoading
   } = useRealtimeData<Comment>({
     tableName: 'comments',
     initialQuery: async () => {
-      const { data, error } = await supabase
-        .from("comments")
-        .select(`
+      const {
+        data,
+        error
+      } = await supabase.from("comments").select(`
           *,
           posts(title, slug)
-        `)
-        .order("created_at", { ascending: false })
-        .limit(5);
-
+        `).order("created_at", {
+        ascending: false
+      }).limit(5);
       if (error) throw error;
       return data || [];
     }
   });
-
   const handleDelete = async (postId: string) => {
     try {
       setIsDeleting(postId);
-      const { error } = await supabase
-        .from("posts")
-        .delete()
-        .match({ id: postId });
-
+      const {
+        error
+      } = await supabase.from("posts").delete().match({
+        id: postId
+      });
       if (error) throw error;
       toast({
         title: "Post deleted",
@@ -126,16 +92,16 @@ const Admin = () => {
       setIsDeleting(null);
     }
   };
-
   const toggleFeaturePost = async (postId: string, currentStatus: boolean) => {
     try {
       setIsTogglingFeature(postId);
-      const { error } = await supabase
-        .from("posts")
-        .update({ featured: !currentStatus })
-        .match({ id: postId })
-        .select("featured");
-
+      const {
+        error
+      } = await supabase.from("posts").update({
+        featured: !currentStatus
+      }).match({
+        id: postId
+      }).select("featured");
       if (error) throw error;
       toast({
         title: `Post ${!currentStatus ? "featured" : "unfeatured"}`,
@@ -153,14 +119,13 @@ const Admin = () => {
       setIsTogglingFeature(null);
     }
   };
-
   const handleDeleteComment = async (commentId: string) => {
     try {
-      const { error } = await supabase
-        .from("comments")
-        .delete()
-        .match({ id: commentId });
-
+      const {
+        error
+      } = await supabase.from("comments").delete().match({
+        id: commentId
+      });
       if (error) throw error;
       toast({
         title: "Comment deleted",
@@ -176,18 +141,13 @@ const Admin = () => {
       });
     }
   };
-
   const totalViews = posts.reduce((sum, post) => sum + (post.views || 0), 0);
   const totalComments = posts.reduce((sum, post) => {
     return sum + (post.comments?.[0]?.count || 0);
   }, 0);
   const featuredPosts = posts.filter(p => p.featured).length;
-
   const renderSkeletonRows = (count: number) => {
-    return Array(count)
-      .fill(0)
-      .map((_, index) => (
-        <TableRow key={`skeleton-${index}`}>
+    return Array(count).fill(0).map((_, index) => <TableRow key={`skeleton-${index}`}>
           <TableCell>
             <div className="flex items-center space-x-2">
               <Skeleton className="h-10 w-10 rounded-md bg-zinc-800" />
@@ -199,12 +159,9 @@ const Admin = () => {
           <TableCell><Skeleton className="h-4 w-16 bg-zinc-800" /></TableCell>
           <TableCell><Skeleton className="h-4 w-16 bg-zinc-800" /></TableCell>
           <TableCell><Skeleton className="h-8 w-24 bg-zinc-800" /></TableCell>
-        </TableRow>
-      ));
+        </TableRow>);
   };
-
-  return (
-    <AdminLayout>
+  return <AdminLayout>
       <div className="space-y-8">
         {/* Dashboard Header */}
         <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-6 md:p-8 shadow-xl">
@@ -219,10 +176,7 @@ const Admin = () => {
                   Manage your content, track analytics, and optimize your blog performance from this central hub.
                 </p>
               </div>
-              <Button 
-                onClick={() => navigate("/admin/create")}
-                className="bg-white hover:bg-indigo-50 text-indigo-700 shadow-md transition-all duration-200 transform hover:scale-105"
-              >
+              <Button onClick={() => navigate("/admin/create")} className="bg-white hover:bg-inwo-50 text-indigo-700 shadow-md transition-all duration-200 transform hover:scale-105">
                 <PlusCircle className="h-4 w-4 mr-2" />
                 New Post
               </Button>
@@ -344,29 +298,19 @@ const Admin = () => {
             </CardHeader>
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button 
-                  onClick={() => navigate("/admin/create")} 
-                  className="h-auto py-6 flex flex-col items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
-                >
+                <Button onClick={() => navigate("/admin/create")} className="h-auto py-6 flex flex-col items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
                   <PlusCircle className="h-8 w-8 mb-1" />
                   <span className="font-medium">Create Post</span>
                   <span className="text-xs text-indigo-200">Add new content</span>
                 </Button>
                 
-                <Button 
-                  onClick={() => navigate("/admin/analytics")} 
-                  className="h-auto py-6 flex flex-col items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
-                >
+                <Button onClick={() => navigate("/admin/analytics")} className="h-auto py-6 flex flex-col items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
                   <BarChart3 className="h-8 w-8 mb-1" />
                   <span className="font-medium">Analytics</span>
                   <span className="text-xs text-emerald-200">View metrics</span>
                 </Button>
                 
-                <Button 
-                  onClick={() => navigate("/admin/settings")} 
-                  variant="outline"
-                  className="h-auto py-6 flex flex-col items-center justify-center gap-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-700"
-                >
+                <Button onClick={() => navigate("/admin/settings")} variant="outline" className="h-auto py-6 flex flex-col items-center justify-center gap-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-700">
                   <LayoutDashboard className="h-8 w-8 mb-1 text-gray-500 dark:text-zinc-400" />
                   <span className="font-medium">Settings</span>
                   <span className="text-xs text-gray-500 dark:text-zinc-500">Update preferences</span>
@@ -399,11 +343,7 @@ const Admin = () => {
                   </div>
                 </div>
               </div>
-              <Button 
-                variant="outline" 
-                className="mt-4 border-indigo-200 dark:border-indigo-900/40 bg-white dark:bg-zinc-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400"
-                onClick={() => navigate("/")}
-              >
+              <Button variant="outline" className="mt-4 border-indigo-200 dark:border-indigo-900/40 bg-white dark:bg-zinc-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400" onClick={() => navigate("/")}>
                 View Your Blog
                 <ArrowUpRight className="ml-2 h-4 w-4" />
               </Button>
@@ -414,16 +354,10 @@ const Admin = () => {
         {/* Content Management Tabs */}
         <Tabs defaultValue="posts" className="w-full">
           <TabsList className="w-full max-w-md mx-auto mb-6 bg-gray-100 dark:bg-zinc-800/50 p-1 rounded-lg">
-            <TabsTrigger 
-              value="posts" 
-              className="flex-1 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400 data-[state=inactive]:text-gray-500 dark:data-[state=inactive]:text-zinc-400"
-            >
+            <TabsTrigger value="posts" className="flex-1 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400 data-[state=inactive]:text-gray-500 dark:data-[state=inactive]:text-zinc-400">
               Posts
             </TabsTrigger>
-            <TabsTrigger 
-              value="comments" 
-              className="flex-1 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400 data-[state=inactive]:text-gray-500 dark:data-[state=inactive]:text-zinc-400"
-            >
+            <TabsTrigger value="comments" className="flex-1 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400 data-[state=inactive]:text-gray-500 dark:data-[state=inactive]:text-zinc-400">
               Recent Comments
             </TabsTrigger>
           </TabsList>
@@ -441,10 +375,7 @@ const Admin = () => {
                       Manage your published content
                     </CardDescription>
                   </div>
-                  <Button 
-                    onClick={() => navigate("/admin/create")}
-                    className="sm:w-auto w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
-                  >
+                  <Button onClick={() => navigate("/admin/create")} className="sm:w-auto w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
                     <PlusCircle className="h-4 w-4 mr-2" />
                     New Post
                   </Button>
@@ -463,10 +394,7 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {postsLoading ? (
-                      renderSkeletonRows(3)
-                    ) : posts.length === 0 ? (
-                      <TableRow>
+                    {postsLoading ? renderSkeletonRows(3) : posts.length === 0 ? <TableRow>
                         <TableCell colSpan={6} className="text-center py-12 text-gray-500 dark:text-zinc-400">
                           <div className="flex flex-col items-center justify-center py-6">
                             <div className="rounded-full bg-gray-100 dark:bg-zinc-700/50 p-3 mb-4">
@@ -474,19 +402,22 @@ const Admin = () => {
                             </div>
                             <p className="text-lg font-medium mb-2">No posts found</p>
                             <p className="text-sm text-gray-500 dark:text-zinc-500 mb-4">Create your first post to get started</p>
-                            <Button 
-                              onClick={() => navigate("/admin/create")} 
-                              className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
-                            >
+                            <Button onClick={() => navigate("/admin/create")} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
                               <PlusCircle className="h-4 w-4 mr-2" />
                               Create First Post
                             </Button>
                           </div>
                         </TableCell>
-                      </TableRow>
-                    ) : (
-                      posts.map(({ id, title, author, category, date, featured, comments, slug }) => (
-                        <TableRow key={id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/60 border-gray-100 dark:border-zinc-700/50">
+                      </TableRow> : posts.map(({
+                    id,
+                    title,
+                    author,
+                    category,
+                    date,
+                    featured,
+                    comments,
+                    slug
+                  }) => <TableRow key={id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/60 border-gray-100 dark:border-zinc-700/50">
                           <TableCell className="py-4">
                             <div className="flex items-center">
                               <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-md flex items-center justify-center mr-3 flex-shrink-0 border border-indigo-200 dark:border-indigo-800/50">
@@ -496,12 +427,10 @@ const Admin = () => {
                                 <p className="font-medium text-gray-900 dark:text-white hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline cursor-pointer truncate max-w-[200px] md:max-w-[300px]" onClick={() => navigate(`/admin/edit/${id}`)}>
                                   {title}
                                 </p>
-                                {featured && (
-                                  <Badge className="mt-1 bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">
+                                {featured && <Badge className="mt-1 bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">
                                     <Star className="h-3 w-3 mr-1 text-amber-700 dark:text-amber-400" fill="currentColor" />
                                     Featured
-                                  </Badge>
-                                )}
+                                  </Badge>}
                               </div>
                             </div>
                           </TableCell>
@@ -534,22 +463,11 @@ const Admin = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-end items-center space-x-2">
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => navigate(`/blog/${slug}`)}
-                                aria-label={`View post: ${title}`}
-                                className="h-8 w-8 border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300"
-                              >
+                              <Button variant="outline" size="icon" onClick={() => navigate(`/blog/${slug}`)} aria-label={`View post: ${title}`} className="h-8 w-8 border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300">
                                 <Eye className="h-4 w-4" />
                               </Button>
                               
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => navigate(`/admin/edit/${id}`)}
-                                className="h-8 w-8 border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300"
-                              >
+                              <Button variant="outline" size="icon" onClick={() => navigate(`/admin/edit/${id}`)} className="h-8 w-8 border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300">
                                 <Pencil className="h-4 w-4" />
                               </Button>
                               
@@ -561,17 +479,13 @@ const Admin = () => {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-[180px] border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300">
                                   <DropdownMenuItem className="cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700 focus:bg-gray-100 dark:focus:bg-zinc-700" onClick={() => toggleFeaturePost(id, featured ?? false)}>
-                                    {featured ? (
-                                      <>
+                                    {featured ? <>
                                         <StarOff className="h-4 w-4 mr-2 text-gray-500 dark:text-zinc-400" />
                                         Unfeature Post
-                                      </>
-                                    ) : (
-                                      <>
+                                      </> : <>
                                         <Star className="h-4 w-4 mr-2 text-amber-600 dark:text-amber-400" />
                                         Feature Post
-                                      </>
-                                    )}
+                                      </>}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20" onClick={() => handleDelete(id)}>
                                     <Trash2 className="h-4 w-4 mr-2" />
@@ -581,19 +495,13 @@ const Admin = () => {
                               </DropdownMenu>
                             </div>
                           </TableCell>
-                        </TableRow>
-                      ))
-                    )}
+                        </TableRow>)}
                   </TableBody>
                 </Table>
               </div>
               <CardFooter className="bg-gray-50/80 dark:bg-zinc-800/80 border-t border-gray-100 dark:border-zinc-700/50 p-4 flex justify-between items-center">
                 <p className="text-sm text-gray-500 dark:text-zinc-400">Showing {posts.length} posts</p>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="text-sm border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300"
-                >
+                <Button variant="outline" size="sm" className="text-sm border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300">
                   Refresh
                 </Button>
               </CardFooter>
@@ -627,10 +535,7 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {commentsLoading ? (
-                      renderSkeletonRows(3)
-                    ) : comments.length === 0 ? (
-                      <TableRow>
+                    {commentsLoading ? renderSkeletonRows(3) : comments.length === 0 ? <TableRow>
                         <TableCell colSpan={5} className="text-center py-12 text-gray-500 dark:text-zinc-400">
                           <div className="flex flex-col items-center justify-center py-6">
                             <div className="rounded-full bg-gray-100 dark:bg-zinc-700/50 p-3 mb-4">
@@ -640,10 +545,14 @@ const Admin = () => {
                             <p className="text-sm text-gray-500 dark:text-zinc-500">Comments will appear here when users engage with your posts</p>
                           </div>
                         </TableCell>
-                      </TableRow>
-                    ) : (
-                      comments.map(({ id, content, name, email, created_at, posts }) => (
-                        <TableRow key={id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/60 border-gray-100 dark:border-zinc-700/50">
+                      </TableRow> : comments.map(({
+                    id,
+                    content,
+                    name,
+                    email,
+                    created_at,
+                    posts
+                  }) => <TableRow key={id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/60 border-gray-100 dark:border-zinc-700/50">
                           <TableCell className="max-w-xs truncate text-gray-700 dark:text-zinc-300 py-4">
                             <div className="bg-gray-50 dark:bg-zinc-800/60 p-2 rounded border border-gray-100 dark:border-zinc-700/50">
                               <p className="line-clamp-2 text-sm">{content || "No content"}</p>
@@ -663,17 +572,9 @@ const Admin = () => {
                             </div>
                           </TableCell>
                           <TableCell className="text-gray-700 dark:text-zinc-300">
-                            {posts?.slug ? (
-                              <Button 
-                                onClick={() => navigate(`/blog/${posts.slug}`)}
-                                variant="ghost"
-                                className="p-0 h-auto text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-transparent hover:underline"
-                              >
+                            {posts?.slug ? <Button onClick={() => navigate(`/blog/${posts.slug}`)} variant="ghost" className="p-0 h-auto text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-transparent hover:underline">
                                 {posts.title || "Unknown Post"}
-                              </Button>
-                            ) : (
-                              <span className="text-gray-500 dark:text-zinc-500">Unknown Post</span>
-                            )}
+                              </Button> : <span className="text-gray-500 dark:text-zinc-500">Unknown Post</span>}
                           </TableCell>
                           <TableCell className="text-gray-500 dark:text-zinc-400 text-sm">
                             <div className="flex items-center">
@@ -683,30 +584,18 @@ const Admin = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-2 justify-end">
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => handleDeleteComment(id)}
-                                aria-label="Delete comment"
-                                className="h-8 w-8 text-red-600 dark:text-red-400 border-gray-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300"
-                              >
+                              <Button variant="outline" size="icon" onClick={() => handleDeleteComment(id)} aria-label="Delete comment" className="h-8 w-8 text-red-600 dark:text-red-400 border-gray-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </TableCell>
-                        </TableRow>
-                      ))
-                    )}
+                        </TableRow>)}
                   </TableBody>
                 </Table>
               </div>
               <CardFooter className="bg-gray-50/80 dark:bg-zinc-800/80 border-t border-gray-100 dark:border-zinc-700/50 p-4 flex justify-between items-center">
                 <p className="text-sm text-gray-500 dark:text-zinc-400">Showing latest {comments.length} comments</p>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="text-sm border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300"
-                >
+                <Button variant="outline" size="sm" className="text-sm border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300">
                   Refresh
                 </Button>
               </CardFooter>
@@ -720,9 +609,6 @@ const Admin = () => {
           background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
       `}</style>
-    </AdminLayout>
-  );
+    </AdminLayout>;
 };
-
 export default Admin;
-

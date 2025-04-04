@@ -1,4 +1,3 @@
-
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { LayoutDashboard, FileText, LogOut, Home, Settings, Menu, X, PenSquare, BarChart3, BookOpen, ChevronRight, User } from "lucide-react";
@@ -7,7 +6,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useState, useEffect } from "react";
 import { NotificationsPopover } from "./NotificationsPopover";
 import { toast } from "@/hooks/use-toast";
-
 const AdminLayout = ({
   children
 }: {
@@ -21,7 +19,6 @@ const AdminLayout = ({
   } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -32,7 +29,6 @@ const AdminLayout = ({
       window.removeEventListener('resize', checkIfMobile);
     };
   }, []);
-  
   const handleNavigation = (path: string) => {
     if (path === location.pathname) return; // Don't navigate if already on the page
     navigate(path);
@@ -40,13 +36,12 @@ const AdminLayout = ({
       setIsMobileMenuOpen(false);
     }
   };
-  
   const handleSignOut = async () => {
     try {
       await signOut();
       toast({
         title: "Signed out successfully",
-        description: "You have been signed out of your account",
+        description: "You have been signed out of your account"
       });
       navigate("/login");
     } catch (error) {
@@ -58,14 +53,11 @@ const AdminLayout = ({
       });
     }
   };
-  
   const userName = user?.email?.split('@')[0] || 'User';
   const userInitial = userName.charAt(0).toUpperCase();
-  
   const isActive = (path: string) => {
     return location.pathname === path ? "sidebar-active" : "sidebar-item";
   };
-  
   return <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 flex">
       {/* Sidebar - Desktop */}
       <aside className={`
@@ -78,7 +70,7 @@ const AdminLayout = ({
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-zinc-700 bg-indigo-600 dark:bg-indigo-700">
           <div className="flex items-center space-x-2">
             <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
-            <span className="text-xl font-bold text-white">Dashboard</span>
+            
           </div>
           {isMobile && <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden text-white hover:text-gray-200 hover:bg-indigo-700">
               <X className="h-5 w-5" />
@@ -166,11 +158,7 @@ const AdminLayout = ({
               <span className="text-indigo-600 dark:text-indigo-400">Admin</span> 
               <ChevronRight className="h-4 w-4 mx-1 text-gray-400" />
               <span>
-              {location.pathname.includes('/create') ? 'Create Post' : 
-               location.pathname.includes('/edit') ? 'Edit Post' : 
-               location.pathname.includes('/analytics') ? 'Analytics' : 
-               location.pathname.includes('/settings') ? 'Settings' : 
-               'Dashboard'}
+              {location.pathname.includes('/create') ? 'Create Post' : location.pathname.includes('/edit') ? 'Edit Post' : location.pathname.includes('/analytics') ? 'Analytics' : location.pathname.includes('/settings') ? 'Settings' : 'Dashboard'}
               </span>
             </div>
           </div>
