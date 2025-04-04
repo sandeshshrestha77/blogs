@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -131,11 +130,19 @@
   }
   
   .card-base {
-    @apply bg-zinc-900/80 border border-zinc-800 rounded-xl p-6 transition-all;
+    @apply bg-zinc-900/80 border border-zinc-800 rounded-xl p-6 transition-all hover:border-blue-500/20 hover:shadow-lg hover:shadow-blue-900/5;
   }
   
   .section-grid {
     @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8;
+  }
+  
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent;
   }
 }
 
@@ -148,6 +155,38 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.5s ease-out forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s infinite;
 }
 
 ::-webkit-scrollbar {
