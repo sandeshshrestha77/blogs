@@ -63,10 +63,10 @@ const AdminLayout = ({
   const userInitial = userName.charAt(0).toUpperCase();
   
   const isActive = (path: string) => {
-    return location.pathname === path ? "default" : "ghost";
+    return location.pathname === path ? "sidebar-active" : "sidebar-item";
   };
   
-  return <div className="min-h-screen bg-gray-100 dark:bg-zinc-900 flex">
+  return <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 flex">
       {/* Sidebar - Desktop */}
       <aside className={`
         fixed lg:relative inset-y-0 left-0 z-50
@@ -75,12 +75,12 @@ const AdminLayout = ({
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Sidebar Header with Logo */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-zinc-700 bg-indigo-600 dark:bg-indigo-700">
           <div className="flex items-center space-x-2">
             <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
-            <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">Dashboard</span>
+            <span className="text-xl font-bold text-white">Dashboard</span>
           </div>
-          {isMobile && <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
+          {isMobile && <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden text-white hover:text-gray-200 hover:bg-indigo-700">
               <X className="h-5 w-5" />
             </Button>}
         </div>
@@ -89,8 +89,8 @@ const AdminLayout = ({
         <div className="flex flex-col h-[calc(100vh-4rem)] overflow-y-auto py-4">
           {/* User Info */}
           <div className="px-4 mb-6">
-            <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50 dark:bg-zinc-700/50">
-              <Avatar className="h-10 w-10 border border-gray-200 dark:border-zinc-600 bg-indigo-100 dark:bg-indigo-900">
+            <div className="flex items-center space-x-3 p-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/30">
+              <Avatar className="h-10 w-10 border border-indigo-200 dark:border-indigo-700 bg-indigo-100 dark:bg-indigo-900">
                 <AvatarFallback className="bg-indigo-600 text-white">
                   {userInitial}
                 </AvatarFallback>
@@ -104,22 +104,22 @@ const AdminLayout = ({
           
           {/* Main Navigation */}
           <div className="px-3 py-2">
-            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mx-3 mb-2">
+            <h3 className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mx-3 mb-2">
               Main
             </h3>
             <nav className="space-y-1">
-              <Button onClick={() => handleNavigation("/admin")} variant={isActive("/admin")} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
-                <LayoutDashboard className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
+              <Button onClick={() => handleNavigation("/admin")} variant={isActive("/admin")} className="w-full justify-start">
+                <LayoutDashboard className="h-5 w-5 mr-3 text-indigo-500 dark:text-indigo-400" />
                 Dashboard
               </Button>
               
-              <Button onClick={() => handleNavigation("/admin/create")} variant={isActive("/admin/create")} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
-                <PenSquare className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
+              <Button onClick={() => handleNavigation("/admin/create")} variant={isActive("/admin/create")} className="w-full justify-start">
+                <PenSquare className="h-5 w-5 mr-3 text-indigo-500 dark:text-indigo-400" />
                 Create Post
               </Button>
 
-              <Button onClick={() => handleNavigation("/admin/analytics")} variant={isActive("/admin/analytics")} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
-                <BarChart3 className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
+              <Button onClick={() => handleNavigation("/admin/analytics")} variant={isActive("/admin/analytics")} className="w-full justify-start">
+                <BarChart3 className="h-5 w-5 mr-3 text-indigo-500 dark:text-indigo-400" />
                 Analytics
               </Button>
             </nav>
@@ -127,16 +127,16 @@ const AdminLayout = ({
           
           {/* System Navigation */}
           <div className="px-3 py-2 mt-2">
-            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mx-3 mb-2">
+            <h3 className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mx-3 mb-2">
               System
             </h3>
             <nav className="space-y-1">
-              <Button onClick={() => handleNavigation("/admin/settings")} variant={isActive("/admin/settings")} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
-                <Settings className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
+              <Button onClick={() => handleNavigation("/admin/settings")} variant={isActive("/admin/settings")} className="w-full justify-start">
+                <Settings className="h-5 w-5 mr-3 text-indigo-500 dark:text-indigo-400" />
                 Settings
               </Button>
               
-              <Button onClick={() => handleNavigation("/")} variant="ghost" className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
+              <Button onClick={() => handleNavigation("/")} variant="ghost" className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800">
                 <BookOpen className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
                 View Blog
               </Button>
@@ -158,13 +158,14 @@ const AdminLayout = ({
         {/* Top Navigation Bar */}
         <header className="bg-white dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 h-16 sticky top-0 z-40 flex items-center px-4 lg:px-6 shadow-sm">
           <div className="flex-1 flex items-center">
-            {isMobile && <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="mr-2 lg:hidden text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
+            {isMobile && <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="mr-2 lg:hidden text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-zinc-700">
                 <Menu className="h-5 w-5" />
               </Button>}
             
             <div className="text-gray-800 dark:text-white font-medium ml-4 flex items-center">
-              <span className="text-gray-500 dark:text-gray-400">Admin /</span> 
-              <span className="ml-2">
+              <span className="text-indigo-600 dark:text-indigo-400">Admin</span> 
+              <ChevronRight className="h-4 w-4 mx-1 text-gray-400" />
+              <span>
               {location.pathname.includes('/create') ? 'Create Post' : 
                location.pathname.includes('/edit') ? 'Edit Post' : 
                location.pathname.includes('/analytics') ? 'Analytics' : 
@@ -179,7 +180,7 @@ const AdminLayout = ({
             <NotificationsPopover />
             
             <Button variant="ghost" className="relative rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700" onClick={() => handleNavigation("/admin/settings")}>
-              <Avatar className="h-8 w-8 border border-gray-200 dark:border-zinc-600">
+              <Avatar className="h-8 w-8 border border-indigo-200 dark:border-indigo-600">
                 <AvatarFallback className="bg-indigo-600 text-white text-sm">
                   {userInitial}
                 </AvatarFallback>
@@ -199,7 +200,7 @@ const AdminLayout = ({
         {isMobile && isMobileMenuOpen && <div className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />}
         
         {/* Page Content */}
-        <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-gray-100 dark:bg-zinc-900">
+        <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-gray-50 dark:bg-zinc-900">
           {children}
         </main>
       </div>

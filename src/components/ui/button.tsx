@@ -20,8 +20,8 @@ const buttonVariants = cva(
         info: "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700",
         warning: "bg-amber-500 text-white hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700",
         danger: "bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700",
-        "sidebar-active": "bg-indigo-100 text-indigo-900 dark:bg-indigo-900 dark:text-indigo-100",
-        "sidebar-item": "text-gray-700 hover:text-indigo-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-zinc-800",
+        "sidebar-active": "bg-indigo-100 text-indigo-900 dark:bg-indigo-900/50 dark:text-indigo-100 font-medium",
+        "sidebar-item": "text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 dark:text-gray-300 dark:hover:text-indigo-400 dark:hover:bg-indigo-900/20",
       },
       size: {
         default: "h-10 px-4 py-2",
