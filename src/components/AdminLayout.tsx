@@ -1,5 +1,5 @@
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { LayoutDashboard, FileText, LogOut, Home, Settings, Menu, X, PenSquare, BarChart3, BookOpen, ChevronRight, User } from "lucide-react";
 import { Button } from "./ui/button";
@@ -14,6 +14,7 @@ const AdminLayout = ({
   children: React.ReactNode;
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     signOut,
     user
@@ -33,6 +34,7 @@ const AdminLayout = ({
   }, []);
   
   const handleNavigation = (path: string) => {
+    if (path === location.pathname) return; // Don't navigate if already on the page
     navigate(path);
     if (isMobile) {
       setIsMobileMenuOpen(false);
@@ -40,16 +42,29 @@ const AdminLayout = ({
   };
   
   const handleSignOut = async () => {
-    await signOut();
-    toast({
-      title: "Signed out successfully",
-      description: "You have been signed out of your account",
-    });
-    navigate("/login");
+    try {
+      await signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been signed out of your account",
+      });
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast({
+        title: "Error signing out",
+        description: "An error occurred while signing out",
+        variant: "destructive"
+      });
+    }
   };
   
   const userName = user?.email?.split('@')[0] || 'User';
   const userInitial = userName.charAt(0).toUpperCase();
+  
+  const isActive = (path: string) => {
+    return location.pathname === path ? "default" : "ghost";
+  };
   
   return <div className="min-h-screen bg-gray-100 dark:bg-zinc-900 flex">
       {/* Sidebar - Desktop */}
@@ -93,17 +108,17 @@ const AdminLayout = ({
               Main
             </h3>
             <nav className="space-y-1">
-              <Button onClick={() => handleNavigation("/admin")} variant={window.location.pathname === "/admin" ? "default" : "ghost"} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
+              <Button onClick={() => handleNavigation("/admin")} variant={isActive("/admin")} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
                 <LayoutDashboard className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
                 Dashboard
               </Button>
               
-              <Button onClick={() => handleNavigation("/admin/create")} variant={window.location.pathname.includes("/admin/create") ? "default" : "ghost"} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
+              <Button onClick={() => handleNavigation("/admin/create")} variant={isActive("/admin/create")} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
                 <PenSquare className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
                 Create Post
               </Button>
 
-              <Button onClick={() => handleNavigation("/admin/analytics")} variant={window.location.pathname.includes("/admin/analytics") ? "default" : "ghost"} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
+              <Button onClick={() => handleNavigation("/admin/analytics")} variant={isActive("/admin/analytics")} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
                 <BarChart3 className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
                 Analytics
               </Button>
@@ -116,7 +131,7 @@ const AdminLayout = ({
               System
             </h3>
             <nav className="space-y-1">
-              <Button onClick={() => handleNavigation("/admin/settings")} variant={window.location.pathname.includes("/admin/settings") ? "default" : "ghost"} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
+              <Button onClick={() => handleNavigation("/admin/settings")} variant={isActive("/admin/settings")} className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700">
                 <Settings className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
                 Settings
               </Button>
@@ -150,10 +165,10 @@ const AdminLayout = ({
             <div className="text-gray-800 dark:text-white font-medium ml-4 flex items-center">
               <span className="text-gray-500 dark:text-gray-400">Admin /</span> 
               <span className="ml-2">
-              {window.location.pathname.includes('/create') ? 'Create Post' : 
-               window.location.pathname.includes('/edit') ? 'Edit Post' : 
-               window.location.pathname.includes('/analytics') ? 'Analytics' : 
-               window.location.pathname.includes('/settings') ? 'Settings' : 
+              {location.pathname.includes('/create') ? 'Create Post' : 
+               location.pathname.includes('/edit') ? 'Edit Post' : 
+               location.pathname.includes('/analytics') ? 'Analytics' : 
+               location.pathname.includes('/settings') ? 'Settings' : 
                'Dashboard'}
               </span>
             </div>
@@ -163,7 +178,7 @@ const AdminLayout = ({
           <div className="flex items-center space-x-3">
             <NotificationsPopover />
             
-            <Button variant="ghost" className="relative rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700" onClick={() => navigate("/admin/settings")}>
+            <Button variant="ghost" className="relative rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700" onClick={() => handleNavigation("/admin/settings")}>
               <Avatar className="h-8 w-8 border border-gray-200 dark:border-zinc-600">
                 <AvatarFallback className="bg-indigo-600 text-white text-sm">
                   {userInitial}

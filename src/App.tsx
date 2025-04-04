@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { supabase } from "./integrations/supabase/client"; 
 import Index from "./pages/Index";
 import Blogs from "./pages/Blogs";
@@ -78,6 +78,8 @@ function App() {
               <AdminAnalytics />
             </ProtectedRoute>
           } />
+          {/* Add a fallback route for any admin paths */}
+          <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
         </Routes>
         <Toaster position="top-right" />
         <ShadcnToaster />

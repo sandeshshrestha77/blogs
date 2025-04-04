@@ -247,17 +247,6 @@ export type Database = {
             }
             Returns: undefined
           }
-      subscribe_to_newsletter:
-        | {
-            Args: Record<PropertyKey, never>
-            Returns: undefined
-          }
-        | {
-            Args: {
-              subscriber_email: string
-            }
-            Returns: Json
-          }
     }
     Enums: {
       [_ in never]: never
