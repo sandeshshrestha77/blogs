@@ -9,7 +9,6 @@ import { BarChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Resp
 import { BarChart3, TrendingUp, Eye, MessageSquare, FileText, Calendar, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import useRealtimeData from "@/hooks/useRealtimeData";
 
 interface Post {
   id: string;
@@ -22,14 +21,15 @@ interface Post {
 }
 
 const AdminAnalytics = () => {
+  const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('month');
   const [chartType, setChartType] = useState<'bar' | 'line'>('bar');
-  
-  // Use the real-time data hook for posts
-  const { data: posts, loading: postsLoading, error: postsError } = useRealtimeData<Post>({
-    tableName: 'posts',
-    initialQuery: async () => {
+
+  const fetchPosts = async () => {
+    try {
+      setIsLoading(true);
+      
       const { data, error } = await supabase
         .from("posts")
         .select(`
@@ -42,33 +42,33 @@ const AdminAnalytics = () => {
           comments(count)
         `)
         .order("created_at", { ascending: false });
-        
-      if (error) throw error;
-      return data || [];
-    }
-  });
 
-  useEffect(() => {
-    // Update loading state based on posts loading
-    setIsLoading(postsLoading);
-  }, [postsLoading]);
-
-  useEffect(() => {
-    // Show error toast if there's an error
-    if (postsError) {
-      console.error("Error fetching posts data:", postsError);
+      if (error) {
+        console.error("Error fetching posts:", error);
+        throw error;
+      }
+      
+      if (data) {
+        setPosts(data as Post[]);
+      }
+    } catch (error) {
+      console.error("Error fetching posts data:", error);
       toast({
         title: "Error",
         description: "Failed to load analytics data",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
-  }, [postsError]);
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   // Generate data for charts based on the real posts
   const generateViewData = () => {
-    if (!posts || posts.length === 0) return [];
-    
     return posts.slice(0, 10).map((post, index) => {
       const createdDate = new Date(post.created_at);
       return {
@@ -81,8 +81,6 @@ const AdminAnalytics = () => {
   };
 
   const generateCategoryData = () => {
-    if (!posts || posts.length === 0) return [];
-    
     const categories: {[key: string]: number} = {};
     
     posts.forEach(post => {
@@ -103,18 +101,11 @@ const AdminAnalytics = () => {
   const viewData = generateViewData();
   const categoryData = generateCategoryData();
 
-  const totalViews = (posts || []).reduce((sum, post) => sum + (post.views || 0), 0);
+  const totalViews = posts.reduce((sum, post) => sum + (post.views || 0), 0);
   
-  const totalComments = (posts || []).reduce((sum, post) => {
+  const totalComments = posts.reduce((sum, post) => {
     return sum + (post.comments?.[0]?.count || 0);
   }, 0);
-
-  const calculateGrowthRate = () => {
-    // Simple mock growth rate for demo purposes
-    // In a real app, you would calculate this based on historical data
-    const randomGrowth = Math.floor(Math.random() * 20) + 5;
-    return `+${randomGrowth}.${Math.floor(Math.random() * 9)}%`;
-  };
 
   return (
     <AdminLayout>
@@ -170,7 +161,7 @@ const AdminAnalytics = () => {
                     <h3 className="text-3xl font-bold text-gray-800 dark:text-white mt-1">{totalViews.toLocaleString()}</h3>
                     <div className="mt-4 flex items-center text-sm">
                       <TrendingUp className="h-4 w-4 text-emerald-500 mr-1" />
-                      <span className="font-medium text-emerald-500">{calculateGrowthRate()}</span>
+                      <span className="font-medium text-emerald-500">+12.5%</span>
                       <span className="text-gray-500 dark:text-gray-400 ml-1">vs last {timeRange}</span>
                     </div>
                   </div>
@@ -184,11 +175,11 @@ const AdminAnalytics = () => {
                 <CardContent className="pt-6 pb-4">
                   <div className="flex flex-col">
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Posts</p>
-                    <h3 className="text-3xl font-bold text-gray-800 dark:text-white mt-1">{(posts || []).length}</h3>
+                    <h3 className="text-3xl font-bold text-gray-800 dark:text-white mt-1">{posts.length}</h3>
                     <div className="mt-4 flex items-center text-sm">
                       <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400 mr-1" />
                       <span className="text-gray-700 dark:text-gray-300 font-medium">
-                        {Math.max(1, Math.round((posts || []).length / 4))} posts/month
+                        {Math.max(1, Math.round(posts.length / 4))} posts/month
                       </span>
                     </div>
                   </div>
@@ -205,7 +196,7 @@ const AdminAnalytics = () => {
                     <h3 className="text-3xl font-bold text-gray-800 dark:text-white mt-1">{totalComments.toLocaleString()}</h3>
                     <div className="mt-4 flex items-center text-sm">
                       <span className="text-gray-700 dark:text-gray-300 font-medium">
-                        {(posts || []).length ? (totalComments / (posts || []).length).toFixed(1) : 0} comments/post
+                        {posts.length ? (totalComments / posts.length).toFixed(1) : 0} comments/post
                       </span>
                     </div>
                   </div>
@@ -225,7 +216,7 @@ const AdminAnalytics = () => {
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="h-[300px] w-full">
-                    {viewData.length === 0 ? (
+                    {posts.length === 0 ? (
                       <div className="h-full w-full flex items-center justify-center">
                         <p className="text-gray-500 dark:text-gray-400">No post data available</p>
                       </div>
@@ -398,11 +389,7 @@ const AdminAnalytics = () => {
 
             <div className="flex justify-center mt-6">
               <Button 
-                onClick={() => {
-                  setIsLoading(true);
-                  // Force a refresh of the data
-                  setTimeout(() => setIsLoading(false), 500);
-                }} 
+                onClick={fetchPosts} 
                 variant="outline" 
                 className="border-gray-200 dark:border-zinc-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 flex items-center gap-2"
               >
