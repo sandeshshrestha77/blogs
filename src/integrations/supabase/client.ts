@@ -17,6 +17,11 @@ export const supabase = createClient<Database>(
       storage: localStorage,
       persistSession: true,
       autoRefreshToken: true,
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 10,
+      },
     }
   }
 );
@@ -36,12 +41,12 @@ export const subscribeToTable = (
   // Subscribe to changes
   channel
     .on(
-      'postgres_changes' as any, // Type assertion to fix TS error
+      'postgres_changes',
       {
         event: event,
         schema: 'public',
         table: tableName,
-      },
+      } as any, // Type assertion to fix TS error
       (payload) => {
         callback(payload);
       }

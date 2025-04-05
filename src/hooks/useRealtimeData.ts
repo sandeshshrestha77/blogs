@@ -57,13 +57,13 @@ export function useRealtimeData<T>(options: UseRealtimeDataOptions) {
       // Add subscription to postgres changes
       channel
         .on(
-          'postgres_changes',
-          {
+          'postgres_changes', // Use string literal without type assertion
+          { 
             event: event,
             schema: 'public',
             table: tableName,
             filter: filter
-          },
+          } as any, // Type assertion here instead to fix the TypeScript error
           () => {
             // When any change happens, just refresh the data
             refreshData();
