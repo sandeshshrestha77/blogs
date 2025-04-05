@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, getUser } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -56,6 +56,7 @@ const estimateReadTime = (content: string): string => {
 const AdminPostForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -93,6 +94,28 @@ const AdminPostForm = () => {
     "header", "bold", "italic", "underline", "strike", "list", "bullet", 
     "link", "image", "code-block", "align"
   ];
+  
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const user = await getUser();
+      if (user) {
+        setCurrentUser(user.id);
+        setFormData(prev => ({
+          ...prev,
+          author: user.id
+        }));
+      } else {
+        toast({
+          title: "Authentication Required",
+          description: "You must be logged in to create or edit posts",
+          variant: "destructive"
+        });
+        navigate("/login");
+      }
+    };
+    
+    fetchCurrentUser();
+  }, []);
   
   useEffect(() => {
     if (id) fetchPost();
@@ -273,15 +296,27 @@ const AdminPostForm = () => {
       return;
     }
     
+    if (!currentUser) {
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to create or edit posts",
+        variant: "destructive"
+      });
+      navigate("/login");
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
-      console.log("Submitting form data:", formData);
+      console.log("Current user ID:", currentUser);
+      console.log("Submitting form data:", { ...formData, author: currentUser });
       
       const imageUrl = await handleImageUpload();
       
       const postData = {
         ...formData,
+        author: currentUser,
         image: imageUrl,
         updated_at: new Date().toISOString(),
         meta_title: formData.meta_title || generateSeoTitle(formData.title),
