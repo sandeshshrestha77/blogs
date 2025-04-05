@@ -13,60 +13,69 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useRealtimeData } from "@/hooks/useRealtimeData";
+
 type Post = Database['public']['Tables']['posts']['Row'] & {
   comments: {
     count: number;
   }[];
 };
+
 type Comment = Database['public']['Tables']['comments']['Row'] & {
   posts?: {
     title: string;
     slug: string;
   };
 };
+
 const Admin = () => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isTogglingFeature, setIsTogglingFeature] = useState<string | null>(null);
   const navigate = useNavigate();
+  
   const {
     data: posts = [],
     loading: postsLoading,
     error: postsError
-  } = useRealtimeData<Post>({
-    tableName: 'posts',
-    initialQuery: async () => {
-      const {
-        data,
-        error
-      } = await supabase.from("posts").select(`
+  } = useRealtimeData<Post>(
+    'posts',
+    async () => {
+      const { data, error } = await supabase
+        .from("posts")
+        .select(`
           *,
           comments(count)
-        `).order("created_at", {
-        ascending: false
-      });
-      if (error) throw error;
-      return data || [];
+        `)
+        .order("created_at", { ascending: false });
+      
+      return { data, error };
     }
-  });
+  );
+  
   const {
     data: comments = [],
     loading: commentsLoading
-  } = useRealtimeData<Comment>({
-    tableName: 'comments',
-    initialQuery: async () => {
-      const {
-        data,
-        error
-      } = await supabase.from("comments").select(`
+  } = useRealtimeData<Comment>(
+    'comments',
+    async () => {
+      const { data, error } = await supabase
+        .from("comments")
+        .select(`
           *,
           posts(title, slug)
-        `).order("created_at", {
-        ascending: false
-      }).limit(5);
-      if (error) throw error;
-      return data || [];
+        `)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      
+      return { data, error };
     }
-  });
+  );
+  
+  const totalViews = posts ? posts.reduce((sum, post) => sum + (post.views || 0), 0) : 0;
+  const totalComments = posts ? posts.reduce((sum, post) => {
+    return sum + (post.comments?.[0]?.count || 0);
+  }, 0) : 0;
+  const featuredPosts = posts ? posts.filter(p => p.featured).length : 0;
+
   const handleDelete = async (postId: string) => {
     try {
       setIsDeleting(postId);
@@ -92,6 +101,7 @@ const Admin = () => {
       setIsDeleting(null);
     }
   };
+  
   const toggleFeaturePost = async (postId: string, currentStatus: boolean) => {
     try {
       setIsTogglingFeature(postId);
@@ -119,6 +129,7 @@ const Admin = () => {
       setIsTogglingFeature(null);
     }
   };
+  
   const handleDeleteComment = async (commentId: string) => {
     try {
       const {
@@ -141,11 +152,7 @@ const Admin = () => {
       });
     }
   };
-  const totalViews = posts.reduce((sum, post) => sum + (post.views || 0), 0);
-  const totalComments = posts.reduce((sum, post) => {
-    return sum + (post.comments?.[0]?.count || 0);
-  }, 0);
-  const featuredPosts = posts.filter(p => p.featured).length;
+  
   const renderSkeletonRows = (count: number) => {
     return Array(count).fill(0).map((_, index) => <TableRow key={`skeleton-${index}`}>
           <TableCell>
@@ -161,9 +168,9 @@ const Admin = () => {
           <TableCell><Skeleton className="h-8 w-24 bg-zinc-800" /></TableCell>
         </TableRow>);
   };
+  
   return <AdminLayout>
       <div className="space-y-8">
-        {/* Dashboard Header */}
         <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-6 md:p-8 shadow-xl">
           <div className="absolute inset-0 bg-pattern opacity-10"></div>
           <div className="relative z-10">
@@ -184,7 +191,6 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           <Card className="overflow-hidden border-none bg-white dark:bg-zinc-800 shadow-lg hover:shadow-xl transition-all duration-200 group">
             <CardContent className="p-6">
@@ -192,7 +198,7 @@ const Admin = () => {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-gray-500 dark:text-zinc-400">Total Posts</p>
                   <div className="flex items-end gap-1">
-                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{posts.length}</h3>
+                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{posts?.length || 0}</h3>
                     <Badge className="mb-1 bg-blue-100 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900/50 border">
                       <ChevronUp className="h-3 w-3 mr-1" />
                       9%
@@ -283,7 +289,6 @@ const Admin = () => {
           </Card>
         </div>
 
-        {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           <Card className="md:col-span-8 border border-gray-200 dark:border-zinc-700/50 bg-white dark:bg-zinc-800 shadow-md">
             <CardHeader className="p-6 border-b border-gray-100 dark:border-zinc-700/50 bg-gray-50/80 dark:bg-zinc-800/80">
@@ -351,7 +356,6 @@ const Admin = () => {
           </Card>
         </div>
 
-        {/* Content Management Tabs */}
         <Tabs defaultValue="posts" className="w-full">
           <TabsList className="w-full max-w-md mx-auto mb-6 bg-gray-100 dark:bg-zinc-800/50 p-1 rounded-lg">
             <TabsTrigger value="posts" className="flex-1 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400 data-[state=inactive]:text-gray-500 dark:data-[state=inactive]:text-zinc-400">
@@ -394,7 +398,8 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {postsLoading ? renderSkeletonRows(3) : posts.length === 0 ? <TableRow>
+                    {postsLoading ? renderSkeletonRows(3) : !posts || posts.length === 0 ? (
+                      <TableRow>
                         <TableCell colSpan={6} className="text-center py-12 text-gray-500 dark:text-zinc-400">
                           <div className="flex flex-col items-center justify-center py-6">
                             <div className="rounded-full bg-gray-100 dark:bg-zinc-700/50 p-3 mb-4">
@@ -408,99 +413,102 @@ const Admin = () => {
                             </Button>
                           </div>
                         </TableCell>
-                      </TableRow> : posts.map(({
-                    id,
-                    title,
-                    author,
-                    category,
-                    date,
-                    featured,
-                    comments,
-                    slug
-                  }) => <TableRow key={id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/60 border-gray-100 dark:border-zinc-700/50">
-                          <TableCell className="py-4">
-                            <div className="flex items-center">
-                              <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-md flex items-center justify-center mr-3 flex-shrink-0 border border-indigo-200 dark:border-indigo-800/50">
-                                <FileText className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                              </div>
-                              <div>
-                                <p className="font-medium text-gray-900 dark:text-white hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline cursor-pointer truncate max-w-[200px] md:max-w-[300px]" onClick={() => navigate(`/admin/edit/${id}`)}>
-                                  {title}
-                                </p>
-                                {featured && <Badge className="mt-1 bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">
-                                    <Star className="h-3 w-3 mr-1 text-amber-700 dark:text-amber-400" fill="currentColor" />
-                                    Featured
-                                  </Badge>}
-                              </div>
+                      </TableRow>
+                    ) : posts.map(({
+                      id,
+                      title,
+                      author,
+                      category,
+                      date,
+                      featured,
+                      comments,
+                      slug
+                    }) => (
+                      <TableRow key={id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/60 border-gray-100 dark:border-zinc-700/50">
+                        <TableCell className="py-4">
+                          <div className="flex items-center">
+                            <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-md flex items-center justify-center mr-3 flex-shrink-0 border border-indigo-200 dark:border-indigo-800/50">
+                              <FileText className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                                <span className="text-xs font-medium text-indigo-700 dark:text-indigo-400">
-                                  {author?.[0]?.toUpperCase() || "A"}
-                                </span>
-                              </div>
-                              <span className="text-sm text-gray-700 dark:text-zinc-300">{author || "Unknown"}</span>
+                            <div>
+                              <p className="font-medium text-gray-900 dark:text-white hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline cursor-pointer truncate max-w-[200px] md:max-w-[300px]" onClick={() => navigate(`/admin/edit/${id}`)}>
+                                {title}
+                              </p>
+                              {featured && <Badge className="mt-1 bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">
+                                  <Star className="h-3 w-3 mr-1 text-amber-700 dark:text-amber-400" fill="currentColor" />
+                                  Featured
+                                </Badge>}
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="bg-gray-50 dark:bg-zinc-800/80 border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300">
-                              {category || "Uncategorized"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-gray-500 dark:text-zinc-400 text-sm">
-                            <div className="flex items-center">
-                              <Calendar className="h-3 w-3 mr-1 text-gray-400 dark:text-zinc-500" />
-                              {new Date(date).toLocaleDateString() || "N/A"}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                              <span className="text-xs font-medium text-indigo-700 dark:text-indigo-400">
+                                {author?.[0]?.toUpperCase() || "A"}
+                              </span>
                             </div>
-                          </TableCell>
-                          <TableCell className="text-gray-700 dark:text-zinc-300">
-                            <div className="flex items-center gap-1">
-                              <MessageSquare className="h-4 w-4 text-gray-400 dark:text-zinc-500" />
-                              <span className="font-medium">{comments && comments[0] ? comments[0].count : 0}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex justify-end items-center space-x-2">
-                              <Button variant="outline" size="icon" onClick={() => navigate(`/blog/${slug}`)} aria-label={`View post: ${title}`} className="h-8 w-8 border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              
-                              <Button variant="outline" size="icon" onClick={() => navigate(`/admin/edit/${id}`)} className="h-8 w-8 border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300">
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="outline" size="icon" className="h-8 w-8 border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-[180px] border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300">
-                                  <DropdownMenuItem className="cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700 focus:bg-gray-100 dark:focus:bg-zinc-700" onClick={() => toggleFeaturePost(id, featured ?? false)}>
-                                    {featured ? <>
-                                        <StarOff className="h-4 w-4 mr-2 text-gray-500 dark:text-zinc-400" />
-                                        Unfeature Post
-                                      </> : <>
-                                        <Star className="h-4 w-4 mr-2 text-amber-600 dark:text-amber-400" />
-                                        Feature Post
-                                      </>}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20" onClick={() => handleDelete(id)}>
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete Post
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </TableCell>
-                        </TableRow>)}
+                            <span className="text-sm text-gray-700 dark:text-zinc-300">{author || "Unknown"}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="bg-gray-50 dark:bg-zinc-800/80 border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300">
+                            {category || "Uncategorized"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-gray-500 dark:text-zinc-400 text-sm">
+                          <div className="flex items-center">
+                            <Calendar className="h-3 w-3 mr-1 text-gray-400 dark:text-zinc-500" />
+                            {new Date(date).toLocaleDateString() || "N/A"}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-gray-700 dark:text-zinc-300">
+                          <div className="flex items-center gap-1">
+                            <MessageSquare className="h-4 w-4 text-gray-400 dark:text-zinc-500" />
+                            <span className="font-medium">{comments && comments[0] ? comments[0].count : 0}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex justify-end items-center space-x-2">
+                            <Button variant="outline" size="icon" onClick={() => navigate(`/blog/${slug}`)} aria-label={`View post: ${title}`} className="h-8 w-8 border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            
+                            <Button variant="outline" size="icon" onClick={() => navigate(`/admin/edit/${id}`)} className="h-8 w-8 border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300">
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon" className="h-8 w-8 border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-[180px] border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300">
+                                <DropdownMenuItem className="cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700 focus:bg-gray-100 dark:focus:bg-zinc-700" onClick={() => toggleFeaturePost(id, featured ?? false)}>
+                                  {featured ? <>
+                                      <StarOff className="h-4 w-4 mr-2 text-gray-500 dark:text-zinc-400" />
+                                      Unfeature Post
+                                    </> : <>
+                                      <Star className="h-4 w-4 mr-2 text-amber-600 dark:text-amber-400" />
+                                      Feature Post
+                                    </>}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20" onClick={() => handleDelete(id)}>
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete Post
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </div>
               <CardFooter className="bg-gray-50/80 dark:bg-zinc-800/80 border-t border-gray-100 dark:border-zinc-700/50 p-4 flex justify-between items-center">
-                <p className="text-sm text-gray-500 dark:text-zinc-400">Showing {posts.length} posts</p>
+                <p className="text-sm text-gray-500 dark:text-zinc-400">Showing {posts?.length || 0} posts</p>
                 <Button variant="outline" size="sm" className="text-sm border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300">
                   Refresh
                 </Button>
@@ -535,7 +543,8 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {commentsLoading ? renderSkeletonRows(3) : comments.length === 0 ? <TableRow>
+                    {commentsLoading ? renderSkeletonRows(3) : !comments || comments.length === 0 ? (
+                      <TableRow>
                         <TableCell colSpan={5} className="text-center py-12 text-gray-500 dark:text-zinc-400">
                           <div className="flex flex-col items-center justify-center py-6">
                             <div className="rounded-full bg-gray-100 dark:bg-zinc-700/50 p-3 mb-4">
@@ -545,56 +554,59 @@ const Admin = () => {
                             <p className="text-sm text-gray-500 dark:text-zinc-500">Comments will appear here when users engage with your posts</p>
                           </div>
                         </TableCell>
-                      </TableRow> : comments.map(({
-                    id,
-                    content,
-                    name,
-                    email,
-                    created_at,
-                    posts
-                  }) => <TableRow key={id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/60 border-gray-100 dark:border-zinc-700/50">
-                          <TableCell className="max-w-xs truncate text-gray-700 dark:text-zinc-300 py-4">
-                            <div className="bg-gray-50 dark:bg-zinc-800/60 p-2 rounded border border-gray-100 dark:border-zinc-700/50">
-                              <p className="line-clamp-2 text-sm">{content || "No content"}</p>
+                      </TableRow>
+                    ) : comments.map(({
+                      id,
+                      content,
+                      name,
+                      email,
+                      created_at,
+                      posts
+                    }) => (
+                      <TableRow key={id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/60 border-gray-100 dark:border-zinc-700/50">
+                        <TableCell className="max-w-xs truncate text-gray-700 dark:text-zinc-300 py-4">
+                          <div className="bg-gray-50 dark:bg-zinc-800/60 p-2 rounded border border-gray-100 dark:border-zinc-700/50">
+                            <p className="line-clamp-2 text-sm">{content || "No content"}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center border border-indigo-200 dark:border-indigo-800/50">
+                              <span className="text-sm font-medium text-indigo-700 dark:text-indigo-400">
+                                {name?.[0]?.toUpperCase() || "U"}
+                              </span>
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center border border-indigo-200 dark:border-indigo-800/50">
-                                <span className="text-sm font-medium text-indigo-700 dark:text-indigo-400">
-                                  {name?.[0]?.toUpperCase() || "U"}
-                                </span>
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium text-gray-900 dark:text-white">{name}</p>
-                                <p className="text-xs text-gray-500 dark:text-zinc-500">{email}</p>
-                              </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">{name}</p>
+                              <p className="text-xs text-gray-500 dark:text-zinc-500">{email}</p>
                             </div>
-                          </TableCell>
-                          <TableCell className="text-gray-700 dark:text-zinc-300">
-                            {posts?.slug ? <Button onClick={() => navigate(`/blog/${posts.slug}`)} variant="ghost" className="p-0 h-auto text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-transparent hover:underline">
-                                {posts.title || "Unknown Post"}
-                              </Button> : <span className="text-gray-500 dark:text-zinc-500">Unknown Post</span>}
-                          </TableCell>
-                          <TableCell className="text-gray-500 dark:text-zinc-400 text-sm">
-                            <div className="flex items-center">
-                              <Calendar className="h-3 w-3 mr-1 text-gray-400 dark:text-zinc-500" />
-                              {new Date(created_at).toLocaleDateString() || "N/A"}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2 justify-end">
-                              <Button variant="outline" size="icon" onClick={() => handleDeleteComment(id)} aria-label="Delete comment" className="h-8 w-8 text-red-600 dark:text-red-400 border-gray-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-gray-700 dark:text-zinc-300">
+                          {posts?.slug ? <Button onClick={() => navigate(`/blog/${posts.slug}`)} variant="ghost" className="p-0 h-auto text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-transparent hover:underline">
+                              {posts.title || "Unknown Post"}
+                            </Button> : <span className="text-gray-500 dark:text-zinc-500">Unknown Post</span>}
+                        </TableCell>
+                        <TableCell className="text-gray-500 dark:text-zinc-400 text-sm">
+                          <div className="flex items-center">
+                            <Calendar className="h-3 w-3 mr-1 text-gray-400 dark:text-zinc-500" />
+                            {new Date(created_at).toLocaleDateString() || "N/A"}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2 justify-end">
+                            <Button variant="outline" size="icon" onClick={() => handleDeleteComment(id)} aria-label="Delete comment" className="h-8 w-8 text-red-600 dark:text-red-400 border-gray-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </div>
               <CardFooter className="bg-gray-50/80 dark:bg-zinc-800/80 border-t border-gray-100 dark:border-zinc-700/50 p-4 flex justify-between items-center">
-                <p className="text-sm text-gray-500 dark:text-zinc-400">Showing latest {comments.length} comments</p>
+                <p className="text-sm text-gray-500 dark:text-zinc-400">Showing latest {comments?.length || 0} comments</p>
                 <Button variant="outline" size="sm" className="text-sm border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300">
                   Refresh
                 </Button>
@@ -611,4 +623,5 @@ const Admin = () => {
       `}</style>
     </AdminLayout>;
 };
+
 export default Admin;
