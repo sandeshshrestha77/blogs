@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
@@ -15,6 +14,7 @@ import "react-quill/dist/quill.snow.css";
 import { toast } from "@/hooks/use-toast";
 import { PlusCircle, Save, Eye, X, ArrowLeft, Image, Star, Calendar, User, Tag, Clock, Search, AlertCircle } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+
 type Post = Database["public"]["Tables"]["posts"]["Row"] & {
   meta_title?: string;
   meta_description?: string;
@@ -22,19 +22,16 @@ type Post = Database["public"]["Tables"]["posts"]["Row"] & {
   alt_text?: string;
 };
 
-// SEO Helper Functions
 const generateSeoTitle = (title: string): string => {
   return title.length <= 60 ? title : title.substring(0, 57) + "...";
 };
 
 const generateSeoDescription = (content: string): string => {
-  // Remove HTML tags and limit to 160 characters
   const plainText = content.replace(/<[^>]+>/g, "");
   return plainText.length <= 160 ? plainText : plainText.substring(0, 157) + "...";
 };
 
 const generateKeywords = (title: string, category: string): string => {
-  // Extract potential keywords from title
   const words = title
     .toLowerCase()
     .replace(/[^\w\s]/g, "")
@@ -42,7 +39,6 @@ const generateKeywords = (title: string, category: string): string => {
     .filter(word => word.length > 3)
     .slice(0, 5);
   
-  // Add category if it exists
   if (category && !words.includes(category.toLowerCase())) {
     words.push(category.toLowerCase());
   }
@@ -53,7 +49,7 @@ const generateKeywords = (title: string, category: string): string => {
 const estimateReadTime = (content: string): string => {
   const plainText = content.replace(/<[^>]+>/g, "");
   const wordCount = plainText.split(/\s+/).length;
-  const readingTime = Math.max(1, Math.ceil(wordCount / 200)); // Assuming 200 words per minute
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
   return readingTime.toString();
 };
 
@@ -102,33 +98,27 @@ const AdminPostForm = () => {
     if (id) fetchPost();
   }, [id]);
   
-  // Calculate SEO score when relevant fields change
   useEffect(() => {
     const calculateSeoScore = () => {
       let score = 0;
       
-      // Title factors
       if (formData.meta_title) {
         const titleLength = formData.meta_title.length;
         if (titleLength >= 40 && titleLength <= 60) score += 20;
         else if (titleLength > 0) score += 10;
       }
       
-      // Description factors
       if (formData.meta_description) {
         const descLength = formData.meta_description.length;
         if (descLength >= 140 && descLength <= 160) score += 20;
         else if (descLength > 0) score += 10;
       }
       
-      // Keywords factors
       if (formData.keywords && formData.keywords.split(",").length >= 3) score += 20;
       else if (formData.keywords) score += 10;
       
-      // Image ALT text
       if (imagePreview && formData.alt_text) score += 20;
       
-      // Slug quality
       if (formData.slug && formData.slug.includes(formData.title.toLowerCase().split(" ")[0])) score += 20;
       
       setSeoScore(score);
@@ -286,9 +276,10 @@ const AdminPostForm = () => {
     setIsLoading(true);
     
     try {
+      console.log("Submitting form data:", formData);
+      
       const imageUrl = await handleImageUpload();
       
-      // Auto-generate SEO fields if they're empty
       const postData = {
         ...formData,
         image: imageUrl,
@@ -299,11 +290,22 @@ const AdminPostForm = () => {
         read_time: formData.read_time || estimateReadTime(formData.content)
       };
       
-      const { error } = id
-        ? await supabase.from("posts").update(postData).eq("id", id)
-        : await supabase.from("posts").insert([postData]);
+      console.log("Final post data to be saved:", postData);
       
-      if (error) throw error;
+      let response;
+      
+      if (id) {
+        response = await supabase.from("posts").update(postData).eq("id", id);
+      } else {
+        response = await supabase.from("posts").insert([postData]);
+      }
+      
+      const { error } = response;
+      
+      if (error) {
+        console.error("Supabase error response:", error);
+        throw error;
+      }
       
       toast({
         title: "Success",
@@ -315,7 +317,7 @@ const AdminPostForm = () => {
       console.error("Error saving post:", error);
       toast({
         title: "Error",
-        description: "Failed to save post",
+        description: "Failed to save post. Check the console for details.",
         variant: "destructive"
       });
     } finally {
@@ -429,7 +431,6 @@ const AdminPostForm = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content Column */}
           <div className="lg:col-span-2 space-y-6">
             <Card className="bg-white dark:bg-zinc-800 shadow-sm border border-gray-200 dark:border-zinc-700">
               <CardContent className="p-6">
@@ -617,7 +618,6 @@ const AdminPostForm = () => {
             </Card>
           </div>
 
-          {/* Sidebar Column */}
           <div className="space-y-6">
             <Card className="bg-white dark:bg-zinc-800 shadow-sm border border-gray-200 dark:border-zinc-700">
               <CardHeader className="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
