@@ -3,28 +3,32 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { session, loading } = useAuth();
+  const { session, user, loading } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
-    if (!session && !loading) {
+    if (!loading && !session && !user) {
       toast.error("You must be logged in to access this page.");
     }
-  }, [session, loading]);
+  }, [session, loading, user]);
 
+  // Show loading state while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <LoadingSpinner size="md" />
       </div>
     );
   }
 
-  if (!session) {
+  // Redirect to login if not authenticated
+  if (!session && !user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return children;
+  // If authenticated, render the protected content
+  return <>{children}</>;
 }

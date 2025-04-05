@@ -1,0 +1,14 @@
+
+project_id = "afnrcckplletaqljyjyi"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[db]
+port = 54322
+
+[realtime]
+enabled = true
+webhooks_enabled = true
