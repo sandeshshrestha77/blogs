@@ -12,11 +12,14 @@ import type { Database } from "@/integrations/supabase/types";
 import { Helmet } from "react-helmet";
 import Testimonials from "@/components/Testimonials";
 import Features from "@/components/Features";
+
 type Post = Database['public']['Tables']['posts']['Row'];
+
 const Index = () => {
   const navigate = useNavigate();
   const [featuredPost, setFeaturedPost] = useState<Post | null>(null);
   const [showAllPosts, setShowAllPosts] = useState(false);
+  
   const {
     data: posts,
     loading: updating
@@ -29,14 +32,17 @@ const Index = () => {
       } = await supabase.from("posts").select().eq('featured', false).order("created_at", {
         ascending: false
       }).limit(showAllPosts ? 100 : 6);
+      
       if (error) {
         console.error("Error fetching posts:", error);
-        return [];
+        return { data: [], error };
       }
-      return data || [];
+      
+      return { data: data || [], error: null };
     },
     event: '*'
   });
+
   useEffect(() => {
     const fetchFeaturedPost = async () => {
       try {
@@ -62,11 +68,13 @@ const Index = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
   const handleViewAll = () => setShowAllPosts(true);
   const displayedPosts = useMemo(() => posts || [], [posts]);
   const metaTitle = "Sandesh Shrestha | Articles & Insights on Technology and Design";
   const metaDescription = "Explore expert guides and tutorials on technology, design, and development...";
   const keywords = "web development, design, technology, tutorials, digital skills, programming";
+  
   return <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900">
       <Helmet>
         <title>{metaTitle}</title>
@@ -76,7 +84,6 @@ const Index = () => {
       
       <Navbar />
       
-      {/* Hero Section with improved visuals and animations */}
       <section className="relative overflow-hidden pt-32 pb-20">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
@@ -123,7 +130,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section - New Addition */}
       <Features />
 
       {featuredPost && <section className="relative py-24 overflow-hidden">
@@ -184,7 +190,6 @@ const Index = () => {
           </div>
         </section>}
 
-      {/* Testimonials Section - New Addition */}
       <Testimonials />
 
       {displayedPosts.length > 0 && <section className="bg-zinc-950 py-24">
@@ -232,7 +237,6 @@ const Index = () => {
           </div>
         </div>}
       
-      {/* Call To Action Section - New Addition */}
       <section className="relative py-24 bg-gradient-to-br from-blue-900/20 to-purple-900/20">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] bg-blue-500/10 rounded-full blur-3xl"></div>
@@ -262,4 +266,5 @@ const Index = () => {
       <Footer />
     </div>;
 };
+
 export default Index;

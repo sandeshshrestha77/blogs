@@ -3,14 +3,16 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
-export function useRealtimeData<T>(
-  tableName: string,
-  initialQuery: () => Promise<{ data: T[] | null; error: any }>,
-  options?: { 
-    event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*',
-    filter?: string
-  }
-) {
+// Define a proper type for the options parameter
+type UseRealtimeDataOptions = { 
+  tableName: string;
+  initialQuery: () => Promise<{ data: any[] | null; error: any }>;
+  event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
+  filter?: string;
+};
+
+export function useRealtimeData<T>(options: UseRealtimeDataOptions) {
+  const { tableName, initialQuery, event = '*', filter } = options;
   const [data, setData] = useState<T[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -40,7 +42,7 @@ export function useRealtimeData<T>(
     };
 
     fetchData();
-  }, [refreshTrigger, tableName]);
+  }, [refreshTrigger, tableName, initialQuery]);
 
   useEffect(() => {
     let channel: RealtimeChannel | null = null;
@@ -50,16 +52,23 @@ export function useRealtimeData<T>(
       const channelName = `realtime-${tableName}-${Date.now()}`;
       
       // Set up the channel with the table subscription
-      channel = supabase.channel(channelName)
-        .on('postgres_changes', {
-          event: options?.event || '*',
-          schema: 'public',
-          table: tableName,
-          filter: options?.filter
-        }, () => {
-          // When any change happens, just refresh the data
-          refreshData();
-        })
+      channel = supabase.channel(channelName);
+      
+      // Add subscription to postgres changes
+      channel
+        .on(
+          'postgres_changes', // Using string literal instead of enum
+          {
+            event: event,
+            schema: 'public',
+            table: tableName,
+            filter: filter
+          },
+          () => {
+            // When any change happens, just refresh the data
+            refreshData();
+          }
+        )
         .subscribe((status) => {
           if (status !== 'SUBSCRIBED') {
             console.error(`Failed to subscribe to ${tableName}:`, status);
@@ -76,7 +85,7 @@ export function useRealtimeData<T>(
         supabase.removeChannel(channel);
       }
     };
-  }, [tableName, options?.event, options?.filter]);
+  }, [tableName, event, filter]);
 
   return { data, loading, error, refresh: refreshData };
 }

@@ -31,9 +31,12 @@ export const subscribeToTable = (
   const channelName = `table-changes-${tableName}-${Date.now()}`;
   
   // Set up the channel with the table subscription
-  const channel = supabase.channel(channelName)
+  const channel = supabase.channel(channelName);
+  
+  // Subscribe to changes
+  channel
     .on(
-      'postgres_changes',
+      'postgres_changes', // Using string literal instead of enum
       {
         event: event,
         schema: 'public',
