@@ -2,38 +2,74 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import AdminLayout from "@/components/AdminLayout";
-import { Settings as SettingsIcon, Save, User, FileText, Shield, Lock, Palette, Globe, Bell } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Settings as SettingsIcon, Save } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client"; // Corrected import path
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const AdminSettings = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
+  const [siteName, setSiteName] = useState("My Blog");
+  const [siteDescription, setSiteDescription] = useState("A blog about technology, design, and more.");
+ 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
+
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [commentNotifications, setCommentNotifications] = useState(true);
+
   const [defaultCategory, setDefaultCategory] = useState("Technology");
   const [seoDescription, setSeoDescription] = useState("This is a default SEO description for new posts.");
 
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        setIsLoading(true);
-        
         if (user?.email) {
           setEmail(user.email);
           setDisplayName(user.email.split('@')[0] || "");
         }
         
+        const { data: siteData, error: siteError } = await supabase
+          .from('site_settings')
+          .select('*')
+          .single();
+        
+        if (siteError) {
+          if (siteError.code !== 'PGRST116') { 
+            console.error('Error loading site settings:', siteError);
+          }
+        } else if (siteData) {
+          setSiteName(siteData.site_name || "My Blog");
+          setSiteDescription(siteData.site_description || "A blog about technology, design, and more.");
+        }
+
         if (user?.id) {
-          // Load post defaults
+          const { data: userData, error: userError } = await supabase
+            .from('user_settings')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (userError) {
+            if (userError.code !== 'PGRST116') {
+              console.error('Error loading user settings:', userError);
+            }
+          } else if (userData) {
+            setDisplayName(userData.display_name || user.email?.split('@')[0] || "");
+            setEmailNotifications(userData.email_notifications !== undefined ? userData.email_notifications : true);
+            setCommentNotifications(userData.comment_notifications !== undefined ? userData.comment_notifications : true);
+          }
+        }
+
+        if (user?.id) {
           const { data: postData, error: postError } = await supabase
             .from('post_defaults')
             .select('*')
@@ -52,8 +88,6 @@ const AdminSettings = () => {
       } catch (error) {
         console.error('Error loading settings:', error);
         toast.error("Failed to load settings");
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -71,35 +105,51 @@ const AdminSettings = () => {
     try {
       setIsLoading(true);
 
-      // Save post defaults
-      const { data: postDefaultsExists } = await supabase
-        .from('post_defaults')
+      const { data: existingSiteSettings } = await supabase
+        .from('site_settings')
         .select('id')
-        .eq('user_id', user.id);
+        .single();
       
-      if (postDefaultsExists && postDefaultsExists.length > 0) {
-        // Update existing record
-        const { error: postError } = await supabase
-          .from('post_defaults')
-          .update({
-            default_category: defaultCategory,
-            seo_description: seoDescription
-          })
-          .eq('user_id', user.id);
-        
-        if (postError) throw postError;
-      } else {
-        // Insert new record
-        const { error: postError } = await supabase
-          .from('post_defaults')
-          .insert({
-            user_id: user.id,
-            default_category: defaultCategory,
-            seo_description: seoDescription
-          });
-        
-        if (postError) throw postError;
-      }
+      const { error: siteError } = await supabase
+        .from('site_settings')
+        .upsert({
+          id: existingSiteSettings?.id || undefined,
+          site_name: siteName,
+          site_description: siteDescription
+        }, { 
+          onConflict: 'id',
+          ignoreDuplicates: false
+        });
+      
+      if (siteError) throw siteError;
+
+      const { error: userError } = await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          display_name: displayName,
+          email_notifications: emailNotifications,
+          comment_notifications: commentNotifications
+        }, { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        });
+      
+      if (userError) throw userError;
+
+
+      const { error: postError } = await supabase
+        .from('post_defaults')
+        .upsert({
+          user_id: user.id,
+          default_category: defaultCategory,
+          seo_description: seoDescription
+        }, { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        });
+      
+      if (postError) throw postError;
 
       toast.success("Settings saved successfully");
     } catch (error) {
@@ -112,137 +162,177 @@ const AdminSettings = () => {
   
   return (
     <AdminLayout>
-      {isLoading && !user ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div>
+        <div className="mb-6">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
+            <SettingsIcon className="mr-2 h-5 md:h-6 w-5 md:w-6 text-[#2271b1]" />
+            Settings
+          </h1>
+          <p className="text-sm md:text-base text-gray-600">
+            Configure your blog settings
+          </p>
         </div>
-      ) : (
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <div className="flex items-center gap-4 mb-2">
-              <div className="h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-300">
-                <SettingsIcon className="h-5 w-5" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Settings
-                </h1>
-                <p className="text-gray-500 dark:text-gray-400">
-                  Manage your account preferences and blog configuration
-                </p>
-              </div>
+        
+        <form onSubmit={handleSaveSettings}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="lg:col-span-2 space-y-4 md:space-y-6">
+              <Card className="bg-white shadow-sm border border-gray-200">
+                <CardHeader className="pb-2 md:pb-3">
+                  <CardTitle className="text-gray-800 text-lg md:text-xl">General Settings</CardTitle>
+                  <CardDescription className="text-gray-600">Configure the general settings for your blog</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="siteName" className="text-gray-700">Site Name</Label>
+                    <Input 
+                      id="siteName" 
+                      value={siteName} 
+                      onChange={(e) => setSiteName(e.target.value)} 
+                      placeholder="My Blog" 
+                      className="text-gray-800 placeholder:text-gray-400"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="siteDescription" className="text-gray-700">Site Description</Label>
+                    <Textarea 
+                      id="siteDescription" 
+                      value={siteDescription} 
+                      onChange={(e) => setSiteDescription(e.target.value)} 
+                      placeholder="A brief description of your blog"
+                      rows={3}
+                      className="text-gray-800 placeholder:text-gray-400"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-white shadow-sm border border-gray-200">
+                <CardHeader className="pb-2 md:pb-3">
+                  <CardTitle className="text-gray-800 text-lg md:text-xl">Default Post Settings</CardTitle>
+                  <CardDescription className="text-gray-600">Configure defaults for new blog posts</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="defaultCategory" className="text-gray-700">Default Category</Label>
+                    <Input 
+                      id="defaultCategory" 
+                      value={defaultCategory} 
+                      onChange={(e) => setDefaultCategory(e.target.value)} 
+                      placeholder="Technology"
+                      className="text-gray-800 placeholder:text-gray-400"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="seoDescription" className="text-gray-700">Default SEO Description</Label>
+                    <Textarea 
+                      id="seoDescription" 
+                      value={seoDescription} 
+                      onChange={(e) => setSeoDescription(e.target.value)} 
+                      placeholder="Default SEO description for new posts"
+                      rows={3}
+                      className="text-gray-800 placeholder:text-gray-400"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div className="space-y-4 md:space-y-6">
+              <Card className="bg-white shadow-sm border border-gray-200">
+                <CardHeader className="pb-2 md:pb-3">
+                  <CardTitle className="text-gray-800 text-lg md:text-xl">Profile Settings</CardTitle>
+                  <CardDescription className="text-gray-600">Update your profile information</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="displayName" className="text-gray-700">Display Name</Label>
+                    <Input 
+                      id="displayName" 
+                      value={displayName} 
+                      onChange={(e) => setDisplayName(e.target.value)} 
+                      placeholder="Your Name"
+                      className="text-gray-800 placeholder:text-gray-400"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-gray-700">Email Address</Label>
+                    <Input 
+                      id="email" 
+                      type="email"
+                      value={email} 
+                      onChange={(e) => setEmail(e.target.value)} 
+                      placeholder="your.email@example.com"
+                      disabled
+                      className="text-gray-800 placeholder:text-gray-400 bg-gray-100"
+                    />
+                    <p className="text-xs text-gray-500">Email address cannot be changed</p>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-white shadow-sm border border-gray-200">
+                <CardHeader className="pb-2 md:pb-3">
+                  <CardTitle className="text-gray-800 text-lg md:text-xl">Notification Settings</CardTitle>
+                  <CardDescription className="text-gray-600">Configure your notification preferences</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="emailNotif" className="text-gray-700">Email Notifications</Label>
+                      <p className="text-xs text-gray-500">Receive email notifications</p>
+                    </div>
+                    <Switch 
+                      id="emailNotif"
+                      checked={emailNotifications}
+                      onCheckedChange={setEmailNotifications}
+                    />
+                  </div>
+                  
+                  <Separator className="my-2" />
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="commentNotif" className="text-gray-700">Comment Notifications</Label>
+                      <p className="text-xs text-gray-500">Get notified on new comments</p>
+                    </div>
+                    <Switch 
+                      id="commentNotif"
+                      checked={commentNotifications}
+                      onCheckedChange={setCommentNotifications}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
           
-          <form onSubmit={handleSaveSettings}>
-            <Tabs defaultValue="profile" className="mb-8">
-              <TabsList className="mb-6 bg-white dark:bg-zinc-800 p-1 border border-gray-200 dark:border-zinc-700 rounded-lg">
-                <TabsTrigger value="profile" className="flex items-center gap-2 data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400">
-                  <User className="h-4 w-4" />
-                  <span>Profile</span>
-                </TabsTrigger>
-                <TabsTrigger value="defaults" className="flex items-center gap-2 data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400">
-                  <FileText className="h-4 w-4" />
-                  <span>Post Defaults</span>
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="profile">
-                <Card className="border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
-                  <CardHeader className="border-b border-gray-100 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80">
-                    <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                      <User className="h-5 w-5 text-indigo-500" />
-                      Profile Settings
-                    </CardTitle>
-                    <CardDescription className="text-gray-500 dark:text-gray-400">Your profile information</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6 pt-6">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 p-4 bg-gray-50 dark:bg-zinc-800/50 rounded-lg border border-gray-100 dark:border-zinc-700">
-                      <Avatar className="h-16 w-16 border-2 border-indigo-100 dark:border-indigo-900 shadow-md">
-                        <AvatarFallback className="bg-indigo-600 text-white text-xl">
-                          {user?.email?.charAt(0).toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="space-y-1">
-                        <p className="font-medium text-gray-900 dark:text-white">{displayName || "User"}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{email}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email Address</Label>
-                      <Input 
-                        id="email" 
-                        type="email"
-                        value={email} 
-                        disabled
-                        className="bg-gray-50 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-500"
-                      />
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email address cannot be changed</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="defaults">
-                <Card className="border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
-                  <CardHeader className="border-b border-gray-100 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80">
-                    <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-indigo-500" />
-                      Default Post Settings
-                    </CardTitle>
-                    <CardDescription className="text-gray-500 dark:text-gray-400">Configure defaults for new blog posts</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6 pt-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="defaultCategory" className="text-gray-700 dark:text-gray-300">Default Category</Label>
-                      <Input 
-                        id="defaultCategory" 
-                        value={defaultCategory} 
-                        onChange={(e) => setDefaultCategory(e.target.value)} 
-                        placeholder="Technology"
-                        className="bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus-visible:ring-indigo-500"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="seoDescription" className="text-gray-700 dark:text-gray-300">Default SEO Description</Label>
-                      <Textarea 
-                        id="seoDescription" 
-                        value={seoDescription} 
-                        onChange={(e) => setSeoDescription(e.target.value)} 
-                        placeholder="Default SEO description for new posts"
-                        rows={3}
-                        className="bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus-visible:ring-indigo-500"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-            
-            <div className="mt-6 flex justify-end">
-              <Button 
-                type="submit" 
-                className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 px-6"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4" />
-                    Save Settings
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        </div>
-      )}
+          <div className="mt-6 flex justify-end">
+            <Button 
+              type="submit" 
+              className="bg-[#2271b1] hover:bg-[#135e96] text-white"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Settings
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
     </AdminLayout>
   );
 };

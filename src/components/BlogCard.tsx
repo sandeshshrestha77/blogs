@@ -23,7 +23,7 @@ const BlogCard = ({
   image,
   author,
   date,
-  categories = [],
+  categories,
   slug,
   read_time,
   alt_text,
@@ -44,11 +44,9 @@ const BlogCard = ({
 
       <div className="flex flex-col flex-grow p-4 sm:p-6 px-[16px] rounded">
         <div className="flex flex-wrap gap-2 mb-3">
-          {categories && categories.length > 0 && categories.slice(0, 2).map(category => 
-            <span key={category} className="px-2 py-1 text-xs font-medium bg-blue-600/20 text-blue-400 rounded-full border border-blue-500/20">
+          {categories.slice(0, 2).map(category => <span key={category} className="px-2 py-1 text-xs font-medium bg-blue-600/20 text-blue-400 rounded-full border border-blue-500/20">
               {category}
-            </span>
-          )}
+            </span>)}
         </div>
 
         <h3 className="text-lg sm:text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">

@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 244 63% 40%; /* Indigo */
+    --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -30,39 +30,9 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 244 63% 40%;
+    --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
-  }
-  
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 240 10% 3.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 244 63% 50%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 217 19% 20%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
   }
 }
 
@@ -72,7 +42,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-white;
   }
   
   h1 {
@@ -130,19 +100,11 @@
   }
   
   .card-base {
-    @apply bg-zinc-900/80 border border-zinc-800 rounded-xl p-6 transition-all hover:border-blue-500/20 hover:shadow-lg hover:shadow-blue-900/5;
+    @apply bg-zinc-900/80 border border-zinc-800 rounded-xl p-6 transition-all;
   }
   
   .section-grid {
     @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8;
-  }
-  
-  .glass-card {
-    @apply bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl;
-  }
-  
-  .text-gradient {
-    @apply bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent;
   }
 }
 
@@ -157,73 +119,42 @@
   }
 }
 
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.2;
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
-}
-
-.animate-slide-in-right {
-  animation: slideInRight 0.5s ease-out forwards;
-}
-
-.animate-pulse-slow {
-  animation: pulse 3s infinite;
-}
-
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-zinc-800;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-indigo-300/50 dark:bg-indigo-500/50 rounded-md;
+  background: rgba(65, 105, 225, 0.5);
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-indigo-400/70 dark:bg-indigo-500/70;
+  background: rgba(65, 105, 225, 0.7);
 }
 
 .article-content {
-  @apply text-gray-700 dark:text-gray-300;
+  @apply text-gray-300;
 }
 
 .article-content h1 {
-  @apply text-3xl font-bold text-gray-900 dark:text-white mt-10 mb-6;
+  @apply text-3xl font-bold text-white mt-10 mb-6;
 }
 
 .article-content h2 {
-  @apply text-2xl font-bold text-gray-900 dark:text-white mt-10 mb-5;
+  @apply text-2xl font-bold text-white mt-10 mb-5;
 }
 
 .article-content h3 {
-  @apply text-xl font-bold text-gray-900 dark:text-white mt-8 mb-4;
+  @apply text-xl font-bold text-white mt-8 mb-4;
 }
 
 .article-content h4 {
-  @apply text-lg font-bold text-gray-900 dark:text-white mt-6 mb-3;
+  @apply text-lg font-bold text-white mt-6 mb-3;
 }
 
 .article-content p {
@@ -232,7 +163,7 @@
 
 .article-content strong, 
 .article-content b {
-  @apply text-gray-900 dark:text-white font-bold;
+  @apply text-white font-bold;
 }
 
 .article-content em, 
@@ -253,11 +184,11 @@
 }
 
 .article-content a {
-  @apply text-indigo-600 dark:text-indigo-400 hover:underline;
+  @apply text-blue-400 hover:underline;
 }
 
 .article-content blockquote {
-  @apply border-l-4 border-indigo-500 pl-4 italic my-6;
+  @apply border-l-4 border-blue-500 pl-4 italic my-6;
 }
 
 .article-content img {
@@ -265,15 +196,15 @@
 }
 
 .article-content pre {
-  @apply bg-gray-100 dark:bg-zinc-800 p-4 rounded-lg overflow-x-auto my-6;
+  @apply bg-zinc-800 p-4 rounded-lg overflow-x-auto my-6;
 }
 
 .article-content code {
-  @apply bg-gray-100 dark:bg-zinc-800 px-1 py-0.5 rounded text-sm;
+  @apply bg-zinc-800 px-1 py-0.5 rounded text-sm;
 }
 
 .article-content hr {
-  @apply border-gray-200 dark:border-zinc-700 my-8;
+  @apply border-zinc-700 my-8;
 }
 
 .article-content table {
@@ -282,42 +213,23 @@
 
 .article-content th,
 .article-content td {
-  @apply border border-gray-200 dark:border-zinc-700 p-2 text-left;
+  @apply border border-zinc-700 p-2 text-left;
 }
 
 .article-content th {
-  @apply bg-gray-100 dark:bg-zinc-800 font-bold;
+  @apply bg-zinc-800 font-bold;
 }
 
-/* ReactQuill Editor Styling */
 .ql-toolbar.ql-snow {
-  @apply border-gray-300 dark:border-zinc-700 rounded-t-lg !important;
+  border-color: #374151 !important;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
 }
 
 .ql-container.ql-snow {
-  @apply border-gray-300 dark:border-zinc-700 rounded-b-lg !important;
-}
-
-.dark .ql-toolbar.ql-snow .ql-formats button,
-.dark .ql-toolbar.ql-snow .ql-formats span {
-  @apply text-gray-400;
-}
-
-.dark .ql-toolbar.ql-snow .ql-picker-label,
-.dark .ql-toolbar.ql-snow .ql-picker-options {
-  @apply text-gray-300;
-}
-
-.dark .ql-snow .ql-stroke {
-  @apply stroke-gray-400;
-}
-
-.dark .ql-snow .ql-fill {
-  @apply fill-gray-400;
-}
-
-.dark .ql-editor {
-  @apply text-gray-300;
+  border-color: #374151 !important;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
 }
 
 @media (max-width: 768px) {
