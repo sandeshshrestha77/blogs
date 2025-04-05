@@ -59,7 +59,7 @@ const AdminPostForm = () => {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: "",
-    author: "",
+    author: "sandesh shrestha",
     content: "",
     category: "",
     date: new Date().toISOString().split("T")[0],
@@ -100,10 +100,6 @@ const AdminPostForm = () => {
       const user = await getUser();
       if (user) {
         setCurrentUser(user.id);
-        setFormData(prev => ({
-          ...prev,
-          author: user.id
-        }));
       } else {
         toast({
           title: "Authentication Required",
@@ -115,7 +111,7 @@ const AdminPostForm = () => {
     };
     
     fetchCurrentUser();
-  }, []);
+  }, [navigate]);
   
   useEffect(() => {
     if (id) fetchPost();
@@ -166,7 +162,7 @@ const AdminPostForm = () => {
         setFormData({
           title: data.title || "",
           slug: data.slug || "",
-          author: data.author || "",
+          author: data.author || "sandesh shrestha",
           content: data.content || "",
           category: data.category || "",
           date: data.date?.split("T")[0] || "",
@@ -310,13 +306,13 @@ const AdminPostForm = () => {
     
     try {
       console.log("Current user ID:", currentUser);
-      console.log("Submitting form data:", { ...formData, author: currentUser });
+      console.log("Submitting form data with author:", formData.author);
       
       const imageUrl = await handleImageUpload();
       
       const postData = {
         ...formData,
-        author: currentUser,
+        author: "sandesh shrestha",
         image: imageUrl,
         updated_at: new Date().toISOString(),
         meta_title: formData.meta_title || generateSeoTitle(formData.title),
