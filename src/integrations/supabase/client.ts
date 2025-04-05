@@ -6,10 +6,20 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error('Missing Supabase environment variables. Please check your .env file.');
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient<Database>(
+  supabaseUrl, 
+  supabaseAnonKey, 
+  {
+    auth: {
+      storage: localStorage,
+      persistSession: true,
+      autoRefreshToken: true,
+    }
+  }
+);
 
 // Helper function to subscribe to real-time changes on a Supabase table
 export const subscribeToTable = (
@@ -17,22 +27,18 @@ export const subscribeToTable = (
   callback: (payload: any) => void,
   event = '*'
 ) => {
-  // Fix the issue with the RealtimeChannelOptions type by using a type assertion
-  const channel = supabase.channel(`table-changes-${tableName}`, {
-    config: {
-      broadcast: { self: true },
-    },
-  });
-
-  // Use the correct method signature with type assertion to fix TS error
-  channel
+  // Create a unique channel name
+  const channelName = `table-changes-${tableName}-${Date.now()}`;
+  
+  // Set up the channel with the table subscription
+  const channel = supabase.channel(channelName)
     .on(
       'postgres_changes',
       {
         event: event,
         schema: 'public',
         table: tableName,
-      } as any, // Type assertion to bypass TypeScript error
+      },
       (payload) => {
         callback(payload);
       }

@@ -1,108 +1,82 @@
 
 import { useState, useEffect } from 'react';
-import { subscribeToTable, supabase } from '@/integrations/supabase/client';
-import { toast } from "sonner";
+import { supabase } from '@/integrations/supabase/client';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
-interface UseRealtimeDataOptions {
-  tableName: string;
-  event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
-  filter?: (data: any) => boolean;
-  initialQuery?: () => Promise<any[]>;
-}
-
-export function useRealtimeData<T = any>({ 
-  tableName, 
-  event = '*',
-  filter,
-  initialQuery
-}: UseRealtimeDataOptions) {
-  const [data, setData] = useState<T[]>([]);
+export function useRealtimeData<T>(
+  tableName: string,
+  initialQuery: () => Promise<{ data: T[] | null; error: any }>,
+  options?: { 
+    event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*',
+    filter?: string
+  }
+) {
+  const [data, setData] = useState<T[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const refreshData = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
 
   useEffect(() => {
-    async function fetchInitialData() {
+    const fetchData = async () => {
       try {
-        if (initialQuery) {
-          // Use the initialQuery function if provided
-          const initialData = await initialQuery();
-          setData(initialData as T[]);
-        } else {
-          // Default query if no initialQuery is provided
-          // Use type assertion with 'as const' to handle table name type safely
-          const { data: initialData, error } = await supabase
-            .from(tableName as any)
-            .select('*');
-          
-          if (error) throw error;
-          setData((initialData || []) as T[]);
+        setLoading(true);
+        const { data: fetchedData, error: fetchError } = await initialQuery();
+        
+        if (fetchError) {
+          throw fetchError;
         }
-      } catch (err) {
-        console.error(`Error fetching initial data from ${tableName}:`, err);
-        setError(err instanceof Error ? err : new Error(String(err)));
+        
+        setData(fetchedData || []);
+      } catch (e) {
+        console.error(`Error fetching data from ${tableName}:`, e);
+        setError(e instanceof Error ? e : new Error(String(e)));
       } finally {
         setLoading(false);
       }
-    }
+    };
 
-    fetchInitialData();
+    fetchData();
+  }, [refreshTrigger, tableName]);
 
-    let unsubscribe: (() => void) | null = null;
+  useEffect(() => {
+    let channel: RealtimeChannel | null = null;
 
-    try {
-      // Create subscription to the Supabase table
-      unsubscribe = subscribeToTable(
-        tableName,
-        (payload) => {
-          // Process the payload based on the event type
-          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-            const newItem = payload.new as T;
-            
-            // Apply filter if provided
-            if (filter && !filter(newItem)) {
-              return;
-            }
-            
-            setData((currentData) => {
-              // Check if the item already exists
-              const exists = currentData.some((item: any) => item.id === (newItem as any).id);
-              
-              if (exists) {
-                // Update existing item
-                return currentData.map((item: any) => 
-                  item.id === (newItem as any).id ? newItem : item
-                );
-              } else {
-                // Add new item
-                return [...currentData, newItem];
-              }
-            });
-          } 
-          else if (payload.eventType === 'DELETE') {
-            const oldItem = payload.old as T;
-            
-            setData((currentData) => 
-              currentData.filter((item: any) => item.id !== (oldItem as any).id)
-            );
+    const setupSubscription = () => {
+      // Create a unique channel name
+      const channelName = `realtime-${tableName}-${Date.now()}`;
+      
+      // Set up the channel with the table subscription
+      channel = supabase.channel(channelName)
+        .on('postgres_changes', {
+          event: options?.event || '*',
+          schema: 'public',
+          table: tableName,
+          filter: options?.filter
+        }, () => {
+          // When any change happens, just refresh the data
+          refreshData();
+        })
+        .subscribe((status) => {
+          if (status !== 'SUBSCRIBED') {
+            console.error(`Failed to subscribe to ${tableName}:`, status);
+          } else {
+            console.log(`Successfully subscribed to ${tableName} changes`);
           }
-        },
-        event
-      );
-    } catch (err) {
-      console.error("Error in useRealtimeData:", err);
-      setError(err instanceof Error ? err : new Error(String(err)));
-      setLoading(false);
-    }
+        });
+    };
 
-    // Clean up the subscription when the component unmounts
+    setupSubscription();
+
     return () => {
-      if (unsubscribe) {
-        unsubscribe();
+      if (channel) {
+        supabase.removeChannel(channel);
       }
     };
-  }, [tableName, event, filter, initialQuery]);
+  }, [tableName, options?.event, options?.filter]);
 
-  return { data, loading, error, setData };
+  return { data, loading, error, refresh: refreshData };
 }
-
-export default useRealtimeData;

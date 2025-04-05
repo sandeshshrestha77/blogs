@@ -26,14 +26,17 @@ const Login = () => {
   
   useEffect(() => {
     const handleOAuthRedirect = async () => {
-      const { error } = await supabase.auth.getSession();
+      const { data, error } = await supabase.auth.getSession();
       if (error) {
         console.error('Error during OAuth redirect:', error);
         toast.error('Authentication failed. Please try again.');
+      } else if (data.session) {
+        console.log("Session found during OAuth redirect:", data.session.user?.email);
       }
     };
     
     if (session) {
+      console.log("Session found, navigating to:", from);
       navigate(from, { replace: true });
     } else if (location.pathname === '/auth/callback') {
       handleOAuthRedirect();
@@ -52,7 +55,7 @@ const Login = () => {
           return;
         }
         
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
@@ -60,17 +63,16 @@ const Login = () => {
         if (error) throw error;
         toast.success("Sign up successful! Please check your email for verification.");
       } else {
-        await signIn(email, password);
-        toast.success("Login successful!");
-        navigate(from, { replace: true });
+        const result = await signIn(email, password);
+        if (result.session) {
+          toast.success("Login successful!");
+          navigate(from, { replace: true });
+        }
       }
     } catch (error: unknown) {
+      console.error("Authentication error:", error);
       if (error instanceof Error) {
-        if (error instanceof Error) {
-          toast.error(error.message || "Authentication failed. Please try again.");
-        } else {
-          toast.error("An unknown error occurred. Please try again.");
-        }
+        toast.error(error.message || "Authentication failed. Please try again.");
       } else {
         toast.error("An unknown error occurred. Please try again.");
       }
