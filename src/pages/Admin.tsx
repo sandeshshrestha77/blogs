@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { LayoutDashboard, Pencil, Trash2, Star, StarOff, Eye, MessageSquare, Calendar, FileText, PlusCircle, BarChart3, MoreHorizontal, ChevronUp, ArrowUpRight, Clock, LinkIcon, Users, TrendingUp, Bookmark, Layers } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
@@ -36,28 +36,26 @@ const Admin = () => {
     data: posts = [],
     loading: postsLoading,
     error: postsError
-  } = useRealtimeData<Post>(
-    'posts',
-    async () => {
-      const { data, error } = await supabase
+  } = useRealtimeData<Post>({
+    tableName: 'posts',
+    initialQuery: async () => {
+      return await supabase
         .from("posts")
         .select(`
           *,
           comments(count)
         `)
         .order("created_at", { ascending: false });
-      
-      return { data, error };
     }
-  );
+  });
   
   const {
     data: comments = [],
     loading: commentsLoading
-  } = useRealtimeData<Comment>(
-    'comments',
-    async () => {
-      const { data, error } = await supabase
+  } = useRealtimeData<Comment>({
+    tableName: 'comments',
+    initialQuery: async () => {
+      return await supabase
         .from("comments")
         .select(`
           *,
@@ -65,10 +63,8 @@ const Admin = () => {
         `)
         .order("created_at", { ascending: false })
         .limit(5);
-      
-      return { data, error };
     }
-  );
+  });
   
   const totalViews = posts ? posts.reduce((sum, post) => sum + (post.views || 0), 0) : 0;
   const totalComments = posts ? posts.reduce((sum, post) => {

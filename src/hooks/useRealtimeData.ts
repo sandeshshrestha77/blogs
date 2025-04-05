@@ -57,7 +57,7 @@ export function useRealtimeData<T>(options: UseRealtimeDataOptions) {
       // Add subscription to postgres changes
       channel
         .on(
-          'postgres_changes', // Using string literal instead of enum
+          'postgres_changes',
           {
             event: event,
             schema: 'public',
